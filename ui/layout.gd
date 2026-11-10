@@ -1,6 +1,6 @@
 extends RefCounted
 ## 화면 배치 계산 — 순수 함수: 창 픽셀의 안전 영역 → 기준 화면(canvas) 단위 여백, 넓은 화면(폴드 안쪽)인가, 틀 사각형(C2 frame).
-## 접는 폰은 실행 중 크기 · 비율이 바뀌어서 ui/home.gd 가 크기가 바뀔 때마다 부른다(CLAUDE.md 4절 화면).
+## 접는 폰은 실행 중 크기 · 비율이 바뀌어서 ui/app.gd 가 크기가 바뀔 때마다 부른다(CLAUDE.md 4절 화면).
 ## 요구: FR-107 · FR-201 · 설계: docs/C2_설계서_화면과명령.md 3절 · 시험: tests/unit/test_layout.gd · insets_from 은 castle_M3D src/ui/safe_area.gd 를 옮겼다.
 
 const WIDE_RATIO := 0.8          # 가로 ÷ 세로가 이보다 크면 넓은 화면(폴드 4 안쪽 약 6:5 = 0.83 · 커버 약 23:9 = 0.39)

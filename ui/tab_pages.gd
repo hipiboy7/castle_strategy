@@ -1,6 +1,6 @@
 extends RefCounted
 ## 아래 탭 내용 셋(조직 · 명령 · 기록) — 보기 사전을 그리기만 하고 누름은 신호로 올린다(ISP). 외교 · 원탁은 빈 상태 글(app).
-## 요구: FR-206(명령) · FR-209(조직) · FR-211(기록)
+## 요구: FR-206(명령) · FR-209(조직) · FR-211(기록 · 새 판)
 
 const View = preload("res://ui/view.gd")
 
@@ -107,6 +107,7 @@ class OrdersPage extends PanelContainer:
 
 class LogPage extends PanelContainer:
 	signal open_report(i: int)
+	signal new_game
 	var _v: VBoxContainer
 
 	func _ready() -> void:
@@ -127,5 +128,11 @@ class LogPage extends PanelContainer:
 			b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 			b.pressed.connect(open_report.emit.bind(i))
 			_v.add_child(b)
+		var n := Button.new()
+		n.text = "새 판으로(지금 판을 지운다)"
+		n.theme_type_variation = "TabButton"
+		n.custom_minimum_size = Vector2(0, 130)
+		n.pressed.connect(func() -> void: new_game.emit())
+		_v.add_child(n)
 		T._line(_v, "판 정보", "Label")
 		T._line(_v, info, "TinyLabel")

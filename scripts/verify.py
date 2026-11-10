@@ -41,7 +41,7 @@ COMMON_SRC = os.environ.get("CASTLE_COMMON") or os.path.join(os.path.dirname(ROO
 RECEIVES = ("data/*.json", "cases/*.json", "canon/*.json", "packs/strategy/*.json", "docs/개발규격/*.md")  # docs/castle_common_요청.md #14
 ASSETS = os.path.join(ROOT, "assets")
 GOLDEN = os.path.join(ROOT, "tests", "integration", "golden_a.json")   # 시나리오 A 26턴 기준 해시(seed → hash)
-# CLAUDE.md 3절 TDD 등급 — 함수 단위 커버리지를 재는 파일(화면 장면 ui/home.gd · 진입 src/main.gd 는 C · 화면 단계가 본다)
+# CLAUDE.md 3절 TDD 등급 — 함수 단위 커버리지를 재는 파일(화면 장면 ui/app.gd 와 부품 · 진입 src/main.gd 는 C · 화면 단계가 본다)
 COV_FILES = {
     "A": ["sim/rng.gd", "sim/hash.gd", "src/launch.gd", "ui/layout.gd",
           "sim/rules_common.gd", "sim/tables.gd", "sim/state.gd", "sim/fixed.gd", "sim/economy.gd", "sim/setup.gd",

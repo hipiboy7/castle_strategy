@@ -74,6 +74,7 @@ var _tab_btn := {}
 var _pages := {}
 var _confirm: ConfirmationDialog
 var _confirm_end: ConfirmationDialog
+var _confirm_new: ConfirmationDialog
 
 
 func _ready() -> void:
@@ -181,6 +182,7 @@ func _build() -> void:
 	_pages["orders"].clear_all.connect(_on_clear)
 	_pages["log"] = Pages.LogPage.new()
 	_pages["log"].open_report.connect(_open_report)
+	_pages["log"].new_game.connect(func() -> void: _confirm_new.popup_centered())
 	for k in SOON:
 		var p := PanelContainer.new()
 		var l := _label(SOON[k], "SmallLabel")
@@ -251,6 +253,8 @@ func _build() -> void:
 	_confirm.confirmed.connect(func() -> void: get_tree().quit())
 	_confirm_end = _dialog("대기 명령이 없습니다. 명령 없이 주를 끝낼까요?", "끝내기", "돌아가기")
 	_confirm_end.confirmed.connect(_end_week)
+	_confirm_new = _dialog("지금 판을 지우고 시나리오 A 를 1주부터 새로 시작할까요?", "새 판", "돌아가기")
+	_confirm_new.confirmed.connect(_new_game)
 
 
 func _dialog(text: String, ok: String, cancel: String) -> ConfirmationDialog:
@@ -436,6 +440,21 @@ func _on_end() -> void:
 	_end_week()
 
 
+## 새 판 — 지금 판(저장 · 대기 명령)을 버리고 A 1주부터(기록 탭 단추 · 확인 뒤)
+func _new_game() -> void:
+	_g = Game.new_game(_t, SCENARIO, SELF_SEED)
+	_draft = []
+	_zone = ""
+	_officer = ""
+	_sheet = ""
+	_tab = "map"
+	_phase = "play"
+	_note = "새 판 — 1주"
+	_save()
+	_relayout()
+	_refresh()
+
+
 ## 주 끝내기 — 내 조직 = 대기 명령 · 다른 조직 = AI → 저장 → 보고
 func _end_week() -> void:
 	if _phase != "play":
@@ -499,9 +518,10 @@ func _save() -> bool:
 
 ## 뒤로 — 열린 것부터 닫고(고르기 · 보고 → 카드 → 고른 간부 → 다른 탭), 다 닫혔으면 '끝낼까요?'
 func _back() -> void:
-	if _confirm.visible or _confirm_end.visible:
+	if _confirm.visible or _confirm_end.visible or _confirm_new.visible:
 		_confirm.hide()
 		_confirm_end.hide()
+		_confirm_new.hide()
 	elif _sheet != "":
 		_close_sheet()
 	elif _tab == "map" and _zone != "" and not _wide:
