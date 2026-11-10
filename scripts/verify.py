@@ -41,8 +41,9 @@ ASSETS = os.path.join(ROOT, "assets")
 VECTORS = os.path.join(ROOT, "tests", "unit", "rng_vectors.json")
 # CLAUDE.md 3절 TDD 등급 — 함수 단위 커버리지를 재는 파일(화면 장면 ui/home.gd · 진입 src/main.gd 는 C · 화면 단계가 본다)
 COV_FILES = {
-    "A": ["sim/rng.gd", "sim/hash.gd", "sim/stub_turn.gd", "src/launch.gd", "ui/layout.gd"],
-    "B": ["src/storage.gd"],
+    "A": ["sim/rng.gd", "sim/hash.gd", "sim/stub_turn.gd", "src/launch.gd", "ui/layout.gd",
+          "sim/rules_common.gd", "sim/tables.gd", "sim/state.gd"],
+    "B": ["src/storage.gd", "src/data_files.gd"],
 }
 COV_DIRS = ("sim", "src", "ui", "tests", "data")
 COV_MIN = {"A": 0.90, "B": 0.70}
