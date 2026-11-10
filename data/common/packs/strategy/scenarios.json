@@ -1,0 +1,4118 @@
+{
+  "_about": "전략 장르 팩(기획서 07 · 00 결정 9) — 전부 AI 후보(conf ai · provisional). 사용자 확정 전엔 게임에서 잠정 표시. work/pilot/strategy_pack.py(2026-11-05 65차 · 원본 다시 읽지 않음 — canon · 판독 기록 · status_by_ep) 명단은 status_by_ep 가 바뀌면 다시 만든다. 08 보강(90차): 시나리오마다 playable(고를 수 있는 조직 — 08 7절) · pillars(원탁 기둥) · assign(명단 위에 덮는 게임 배치) · 시나리오 P(파천 — 명단은 손으로). 구역 주인은 districts.json(zones 10개는 굵은 묶음 — 그대로 둠).",
+  "pillars_note": "B · C = 7기둥(pillars.json). D · E = 2부 '여섯 기둥'(`castle_hotel` 조직 note) — 구성은 2부 교류회 참가 조직(`arc:gyoryuhoe`)과 김신의 새 기둥 제안(p1:118)으로 봄(ai) · E 는 화진 몰락 뒤. F 는 IF — 고를 수 있는 열 조직 모두.",
+  "assign_note": "A · B 는 '김신 쪽 = 부진파 연합'(08 7절) — 원작 이 시점 김신 · 피우진은 무소속, 서진태 · 백도찬은 이스크라로 나온다(asof — canon 인물 소속). 신태진은 p1:031-036 뒤 김신 쪽에 머묾(`arc:p1_cheongsobu` 결말). 백도찬은 선진 대표.",
+  "zones": [
+    {"id": "hoeamsi", "name": "회암시", "parts": "부진 · 남구 · 시장"},
+    {"id": "seoul", "name": "서울", "parts": "영등포 · 강남 · 여의도"},
+    {"id": "incheon", "name": "인천항", "parts": ""},
+    {"id": "busan", "name": "부산", "parts": "해운대 · 반도"},
+    {"id": "chungnam", "name": "충남", "parts": "천안"},
+    {"id": "honam", "name": "호남", "parts": "목포"},
+    {"id": "vladivostok", "name": "블라디보스토크", "parts": ""},
+    {"id": "japan", "name": "요코하마/도쿄", "parts": "관서 포함"},
+    {"id": "hongkong", "name": "홍콩", "parts": ""},
+    {"id": "sea", "name": "동남아", "parts": ""}
+  ],
+  "scenarios": [
+    {
+      "id": "A",
+      "name": "귀국 — 회암시",
+      "at": {"part": "castle1", "ep": 7},
+      "range": "p1:002~p1:007",
+      "player": ["kimshin"],
+      "board": "회암시 군소 세력 — 작은 판 · 튜토리얼",
+      "factions": {"dssecurity": 3, "bujinpa": 2, "iskra": 2, "haseong": 1, "hyeoksindang": 1},
+      "roster": [
+        {
+          "id": "chasumin",
+          "faction": "bujinpa",
+          "role": "보스대리(전 보스 딸)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "icheolmin",
+          "faction": "bujinpa",
+          "role": "조직원 · 회암시 정보통",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "kimdaegeon",
+          "faction": "dssecurity",
+          "role": "이사 · 윤덕수의 오른팔",
+          "rank": "경호대급",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "kimseongjun",
+          "faction": "dssecurity",
+          "role": "폐차장 습격조 우두머리",
+          "rank": "네임드",
+          "learn": [],
+          "conf": "ai",
+          "rank_src": "data/characters.json",
+          "rank_provisional": true
+        },
+        {
+          "id": "yundeoksu",
+          "faction": "dssecurity",
+          "role": "대표(우두머리)",
+          "rank": "전국구",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "kimjaehoon",
+          "faction": "haseong",
+          "role": "하성건설 대표이사",
+          "rank": "건달급",
+          "learn": [],
+          "conf": "ai",
+          "rank_src": "data/characters.json"
+        },
+        {
+          "id": "kimseongyu",
+          "faction": "hyeoksindang",
+          "role": "대표 · 대선후보",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "jintae",
+          "faction": "iskra",
+          "role": "이스크라 출신 킬러 '사로카' · 김신의 오른팔",
+          "rank": "외성 하위",
+          "learn": ["jintae_storm", "jintae_vital"],
+          "conf": "ai"
+        },
+        {"id": "risa", "faction": "iskra", "role": "마담(청부 브로커)", "rank": null, "learn": [], "conf": "ai"},
+        {
+          "id": "gangmanjae",
+          "faction": null,
+          "role": null,
+          "rank": "네임드",
+          "learn": [],
+          "conf": "ai",
+          "rank_src": "data/characters.json",
+          "rank_provisional": true
+        },
+        {
+          "id": "gunter",
+          "faction": null,
+          "role": null,
+          "rank": "조장급",
+          "learn": [],
+          "conf": "ai",
+          "rank_src": "data/characters.json",
+          "rank_provisional": true
+        },
+        {
+          "id": "kimhyeokju",
+          "faction": null,
+          "role": null,
+          "rank": "네임드",
+          "learn": [],
+          "conf": "ai",
+          "rank_src": "data/characters.json",
+          "rank_provisional": true
+        },
+        {
+          "id": "kimshin",
+          "faction": null,
+          "role": "이스크라 출신 · 개인 복수",
+          "rank": "내성 중위",
+          "learn": ["amur_dash", "amur_triple", "amur_weaving", "jesus_zone", "kickarts", "vanish_step"],
+          "conf": "ai",
+          "rank_src": "data/characters.json"
+        },
+        {
+          "id": "woojin",
+          "faction": null,
+          "role": "전당포 · 강민성 첫 제자",
+          "rank": "경호대급",
+          "learn": ["woojin_core_counter"],
+          "conf": "ai"
+        }
+      ],
+      "zones": [
+        {
+          "zone": "hoeamsi",
+          "owner": "dssecurity",
+          "contested": ["bujinpa", "haseong"],
+          "why": "귀국 시점 회암시는 DS 씨큐리티가 외부 세력으로 눌러 앉고 부진파는 약해져 동맹으로 축출을 노림(추정)",
+          "refs": ["p1:002", "p1:011"],
+          "conf": "ai"
+        },
+        {"zone": "seoul", "owner": null, "contested": [], "why": "기록 없음", "refs": ["p1:007"], "conf": "ai"},
+        {"zone": "incheon", "owner": null, "contested": [], "why": "기록 없음", "refs": ["p1:007"], "conf": "ai"},
+        {"zone": "busan", "owner": null, "contested": [], "why": "기록 없음", "refs": ["p1:007"], "conf": "ai"},
+        {"zone": "chungnam", "owner": null, "contested": [], "why": "기록 없음", "refs": ["p1:007"], "conf": "ai"},
+        {"zone": "honam", "owner": null, "contested": [], "why": "기록 없음", "refs": ["p1:007"], "conf": "ai"},
+        {
+          "zone": "vladivostok",
+          "owner": "iskra",
+          "contested": [],
+          "why": "김신이 출발한 러시아 근거지로 이스크라 킬러 소속 인물이 나옴",
+          "refs": ["p1:002"],
+          "conf": "ai"
+        },
+        {"zone": "japan", "owner": null, "contested": [], "why": "기록 없음", "refs": ["p1:007"], "conf": "ai"},
+        {"zone": "hongkong", "owner": null, "contested": [], "why": "기록 없음", "refs": ["p1:007"], "conf": "ai"},
+        {"zone": "sea", "owner": null, "contested": [], "why": "기록 없음", "refs": ["p1:007"], "conf": "ai"}
+      ],
+      "src": "명단 = tools/asof.py(canon status_by_ep) · 구역 = 서브에이전트 후보",
+      "conf": "ai",
+      "provisional": true,
+      "playable": ["bujinpa"],
+      "pillars": [],
+      "assign": [
+        {"id": "kimshin", "faction": "bujinpa", "post": "boss"},
+        {"id": "jintae", "faction": "bujinpa"},
+        {"id": "woojin", "faction": "bujinpa"}
+      ]
+    },
+    {
+      "id": "B",
+      "name": "일곱 기둥 하나",
+      "at": {"part": "castle1", "ep": 37},
+      "range": "p1:033~p1:037",
+      "player": ["kimshin", "kimtaehoon"],
+      "board": "7기둥 원탁 — 6개월 시한(p1:034)",
+      "factions": {
+        "haseong": 7,
+        "iskra": 6,
+        "bujinpa": 5,
+        "namgucheongnyeonhoe": 4,
+        "dssecurity": 2,
+        "hwajin": 2,
+        "sunjin": 2,
+        "castle_holdings": 1,
+        "castle_hotel": 1,
+        "gold": 1,
+        "guilhwapa": 1,
+        "hyeoksindang": 1,
+        "mori": 1,
+        "scale": 1
+      },
+      "roster": [
+        {
+          "id": "chasumin",
+          "faction": "bujinpa",
+          "role": "보스대리(전 보스 딸)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "icheolmin",
+          "faction": "bujinpa",
+          "role": "조직원 · 회암시 정보통",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {"id": "ilguk", "faction": "bujinpa", "role": "보스(당시)", "rank": null, "learn": [], "conf": "ai"},
+        {
+          "id": "kimdaegeon",
+          "faction": "bujinpa",
+          "role": "김신 일파 · 회암시 사업 관리자(부진파 연합)",
+          "rank": "경호대급",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "kimshin",
+          "faction": "bujinpa",
+          "role": "동맹 주도",
+          "rank": "내성 중위",
+          "learn": ["amur_dash", "amur_triple", "amur_weaving", "jesus_zone", "kickarts", "vanish_step"],
+          "conf": "ai",
+          "rank_src": "data/characters.json"
+        },
+        {
+          "id": "choeminuk",
+          "faction": "castle_holdings",
+          "role": "회장(캐슬 정점 · 7기둥 대표격)",
+          "rank": "내성 중위",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "cheonildo",
+          "faction": "castle_hotel",
+          "role": "호텔 캐슬 대표 · 캐슬 원로",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "jangho",
+          "faction": "dssecurity",
+          "role": "김대건 부하",
+          "rank": "그 아래급",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "kimseongjun",
+          "faction": "dssecurity",
+          "role": "폐차장 습격조 우두머리",
+          "rank": "네임드",
+          "learn": [],
+          "conf": "ai",
+          "rank_src": "data/characters.json",
+          "rank_provisional": true
+        },
+        {
+          "id": "choedalcheon",
+          "faction": "gold",
+          "role": "사장(골드 캐피털 최강 주먹)",
+          "rank": "외성 중위",
+          "learn": [],
+          "conf": "ai",
+          "early": "p1:059"
+        },
+        {
+          "id": "kimhwang",
+          "faction": "gold",
+          "role": "골드 캐피털 회장 · 캐슬 기둥",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "guilhwa",
+          "faction": "guilhwapa",
+          "role": "충남 지역 실력자",
+          "rank": "전국구",
+          "learn": ["guilhwa_forearm", "guilhwa_headbutt"],
+          "conf": "ai",
+          "rank_src": "data/characters.json"
+        },
+        {
+          "id": "mahakyoung",
+          "faction": "gyeonghodae",
+          "role": "경호대장 · 캐슬홀딩스 전무",
+          "rank": "톱",
+          "learn": [],
+          "conf": "ai",
+          "early": "p1:045"
+        },
+        {
+          "id": "gangchangseok",
+          "faction": "haseong",
+          "role": "하성 쪽으로 옮겨 김재훈에게 보고",
+          "rank": "그 아래급",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "hwangbomincheol",
+          "faction": "haseong",
+          "role": "부장(로비 대장)",
+          "rank": "전국구",
+          "learn": ["hwangbo_bait", "hwangbo_face_counter"],
+          "conf": "ai"
+        },
+        {
+          "id": "kimjaehoon",
+          "faction": "haseong",
+          "role": "하성건설 대표이사",
+          "rank": "건달급",
+          "learn": [],
+          "conf": "ai",
+          "rank_src": "data/characters.json"
+        },
+        {"id": "kimtaehoon", "faction": "haseong", "role": "하성그룹 회장", "rank": null, "learn": [], "conf": "ai"},
+        {
+          "id": "kimyongseong",
+          "faction": "haseong",
+          "role": "전 회장 · 명예회장 (일선 뒤 실권 유지)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "ojiin",
+          "faction": "haseong",
+          "role": "실장 · 회장 김태훈 측근",
+          "rank": "경호대급",
+          "learn": ["ojiin_skirt_dagger"],
+          "conf": "ai"
+        },
+        {
+          "id": "ryujihak",
+          "faction": "haseong",
+          "role": "하성 제일 실력자(경호 · 킬러)",
+          "rank": "내성 하위",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "lingling",
+          "faction": "hwajin",
+          "role": "유우성 특수경호원",
+          "rank": "외성 하위",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "yuwoosung",
+          "faction": "hwajin",
+          "role": "화진기획 대표 · 삼합회 흑룡지부 간부 출신",
+          "rank": "내성 하위",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "kimseongyu",
+          "faction": "hyeoksindang",
+          "role": "대표 · 대선후보",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "baekdochan",
+          "faction": "iskra",
+          "role": "코드명 파이톤 · 선진 대표 · 스케일 킬러단 지휘 · 캐슬 홀딩스의 한 축",
+          "rank": "톱",
+          "learn": ["baek_sidekick", "baek_vital", "baek_wide", "offbeat"],
+          "conf": "ai"
+        },
+        {
+          "id": "jintae",
+          "faction": "iskra",
+          "role": "이스크라 출신 킬러 '사로카' · 김신의 오른팔",
+          "rank": "외성 하위",
+          "learn": ["jintae_storm", "jintae_vital"],
+          "conf": "ai"
+        },
+        {"id": "keurisa", "faction": "iskra", "role": "킬러", "rank": "준10강", "learn": [], "conf": "ai"},
+        {
+          "id": "krot",
+          "faction": "iskra",
+          "role": "한국 · 일본 브로커",
+          "rank": "이스크라 평 킬러급",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "medvedi",
+          "faction": "iskra",
+          "role": "클럽 발레리노 수장",
+          "rank": "외성 상위",
+          "learn": [],
+          "conf": "ai"
+        },
+        {"id": "risa", "faction": "iskra", "role": "마담(청부 브로커)", "rank": null, "learn": [], "conf": "ai"},
+        {
+          "id": "hide",
+          "faction": "mori",
+          "role": "오도화의 오른팔 · 잠입자(전 니시지마구미)",
+          "rank": "외성 중위",
+          "learn": [],
+          "conf": "ai",
+          "early": "p1:060"
+        },
+        {
+          "id": "immuyeol",
+          "faction": "mori",
+          "role": "수장(타케바야시 구미)",
+          "rank": "준10강",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "masa",
+          "faction": "mori",
+          "role": "오도화의 최측근 부하",
+          "rank": "이스크라 평 킬러급",
+          "learn": [],
+          "conf": "ai",
+          "early": "p1:045"
+        },
+        {
+          "id": "moseunggyu",
+          "faction": "mori",
+          "role": "부산 거처 실무 책임",
+          "rank": "전국구",
+          "learn": [],
+          "conf": "ai",
+          "early": "p1:040"
+        },
+        {
+          "id": "odohwa",
+          "faction": "mori",
+          "role": "부대표(해결사)",
+          "rank": "내성 하위",
+          "learn": [],
+          "conf": "ai",
+          "early": "p1:040"
+        },
+        {
+          "id": "pyoyoung",
+          "faction": "mori",
+          "role": "부산 관리 말단(위장 투항)",
+          "rank": "전국구",
+          "learn": [],
+          "conf": "ai",
+          "early": "p1:042"
+        },
+        {
+          "id": "insu",
+          "faction": "namgucheongnyeonhoe",
+          "role": "2인자",
+          "rank": "그 아래급",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "iseul",
+          "faction": "namgucheongnyeonhoe",
+          "role": "회장",
+          "rank": "전국구",
+          "learn": ["iseul_double_slam", "iseul_throw"],
+          "conf": "ai"
+        },
+        {
+          "id": "namyong",
+          "faction": "namgucheongnyeonhoe",
+          "role": "회원",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "wonyong",
+          "faction": "namgucheongnyeonhoe",
+          "role": "회원",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {"id": "komodo", "faction": "scale", "role": "킬러단 간부", "rank": "외성 하위", "learn": [], "conf": "ai"},
+        {
+          "id": "barista",
+          "faction": "sunjin",
+          "role": "백도찬의 왼팔 · 약 거래 간부",
+          "rank": "준10강",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "namgunghyuk",
+          "faction": "sunjin",
+          "role": "이사 · 백도찬의 오른팔",
+          "rank": "외성 하위",
+          "learn": ["namgung_knuckle_counter", "namgung_knuckle_hook"],
+          "conf": "ai"
+        },
+        {
+          "id": "dojiung",
+          "faction": null,
+          "role": "김신 쪽에 협력한 삼겹살집 주인(남구 청년회 회장 이슬의 선배)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "gangmanjae",
+          "faction": null,
+          "role": null,
+          "rank": "네임드",
+          "learn": [],
+          "conf": "ai",
+          "rank_src": "data/characters.json",
+          "rank_provisional": true
+        },
+        {
+          "id": "gunter",
+          "faction": null,
+          "role": null,
+          "rank": "조장급",
+          "learn": [],
+          "conf": "ai",
+          "rank_src": "data/characters.json",
+          "rank_provisional": true
+        },
+        {"id": "gusanghun", "faction": null, "role": null, "rank": null, "learn": [], "conf": "ai"},
+        {
+          "id": "iriwon",
+          "faction": null,
+          "role": "가게 주인(치료를 해 주는 여자)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "kimhyeokju",
+          "faction": null,
+          "role": null,
+          "rank": "네임드",
+          "learn": [],
+          "conf": "ai",
+          "rank_src": "data/characters.json",
+          "rank_provisional": true
+        },
+        {
+          "id": "sintaejin",
+          "faction": null,
+          "role": "하성 이탈 · 도피 중",
+          "rank": "준10강",
+          "learn": ["sintaejin_pistol", "sintaejin_second_blade", "sintaejin_sweep"],
+          "conf": "ai"
+        },
+        {
+          "id": "woojin",
+          "faction": null,
+          "role": "전당포 · 강민성 첫 제자",
+          "rank": "경호대급",
+          "learn": ["woojin_core_counter"],
+          "conf": "ai"
+        },
+        {"id": "yusehui", "faction": null, "role": "고교생", "rank": null, "learn": [], "conf": "ai"}
+      ],
+      "zones": [
+        {
+          "zone": "hoeamsi",
+          "owner": "bujinpa",
+          "contested": [],
+          "why": "DS가 무릎 꿇고 김신 일파가 회암시의 새 주인이 됨",
+          "refs": ["p1:020"],
+          "conf": "ai"
+        },
+        {
+          "zone": "seoul",
+          "owner": "haseong",
+          "contested": ["castle_holdings"],
+          "why": "하성 본사 습격 이후에도 하성이 서울 판의 큰 세력, 캐슬 홀딩스가 그 위에 있음",
+          "refs": ["p1:030", "p1:036"],
+          "conf": "ai"
+        },
+        {"zone": "incheon", "owner": null, "contested": [], "why": "기록 없음", "refs": ["p1:037"], "conf": "ai"},
+        {"zone": "busan", "owner": null, "contested": [], "why": "기록 없음", "refs": ["p1:037"], "conf": "ai"},
+        {
+          "zone": "chungnam",
+          "owner": "namgucheongnyeonhoe",
+          "contested": [],
+          "why": "천안 구일화를 규합하는 원정에 성공(남구희망청년회 조직으로 표시)",
+          "refs": ["p1:037", "p1:039"],
+          "conf": "ai"
+        },
+        {"zone": "honam", "owner": null, "contested": [], "why": "기록 없음", "refs": ["p1:037"], "conf": "ai"},
+        {
+          "zone": "vladivostok",
+          "owner": "iskra",
+          "contested": [],
+          "why": "피우진이 러시아로 가 이스크라 발레리노 시험을 받는 무대",
+          "refs": ["p1:039"],
+          "conf": "ai"
+        },
+        {"zone": "japan", "owner": null, "contested": [], "why": "기록 없음", "refs": ["p1:037"], "conf": "ai"},
+        {"zone": "hongkong", "owner": null, "contested": [], "why": "기록 없음", "refs": ["p1:037"], "conf": "ai"},
+        {"zone": "sea", "owner": null, "contested": [], "why": "기록 없음", "refs": ["p1:037"], "conf": "ai"}
+      ],
+      "src": "명단 = tools/asof.py(canon status_by_ep) · 구역 = 서브에이전트 후보",
+      "conf": "ai",
+      "provisional": true,
+      "early_note": "early 가 붙은 줄 = 시작 시점엔 아직 안 나왔지만 그 기둥 명단이 두목 하나뿐이라 미리 둔 사람(원작 첫 등장 화 · 그 범위 끝 시점의 소속 · 등급) — 08 3-3 '간부 = 행동력'(castle_strategy 요청 #26 · 2026-11-10). 게임은 early 화가 되기 전엔 숨겨 둬도 된다",
+      "playable": [
+        "bujinpa",
+        "castle_holdings",
+        "castle_hotel",
+        "gold",
+        "mori",
+        "hwajin",
+        "haseong",
+        "sunjin"
+      ],
+      "pillars": ["castle_holdings", "castle_hotel", "gold", "mori", "hwajin", "haseong", "sunjin"],
+      "assign": [
+        {"id": "kimshin", "faction": "bujinpa", "post": "boss"},
+        {"id": "jintae", "faction": "bujinpa"},
+        {"id": "woojin", "faction": "bujinpa"},
+        {"id": "sintaejin", "faction": "bujinpa"},
+        {"id": "baekdochan", "faction": "sunjin", "post": "boss"}
+      ]
+    },
+    {
+      "id": "C",
+      "name": "세 기둥 전쟁",
+      "at": {"part": "castle1", "ep": 89},
+      "range": "p1:089",
+      "player": ["kimshin"],
+      "board": "인천항 · 모리 빌딩 · 골드캐피탈",
+      "factions": {
+        "baekui": 12,
+        "iskra": 12,
+        "haseong": 7,
+        "mori": 6,
+        "bandopa": 3,
+        "namgucheongnyeonhoe": 3,
+        "bujinpa": 2,
+        "bulhwi": 2,
+        "gold": 2,
+        "hwajin": 2,
+        "castle_holdings": 1,
+        "castle_hotel": 1,
+        "chagaunpi": 1,
+        "gyeonghodae": 1,
+        "hyeoksindang": 1,
+        "scale": 1,
+        "sunjin": 1,
+        "tteugeounpi": 1,
+        "wangdokpilpa": 1
+      },
+      "roster": [
+        {
+          "id": "bakcheolgyu",
+          "faction": "baekui",
+          "role": "수원 남문OB파 보스 · 백의 간부",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {"id": "chasumin", "faction": "baekui", "role": "간부", "rank": null, "learn": [], "conf": "ai"},
+        {"id": "dohaksu", "faction": "baekui", "role": "포항 세력 대표", "rank": "전국구", "learn": [], "conf": "ai"},
+        {
+          "id": "eogwangdeuk",
+          "faction": "baekui",
+          "role": "대구 동성로 세력 간부",
+          "rank": "전국구",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "guilhwa",
+          "faction": "baekui",
+          "role": "천안 쪽 간부",
+          "rank": "전국구",
+          "learn": ["guilhwa_forearm", "guilhwa_headbutt"],
+          "conf": "ai",
+          "rank_src": "data/characters.json"
+        },
+        {
+          "id": "iseul",
+          "faction": "baekui",
+          "role": "돌격 선봉 · 간부",
+          "rank": "전국구",
+          "learn": ["iseul_double_slam", "iseul_throw"],
+          "conf": "ai"
+        },
+        {
+          "id": "jintae",
+          "faction": "baekui",
+          "role": "김신 호위 · 측근",
+          "rank": "외성 하위",
+          "learn": ["jintae_storm", "jintae_vital"],
+          "conf": "ai"
+        },
+        {
+          "id": "kimseongjun",
+          "faction": "baekui",
+          "role": "백의 쪽 지휘",
+          "rank": "네임드",
+          "learn": [],
+          "conf": "ai",
+          "rank_src": "data/characters.json",
+          "rank_provisional": true
+        },
+        {
+          "id": "kimshin",
+          "faction": "baekui",
+          "role": "우두머리",
+          "rank": "내성 상위",
+          "learn": ["amur_dash", "amur_triple", "amur_weaving", "jesus_zone", "kickarts", "vanish_step"],
+          "conf": "ai"
+        },
+        {
+          "id": "ttolbae",
+          "faction": "baekui",
+          "role": "백의 결성 때 편입",
+          "rank": "경호대급",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "woojin",
+          "faction": "baekui",
+          "role": "김신 호위 · 동료",
+          "rank": "경호대급",
+          "learn": ["woojin_core_counter"],
+          "conf": "ai"
+        },
+        {
+          "id": "yeominsu",
+          "faction": "baekui",
+          "role": "순천 세력 대표 · 간부",
+          "rank": "전국구",
+          "learn": [],
+          "conf": "ai"
+        },
+        {"id": "neopchi", "faction": "bandopa", "role": "서정치 대리인", "rank": null, "learn": [], "conf": "ai"},
+        {
+          "id": "seojeongchi",
+          "faction": "bandopa",
+          "role": "표영을 보스로 따르는 측근",
+          "rank": "전국구",
+          "learn": [],
+          "conf": "ai"
+        },
+        {"id": "songikcheon", "faction": "bandopa", "role": "간부", "rank": "그 아래급", "learn": [], "conf": "ai"},
+        {
+          "id": "icheolmin",
+          "faction": "bujinpa",
+          "role": "조직원 · 회암시 정보통",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {"id": "ilguk", "faction": "bujinpa", "role": "보스(당시)", "rank": null, "learn": [], "conf": "ai"},
+        {
+          "id": "ihwan",
+          "faction": "bulhwi",
+          "role": "불휘 단장(회상 당시 부단장)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "namilho",
+          "faction": "bulhwi",
+          "role": "칼잡이(표영의 일호 삼촌)",
+          "rank": "이스크라 평 킬러급",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "choeminuk",
+          "faction": "castle_holdings",
+          "role": "회장(캐슬 정점 · 7기둥 대표격)",
+          "rank": "내성 중위",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "cheonildo",
+          "faction": "castle_hotel",
+          "role": "호텔 캐슬 대표 · 캐슬 원로",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "blackmamba",
+          "faction": "chagaunpi",
+          "role": "킬러(차가운 피 팀) · 리사 쪽 도우미",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "choedalcheon",
+          "faction": "gold",
+          "role": "사장(골드 캐피털 최강 주먹)",
+          "rank": "외성 중위",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "kimhwang",
+          "faction": "gold",
+          "role": "골드 캐피털 회장 · 캐슬 기둥",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "mahakyoung",
+          "faction": "gyeonghodae",
+          "role": "경호대장 · 캐슬홀딩스 전무",
+          "rank": "톱",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "gangchangseok",
+          "faction": "haseong",
+          "role": "하성 쪽으로 옮겨 김재훈에게 보고",
+          "rank": "그 아래급",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "hwangbomincheol",
+          "faction": "haseong",
+          "role": "부장(로비 대장)",
+          "rank": "전국구",
+          "learn": ["hwangbo_bait", "hwangbo_face_counter"],
+          "conf": "ai"
+        },
+        {
+          "id": "kimjaehoon",
+          "faction": "haseong",
+          "role": "하성건설 대표이사",
+          "rank": "건달급",
+          "learn": [],
+          "conf": "ai",
+          "rank_src": "data/characters.json"
+        },
+        {"id": "kimtaehoon", "faction": "haseong", "role": "하성그룹 회장", "rank": null, "learn": [], "conf": "ai"},
+        {
+          "id": "kimyongseong",
+          "faction": "haseong",
+          "role": "전 회장 · 명예회장 (일선 뒤 실권 유지)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "ojiin",
+          "faction": "haseong",
+          "role": "실장 · 회장 김태훈 측근",
+          "rank": "경호대급",
+          "learn": ["ojiin_skirt_dagger"],
+          "conf": "ai"
+        },
+        {
+          "id": "ryujihak",
+          "faction": "haseong",
+          "role": "하성 제일 실력자(경호 · 킬러)",
+          "rank": "내성 하위",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "lingling",
+          "faction": "hwajin",
+          "role": "유우성 특수경호원",
+          "rank": "외성 하위",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "yuwoosung",
+          "faction": "hwajin",
+          "role": "화진기획 대표 · 삼합회 흑룡지부 간부 출신",
+          "rank": "내성 하위",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "kimseongyu",
+          "faction": "hyeoksindang",
+          "role": "대표 · 대선후보",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "akila",
+          "faction": "iskra",
+          "role": "이스크라 킬러(프리깃의 대장)",
+          "rank": "내성 상위",
+          "learn": ["jesus_zone"],
+          "conf": "ai",
+          "rank_src": "data/characters.json"
+        },
+        {
+          "id": "baekdochan",
+          "faction": "iskra",
+          "role": "코드명 파이톤 · 선진 대표 · 스케일 킬러단 지휘 · 캐슬 홀딩스의 한 축",
+          "rank": "톱",
+          "learn": ["baek_sidekick", "baek_vital", "baek_wide", "offbeat"],
+          "conf": "ai"
+        },
+        {
+          "id": "gustav",
+          "faction": "iskra",
+          "role": "이스크라 최상위 킬러",
+          "rank": "내성 상위",
+          "learn": [],
+          "conf": "ai"
+        },
+        {"id": "keurisa", "faction": "iskra", "role": "킬러", "rank": "준10강", "learn": [], "conf": "ai"},
+        {
+          "id": "krot",
+          "faction": "iskra",
+          "role": "한국 · 일본 브로커",
+          "rank": "이스크라 평 킬러급",
+          "learn": [],
+          "conf": "ai"
+        },
+        {"id": "marina", "faction": "iskra", "role": "정보원", "rank": null, "learn": [], "conf": "ai"},
+        {
+          "id": "medvedi",
+          "faction": "iskra",
+          "role": "클럽 발레리노 수장",
+          "rank": "외성 상위",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "peurikit",
+          "faction": "iskra",
+          "role": "킬러(아킬라 아래)",
+          "rank": "준10강",
+          "learn": [],
+          "conf": "ai"
+        },
+        {"id": "risa", "faction": "iskra", "role": "마담(청부 브로커)", "rank": null, "learn": [], "conf": "ai"},
+        {"id": "shamo", "faction": "iskra", "role": "킬러", "rank": null, "learn": [], "conf": "ai"},
+        {"id": "shire", "faction": "iskra", "role": "크로트 수행 부하", "rank": "전국구", "learn": [], "conf": "ai"},
+        {"id": "vasily", "faction": "iskra", "role": "클럽 발레리노 파이터", "rank": "전국구", "learn": [], "conf": "ai"},
+        {
+          "id": "hide",
+          "faction": "mori",
+          "role": "오도화의 오른팔 · 잠입자(전 니시지마구미)",
+          "rank": "외성 중위",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "immuyeol",
+          "faction": "mori",
+          "role": "수장(타케바야시 구미)",
+          "rank": "준10강",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "masa",
+          "faction": "mori",
+          "role": "오도화의 최측근 부하",
+          "rank": "이스크라 평 킬러급",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "moseunggyu",
+          "faction": "mori",
+          "role": "부산 거처 실무 책임",
+          "rank": "전국구",
+          "learn": [],
+          "conf": "ai"
+        },
+        {"id": "odohwa", "faction": "mori", "role": "부대표(해결사)", "rank": "내성 하위", "learn": [], "conf": "ai"},
+        {
+          "id": "pyoyoung",
+          "faction": "mori",
+          "role": "부산 관리 말단(위장 투항)",
+          "rank": "전국구",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "insu",
+          "faction": "namgucheongnyeonhoe",
+          "role": "2인자",
+          "rank": "그 아래급",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "namyong",
+          "faction": "namgucheongnyeonhoe",
+          "role": "회원",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "wonyong",
+          "faction": "namgucheongnyeonhoe",
+          "role": "회원",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {"id": "komodo", "faction": "scale", "role": "킬러단 간부", "rank": "외성 하위", "learn": [], "conf": "ai"},
+        {
+          "id": "namgunghyuk",
+          "faction": "sunjin",
+          "role": "이사 · 백도찬의 오른팔",
+          "rank": "외성 하위",
+          "learn": ["namgung_knuckle_counter", "namgung_knuckle_hook"],
+          "conf": "ai"
+        },
+        {
+          "id": "ratel",
+          "faction": "tteugeounpi",
+          "role": "킬러(이스크라 뜨거운 피 소속)",
+          "rank": "외성 하위",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "wangdokpil",
+          "faction": "wangdokpilpa",
+          "role": "대전 대보스 (캐슬에 당함)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {"id": "alleksya", "faction": null, "role": null, "rank": null, "learn": [], "conf": "ai"},
+        {
+          "id": "bulgom",
+          "faction": null,
+          "role": null,
+          "rank": "네임드",
+          "learn": [],
+          "conf": "ai",
+          "rank_src": "data/characters.json",
+          "rank_provisional": true
+        },
+        {"id": "carlo", "faction": null, "role": null, "rank": null, "learn": [], "conf": "ai"},
+        {
+          "id": "dojiung",
+          "faction": null,
+          "role": "김신 쪽에 협력한 삼겹살집 주인(남구 청년회 회장 이슬의 선배)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "gangmanjae",
+          "faction": null,
+          "role": null,
+          "rank": "네임드",
+          "learn": [],
+          "conf": "ai",
+          "rank_src": "data/characters.json",
+          "rank_provisional": true
+        },
+        {"id": "gimyeonggyun", "faction": null, "role": null, "rank": null, "learn": [], "conf": "ai"},
+        {
+          "id": "gunter",
+          "faction": null,
+          "role": null,
+          "rank": "조장급",
+          "learn": [],
+          "conf": "ai",
+          "rank_src": "data/characters.json",
+          "rank_provisional": true
+        },
+        {"id": "gusanghun", "faction": null, "role": null, "rank": null, "learn": [], "conf": "ai"},
+        {
+          "id": "iriwon",
+          "faction": null,
+          "role": "가게 주인(치료를 해 주는 여자)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {"id": "janghun", "faction": null, "role": null, "rank": null, "learn": [], "conf": "ai"},
+        {
+          "id": "jeongseono",
+          "faction": null,
+          "role": "무소속(부산 — 부산지부 이전)",
+          "rank": "그 아래급",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "kimhyeokju",
+          "faction": null,
+          "role": null,
+          "rank": "네임드",
+          "learn": [],
+          "conf": "ai",
+          "rank_src": "data/characters.json",
+          "rank_provisional": true
+        },
+        {"id": "monkey", "faction": null, "role": null, "rank": null, "learn": [], "conf": "ai"},
+        {"id": "ogyudong", "faction": null, "role": null, "rank": null, "learn": [], "conf": "ai"},
+        {"id": "seungyeong", "faction": null, "role": "표영의 오락실 패거리", "rank": null, "learn": [], "conf": "ai"},
+        {"id": "yusehui", "faction": null, "role": "고교생", "rank": null, "learn": [], "conf": "ai"}
+      ],
+      "zones": [
+        {
+          "zone": "hoeamsi",
+          "owner": "baekui",
+          "contested": ["haseong"],
+          "why": "백의 결성 후 회암시 부진파가 김신 일파로 결속, 하성은 속으로 제거를 품음",
+          "refs": ["p1:068", "p1:088"],
+          "conf": "ai"
+        },
+        {
+          "zone": "seoul",
+          "owner": "haseong",
+          "contested": ["castle_holdings"],
+          "why": "하성이 서울 기반 큰 세력, 캐슬 홀딩스(최민욱)가 위에 있음",
+          "refs": ["p1:068", "p1:098"],
+          "conf": "ai"
+        },
+        {
+          "zone": "incheon",
+          "owner": "sunjin",
+          "contested": ["baekui", "iskra"],
+          "why": "백도찬(선진 대표)이 인천항 제3부두로 김신을 불러 결전을 연다",
+          "refs": ["p1:085", "p1:089"],
+          "conf": "ai"
+        },
+        {
+          "zone": "busan",
+          "owner": "mori",
+          "contested": ["bulhwi", "bandopa", "baekui"],
+          "why": "표영이 모리 밑 관리로 위장 투항해 부산은 모리(오도화)가 쥠, 불휘 · 표영 쪽이 노림",
+          "refs": ["p1:053", "p1:092"],
+          "conf": "ai"
+        },
+        {
+          "zone": "chungnam",
+          "owner": "baekui",
+          "contested": [],
+          "why": "구일화가 백의 간부로 소속(천안 쪽 간부)",
+          "refs": ["p1:037", "p1:088"],
+          "conf": "ai"
+        },
+        {
+          "zone": "honam",
+          "owner": "baekui",
+          "contested": [],
+          "why": "호남 신흥 주먹 여민수를 김신 쪽에 영입하는 규합",
+          "refs": ["p1:059", "p1:075"],
+          "conf": "ai"
+        },
+        {
+          "zone": "vladivostok",
+          "owner": "iskra",
+          "contested": [],
+          "why": "피우진 졸업 · 아킬라 등 이스크라 본거지",
+          "refs": ["p1:069", "p1:075"],
+          "conf": "ai"
+        },
+        {
+          "zone": "japan",
+          "owner": "mori",
+          "contested": [],
+          "why": "타케바야시 구미(임무열) 본거지가 일본, 오도화 · 히데도 일본 출신(추정)",
+          "refs": ["p1:092", "p1:098"],
+          "conf": "ai"
+        },
+        {
+          "zone": "hongkong",
+          "owner": "hwajin",
+          "contested": ["samhaphoe"],
+          "why": "유우성의 화진이 삼합회 패권 전쟁으로 홍콩 장악을 노림",
+          "refs": ["p1:076", "p1:077"],
+          "conf": "ai"
+        },
+        {
+          "zone": "sea",
+          "owner": "sunjin",
+          "contested": ["haseong"],
+          "why": "신태진 창고전 동남아 무대, 선진 · 하성이 다툼(근거 약함)",
+          "refs": ["p1:054", "p1:065"],
+          "conf": "ai"
+        }
+      ],
+      "src": "명단 = tools/asof.py(canon status_by_ep) · 구역 = 서브에이전트 후보",
+      "conf": "ai",
+      "provisional": true,
+      "playable": ["baekui", "haseong", "sunjin", "mori", "gold"],
+      "pillars": ["castle_holdings", "castle_hotel", "gold", "mori", "hwajin", "haseong", "sunjin"],
+      "assign": [{"id": "baekdochan", "faction": "sunjin", "post": "boss"}]
+    },
+    {
+      "id": "D",
+      "name": "화진전",
+      "at": {"part": "castle2", "ep": 34},
+      "range": "034",
+      "player": ["kimshin"],
+      "board": "서울 · 회암시 · 홍콩",
+      "factions": {
+        "baekui": 12,
+        "iskra": 10,
+        "haseong": 9,
+        "castle_holdings": 5,
+        "hwajin": 5,
+        "iwashirogumi": 5,
+        "busanseryeok": 4,
+        "gyeonghodae": 3,
+        "iskra_wonrowon": 3,
+        "mori": 3,
+        "namgucheongnyeonhoe": 3,
+        "tteugeounpi": 3,
+        "bujinpa": 2,
+        "castle_hotel": 2,
+        "bandopa": 1,
+        "bulhwi": 1,
+        "chagaunpi": 1,
+        "chiseongdae": 1,
+        "daeguk_amsaljo": 1,
+        "gold": 1,
+        "hyeoksindang": 1,
+        "sacheonwang": 1,
+        "scale": 1,
+        "seongnamjeilpa": 1,
+        "suwonnammunobpa": 1,
+        "wangdokpilpa": 1
+      },
+      "roster": [
+        {
+          "id": "choehyeokjin",
+          "faction": "baekui",
+          "role": "해외 파견직 현장 책임자",
+          "rank": "전국구",
+          "learn": [],
+          "conf": "ai"
+        },
+        {"id": "dohaksu", "faction": "baekui", "role": "포항 세력 대표", "rank": "전국구", "learn": [], "conf": "ai"},
+        {
+          "id": "eogwangdeuk",
+          "faction": "baekui",
+          "role": "대구 동성로 세력 간부",
+          "rank": "전국구",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "guilhwa",
+          "faction": "baekui",
+          "role": "천안 쪽 간부",
+          "rank": "전국구",
+          "learn": ["guilhwa_forearm", "guilhwa_headbutt"],
+          "conf": "ai"
+        },
+        {
+          "id": "imjongtae",
+          "faction": "baekui",
+          "role": "밀항 · 보트 담당 협력자",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "iseul",
+          "faction": "baekui",
+          "role": "돌격 선봉 · 간부",
+          "rank": "전국구",
+          "learn": ["iseul_double_slam", "iseul_throw"],
+          "conf": "ai"
+        },
+        {
+          "id": "jintae",
+          "faction": "baekui",
+          "role": "김신 호위 · 측근",
+          "rank": "외성 상위",
+          "learn": ["jintae_storm", "jintae_vital", "jin_original"],
+          "conf": "ai"
+        },
+        {
+          "id": "kimseongjun",
+          "faction": "baekui",
+          "role": "백의 쪽 지휘",
+          "rank": "네임드",
+          "learn": [],
+          "conf": "ai",
+          "rank_src": "data/characters.json",
+          "rank_provisional": true
+        },
+        {
+          "id": "kimshin",
+          "faction": "baekui",
+          "role": "우두머리",
+          "rank": "톱",
+          "learn": [
+            "amur_dash",
+            "amur_triple",
+            "amur_weaving",
+            "jesus_zone",
+            "kickarts",
+            "vanish_step",
+            "offbeat",
+            "offbeat2",
+            "offbeat_rev"
+          ],
+          "conf": "ai"
+        },
+        {
+          "id": "ttolbae",
+          "faction": "baekui",
+          "role": "백의 결성 때 편입",
+          "rank": "경호대급",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "woojin",
+          "faction": "baekui",
+          "role": "해외 새 지부장",
+          "rank": "준10강",
+          "learn": ["woojin_core_counter"],
+          "conf": "ai"
+        },
+        {
+          "id": "yeominsu",
+          "faction": "baekui",
+          "role": "순천 세력 대표 · 간부",
+          "rank": "이스크라 평 킬러급",
+          "learn": [],
+          "conf": "ai"
+        },
+        {"id": "songikcheon", "faction": "bandopa", "role": "간부", "rank": "그 아래급", "learn": [], "conf": "ai"},
+        {
+          "id": "icheolmin",
+          "faction": "bujinpa",
+          "role": "조직원 · 회암시 정보통",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {"id": "ilguk", "faction": "bujinpa", "role": "보스(당시)", "rank": null, "learn": [], "conf": "ai"},
+        {
+          "id": "ihwan",
+          "faction": "bulhwi",
+          "role": "불휘 단장(회상 당시 부단장)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "jeongseono",
+          "faction": "busanseryeok",
+          "role": "백의 부산지부(모리 포위 즈음부터)",
+          "rank": "그 아래급",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "neopchi",
+          "faction": "busanseryeok",
+          "role": "백의 부산지부 대외담당(표영의 부하)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "pyoyoung",
+          "faction": "busanseryeok",
+          "role": "백의 부산지부장",
+          "rank": "이스크라 평 킬러급",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "seojeongchi",
+          "faction": "busanseryeok",
+          "role": "표영 곁 보호자",
+          "rank": "전국구",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "choedalcheon",
+          "faction": "castle_holdings",
+          "role": "전 골드 사장 · 몰락 후 최민욱 아래",
+          "rank": "외성 하위",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "choeminuk",
+          "faction": "castle_holdings",
+          "role": "회장(캐슬 정점 · 7기둥 대표격)",
+          "rank": "내성 중위",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "ihuiseong",
+          "faction": "castle_holdings",
+          "role": "비서실장",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "mark",
+          "faction": "castle_holdings",
+          "role": "홀딩스 측 교류회 출전 선수",
+          "rank": "준10강",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "ryujihak",
+          "faction": "castle_holdings",
+          "role": "하성에서 홀딩스로 파견(볼모)",
+          "rank": "내성 중위",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "cheonildo",
+          "faction": "castle_hotel",
+          "role": "호텔 캐슬 대표 · 캐슬 원로",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {"id": "ipildo", "faction": "castle_hotel", "role": "벨보이", "rank": "준10강", "learn": [], "conf": "ai"},
+        {
+          "id": "blackmamba",
+          "faction": "chagaunpi",
+          "role": "킬러(차가운 피 팀) · 리사 쪽 도우미",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "sainjin",
+          "faction": "chiseongdae",
+          "role": "홀딩스에서 하성으로 파견된 경호부대장",
+          "rank": "이스크라 평 킬러급",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "juro",
+          "faction": "daeguk_amsaljo",
+          "role": "교관('손가락')",
+          "rank": "외성 상위",
+          "learn": [],
+          "conf": "ai"
+        },
+        {"id": "kimjeon", "faction": "gold", "role": "김황의 장남", "rank": null, "learn": [], "conf": "ai"},
+        {
+          "id": "jeongdan",
+          "faction": "gyeonghodae",
+          "role": "부대장 · 교류회 진행",
+          "rank": "외성 중위",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "mahakyoung",
+          "faction": "gyeonghodae",
+          "role": "경호대장 · 캐슬홀딩스 전무",
+          "rank": "톱",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "majunyeong",
+          "faction": "gyeonghodae",
+          "role": "부대장(수감 중)",
+          "rank": "외성 상위",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "choemyeonghui",
+          "faction": "haseong",
+          "role": "하성 창립자(고인, 회상)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "gangchangseok",
+          "faction": "haseong",
+          "role": "하성 쪽으로 옮겨 김재훈에게 보고",
+          "rank": "그 아래급",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "hwangbomincheol",
+          "faction": "haseong",
+          "role": "부장(로비 대장)",
+          "rank": "전국구",
+          "learn": ["hwangbo_bait", "hwangbo_face_counter"],
+          "conf": "ai"
+        },
+        {
+          "id": "hyeonseok",
+          "faction": "haseong",
+          "role": "넘버 2 · 전 캐슬 10강",
+          "rank": "외성 상위",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "joseokjung",
+          "faction": "haseong",
+          "role": "하성 쪽 대결 출전자",
+          "rank": "전국구",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "kimjaehoon",
+          "faction": "haseong",
+          "role": "하성건설 대표이사",
+          "rank": "건달급",
+          "learn": [],
+          "conf": "ai",
+          "rank_src": "data/characters.json"
+        },
+        {"id": "kimtaehoon", "faction": "haseong", "role": "하성그룹 회장", "rank": null, "learn": [], "conf": "ai"},
+        {
+          "id": "kimyongseong",
+          "faction": "haseong",
+          "role": "전 회장 · 명예회장 (일선 뒤 실권 유지)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "ojiin",
+          "faction": "haseong",
+          "role": "실장 · 회장 김태훈 측근",
+          "rank": "경호대급",
+          "learn": ["ojiin_skirt_dagger"],
+          "conf": "ai"
+        },
+        {
+          "id": "andycheong",
+          "faction": "hwajin",
+          "role": "유우성 쪽 실행자 · 내통자",
+          "rank": "준10강",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "douchen",
+          "faction": "hwajin",
+          "role": "유우성 측근 참모",
+          "rank": "외성 하위",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "gwoan",
+          "faction": "hwajin",
+          "role": "용병(롱터우 유우성 수하)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "lingling",
+          "faction": "hwajin",
+          "role": "유우성 특수경호원",
+          "rank": "외성 하위",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "yuwoosung",
+          "faction": "hwajin",
+          "role": "화진기획 대표 · 삼합회 홍콩 · 마카오 산주",
+          "rank": "내성 하위",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "kimseongyu",
+          "faction": "hyeoksindang",
+          "role": "대표 · 대선후보",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "akila",
+          "faction": "iskra",
+          "role": "이스크라 킬러(프리깃의 대장)",
+          "rank": "내성 상위",
+          "learn": ["jesus_zone"],
+          "conf": "ai",
+          "rank_src": "data/characters.json"
+        },
+        {
+          "id": "bison",
+          "faction": "iskra",
+          "role": "이스크라 킬러",
+          "rank": "이스크라 평 킬러급",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "gustav",
+          "faction": "iskra",
+          "role": "이스크라 최상위 킬러",
+          "rank": "내성 상위",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "krot",
+          "faction": "iskra",
+          "role": "한국 · 일본 브로커",
+          "rank": "이스크라 평 킬러급",
+          "learn": [],
+          "conf": "ai"
+        },
+        {"id": "marina", "faction": "iskra", "role": "정보원", "rank": null, "learn": [], "conf": "ai"},
+        {
+          "id": "peurikit",
+          "faction": "iskra",
+          "role": "킬러(아킬라 아래)",
+          "rank": "준10강",
+          "learn": [],
+          "conf": "ai"
+        },
+        {"id": "reperi", "faction": "iskra", "role": "킬러", "rank": null, "learn": [], "conf": "ai"},
+        {"id": "risa", "faction": "iskra", "role": "마담(청부 브로커)", "rank": null, "learn": [], "conf": "ai"},
+        {"id": "shamo", "faction": "iskra", "role": "킬러", "rank": null, "learn": [], "conf": "ai"},
+        {"id": "shire", "faction": "iskra", "role": "크로트 수행 부하", "rank": "전국구", "learn": [], "conf": "ai"},
+        {
+          "id": "ivanpushkin",
+          "faction": "iskra_wonrowon",
+          "role": "원로(전 소련 MGB)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "missbarbara",
+          "faction": "iskra_wonrowon",
+          "role": "원로 · CIS 로비스트",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "monica",
+          "faction": "iskra_wonrowon",
+          "role": "원로(전대 리사)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "hayabusa",
+          "faction": "iwashirogumi",
+          "role": "신겐의 제1 부하",
+          "rank": "준10강",
+          "learn": ["hayabusa_arc", "hayabusa_low"],
+          "conf": "ai"
+        },
+        {
+          "id": "iwashiro",
+          "faction": "iwashirogumi",
+          "role": "야마구치구미 회장 · 전 일본 야쿠자 의장",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {"id": "kevin", "faction": "iwashirogumi", "role": "구로다의 용병", "rank": null, "learn": [], "conf": "ai"},
+        {
+          "id": "shingen",
+          "faction": "iwashirogumi",
+          "role": "간부 · 후계 후보",
+          "rank": "내성 상위",
+          "learn": ["shingen_daegeuk", "shingen_dive", "shingen_frontkick", "shingen_leap"],
+          "conf": "ai"
+        },
+        {
+          "id": "toishi",
+          "faction": "iwashirogumi",
+          "role": "이와시로 곁 통역 · 호위",
+          "rank": "준10강",
+          "learn": [],
+          "conf": "ai"
+        },
+        {"id": "hide", "faction": "mori", "role": "새 오야붕", "rank": "외성 중위", "learn": [], "conf": "ai"},
+        {
+          "id": "masa",
+          "faction": "mori",
+          "role": "오도화의 최측근 부하",
+          "rank": "이스크라 평 킬러급",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "moseunggyu",
+          "faction": "mori",
+          "role": "부산 거처 실무 책임",
+          "rank": "전국구",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "insu",
+          "faction": "namgucheongnyeonhoe",
+          "role": "2인자",
+          "rank": "그 아래급",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "namyong",
+          "faction": "namgucheongnyeonhoe",
+          "role": "회원",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "wonyong",
+          "faction": "namgucheongnyeonhoe",
+          "role": "회원",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {"id": "eunbo", "faction": "sacheonwang", "role": "사천왕", "rank": "전국구", "learn": [], "conf": "ai"},
+        {"id": "komodo", "faction": "scale", "role": "킬러단 간부", "rank": "외성 하위", "learn": [], "conf": "ai"},
+        {
+          "id": "hantaecheol",
+          "faction": "seongnamjeilpa",
+          "role": "성남제일파 두목 — 백의 섭외 대상",
+          "rank": "이스크라 평 킬러급",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "bakcheolgyu",
+          "faction": "suwonnammunobpa",
+          "role": "수원 남문OB파 보스",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "grolla",
+          "faction": "tteugeounpi",
+          "role": "리사가 데려온 새 팀 · 뜨거운 피 새 리더(킬러)",
+          "rank": "내성 중위",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "pantera",
+          "faction": "tteugeounpi",
+          "role": "킬러(이스크라 뜨거운 피 소속)",
+          "rank": "이스크라 평 킬러급",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "ratel",
+          "faction": "tteugeounpi",
+          "role": "킬러(이스크라 뜨거운 피 소속)",
+          "rank": "외성 하위",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "wangdokpil",
+          "faction": "wangdokpilpa",
+          "role": "대전 대보스 (캐슬에 당함)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {"id": "alleksya", "faction": null, "role": null, "rank": null, "learn": [], "conf": "ai"},
+        {
+          "id": "bulgom",
+          "faction": null,
+          "role": null,
+          "rank": "네임드",
+          "learn": [],
+          "conf": "ai",
+          "rank_src": "data/characters.json",
+          "rank_provisional": true
+        },
+        {"id": "carlo", "faction": null, "role": null, "rank": null, "learn": [], "conf": "ai"},
+        {"id": "chasumin", "faction": null, "role": null, "rank": null, "learn": [], "conf": "ai"},
+        {
+          "id": "dojiung",
+          "faction": null,
+          "role": "김신 쪽에 협력한 삼겹살집 주인(남구 청년회 회장 이슬의 선배)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "gangmanjae",
+          "faction": null,
+          "role": null,
+          "rank": "네임드",
+          "learn": [],
+          "conf": "ai",
+          "rank_src": "data/characters.json",
+          "rank_provisional": true
+        },
+        {"id": "gimyeonggyun", "faction": null, "role": null, "rank": null, "learn": [], "conf": "ai"},
+        {
+          "id": "gunter",
+          "faction": null,
+          "role": null,
+          "rank": "조장급",
+          "learn": [],
+          "conf": "ai",
+          "rank_src": "data/characters.json",
+          "rank_provisional": true
+        },
+        {"id": "gusanghun", "faction": null, "role": null, "rank": null, "learn": [], "conf": "ai"},
+        {
+          "id": "iriwon",
+          "faction": null,
+          "role": "가게 주인(치료를 해 주는 여자)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {"id": "janghun", "faction": null, "role": null, "rank": null, "learn": [], "conf": "ai"},
+        {"id": "jangibo", "faction": null, "role": "화교 거주지 주민(사고뭉치)", "rank": null, "learn": [], "conf": "ai"},
+        {"id": "jangpyeong", "faction": null, "role": "화교 거주지 주민", "rank": null, "learn": [], "conf": "ai"},
+        {"id": "jeondaeamur", "faction": null, "role": null, "rank": null, "learn": [], "conf": "ai"},
+        {"id": "kenzo", "faction": null, "role": null, "rank": null, "learn": [], "conf": "ai"},
+        {
+          "id": "kimhyeokju",
+          "faction": null,
+          "role": null,
+          "rank": "네임드",
+          "learn": [],
+          "conf": "ai",
+          "rank_src": "data/characters.json",
+          "rank_provisional": true
+        },
+        {"id": "kimhyeongcheol", "faction": null, "role": null, "rank": null, "learn": [], "conf": "ai"},
+        {"id": "kkuldanji", "faction": null, "role": "홍콩 사기꾼 · 정보원", "rank": null, "learn": [], "conf": "ai"},
+        {"id": "monkey", "faction": null, "role": null, "rank": null, "learn": [], "conf": "ai"},
+        {"id": "nishijimadaichi", "faction": null, "role": null, "rank": null, "learn": [], "conf": "ai"},
+        {"id": "nishijimakyoko", "faction": null, "role": null, "rank": null, "learn": [], "conf": "ai"},
+        {"id": "ogyudong", "faction": null, "role": null, "rank": null, "learn": [], "conf": "ai"},
+        {"id": "oota", "faction": null, "role": null, "rank": null, "learn": [], "conf": "ai"},
+        {
+          "id": "richeon",
+          "faction": null,
+          "role": "고용된 킬러(중국 최고 살수)",
+          "rank": "톱",
+          "learn": ["triple"],
+          "conf": "ai"
+        },
+        {"id": "seungyeong", "faction": null, "role": "표영의 오락실 패거리", "rank": null, "learn": [], "conf": "ai"},
+        {"id": "shinodaken", "faction": null, "role": null, "rank": null, "learn": [], "conf": "ai"},
+        {
+          "id": "wanghaoming",
+          "faction": null,
+          "role": "대륙 재벌 3세 · 유우성의 후원자",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {"id": "yusehui", "faction": null, "role": "고교생", "rank": null, "learn": [], "conf": "ai"}
+      ],
+      "zones": [
+        {
+          "zone": "hoeamsi",
+          "owner": "baekui",
+          "contested": [],
+          "why": "백의 회식 · 청년곱창 · 차수민 정비소 등 회암시가 백의 근거",
+          "refs": ["014", "p1:119"],
+          "conf": "ai"
+        },
+        {
+          "zone": "seoul",
+          "owner": "castle_holdings",
+          "contested": ["baekui", "hwajin", "haseong"],
+          "why": "교류회 · 호텔 캐슬 등 캐슬 홀딩스 중심, 영등포 백의 사무실과 화진 호텔이 다툼",
+          "refs": ["006", "036"],
+          "conf": "ai"
+        },
+        {"zone": "incheon", "owner": null, "contested": [], "why": "기록 없음", "refs": ["034"], "conf": "ai"},
+        {
+          "zone": "busan",
+          "owner": "baekui",
+          "contested": [],
+          "why": "해운대 백의 부산지부 사무실(자막)",
+          "refs": ["003"],
+          "conf": "ai"
+        },
+        {"zone": "chungnam", "owner": null, "contested": [], "why": "기록 없음", "refs": ["034"], "conf": "ai"},
+        {
+          "zone": "honam",
+          "owner": "castle_holdings",
+          "contested": [],
+          "why": "목포 김황 본가를 홀딩스 경호대가 장악",
+          "refs": ["006"],
+          "conf": "ai"
+        },
+        {
+          "zone": "vladivostok",
+          "owner": "iskra",
+          "contested": [],
+          "why": "라텔이 있는 이스크라 뜨거운 피 근거지, 클럽 발레리노",
+          "refs": ["010", "019"],
+          "conf": "ai"
+        },
+        {
+          "zone": "japan",
+          "owner": "iwashirogumi",
+          "contested": [],
+          "why": "이와시로(야마구치구미) 쪽과 방관 거래 · 신겐 요코하마 습격",
+          "refs": ["017", "019"],
+          "conf": "ai"
+        },
+        {
+          "zone": "hongkong",
+          "owner": "hwajin",
+          "contested": ["samhaphoe"],
+          "why": "홍콩 화진 사업장 · 흑룡성은 유우성의 입지, 잠입 작전 실패",
+          "refs": ["024", "034"],
+          "conf": "ai"
+        },
+        {
+          "zone": "sea",
+          "owner": "hwajin",
+          "contested": [],
+          "why": "화진이 후원하는 동남아 화교 집단 거주지(스케일 잔당은 소탕됨)",
+          "refs": ["005", "034"],
+          "conf": "ai"
+        }
+      ],
+      "src": "명단 = tools/asof.py(canon status_by_ep) · 구역 = 서브에이전트 후보",
+      "conf": "ai",
+      "provisional": true,
+      "playable": ["baekui", "hwajin", "haseong", "castle_holdings"],
+      "pillars": ["castle_holdings", "castle_hotel", "haseong", "hwajin", "baekui", "iskra"],
+      "assign": []
+    },
+    {
+      "id": "E",
+      "name": "새 캐슬",
+      "at": {"part": "castle2", "ep": 64},
+      "range": "064",
+      "player": ["kimshin"],
+      "board": "교회 · 하성 · 정치",
+      "factions": {
+        "baekui": 12,
+        "haseong": 9,
+        "iskra": 9,
+        "busanseryeok": 5,
+        "gyeonghodae": 5,
+        "iwashirogumi": 5,
+        "castle_holdings": 4,
+        "iskra_wonrowon": 3,
+        "mori": 3,
+        "namgucheongnyeonhoe": 3,
+        "tteugeounpi": 3,
+        "castle_hotel": 2,
+        "daeguk_amsaljo": 2,
+        "bandopa": 1,
+        "bujinpa": 1,
+        "bulhwi": 1,
+        "chagaunpi": 1,
+        "chiseongdae": 1,
+        "gold": 1,
+        "hwajin": 1,
+        "hyeoksindang": 1,
+        "scale": 1,
+        "suwonnammunobpa": 1,
+        "wangdokpilpa": 1
+      },
+      "roster": [
+        {
+          "id": "choehyeokjin",
+          "faction": "baekui",
+          "role": "해외 파견직 현장 책임자",
+          "rank": "전국구",
+          "learn": [],
+          "conf": "ai"
+        },
+        {"id": "dohaksu", "faction": "baekui", "role": "포항 세력 대표", "rank": "전국구", "learn": [], "conf": "ai"},
+        {
+          "id": "eogwangdeuk",
+          "faction": "baekui",
+          "role": "대구 동성로 세력 간부",
+          "rank": "전국구",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "guilhwa",
+          "faction": "baekui",
+          "role": "천안 쪽 간부",
+          "rank": "전국구",
+          "learn": ["guilhwa_forearm", "guilhwa_headbutt"],
+          "conf": "ai"
+        },
+        {
+          "id": "hantaecheol",
+          "faction": "baekui",
+          "role": "성남제일파 병력으로 백의 원군(합류)",
+          "rank": "이스크라 평 킬러급",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "imjongtae",
+          "faction": "baekui",
+          "role": "밀항 · 보트 담당 협력자",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "jintae",
+          "faction": "baekui",
+          "role": "김신 호위 · 측근",
+          "rank": "내성 하위",
+          "learn": ["jintae_storm", "jintae_vital", "jin_original", "roulette", "inch"],
+          "conf": "ai"
+        },
+        {
+          "id": "kimseongjun",
+          "faction": "baekui",
+          "role": "백의 쪽 지휘",
+          "rank": "네임드",
+          "learn": [],
+          "conf": "ai",
+          "rank_src": "data/characters.json",
+          "rank_provisional": true
+        },
+        {
+          "id": "kimshin",
+          "faction": "baekui",
+          "role": "우두머리",
+          "rank": "재앙",
+          "learn": [
+            "amur_dash",
+            "amur_triple",
+            "amur_weaving",
+            "jesus_zone",
+            "kickarts",
+            "vanish_step",
+            "offbeat",
+            "offbeat2",
+            "offbeat_rev",
+            "inch",
+            "triple"
+          ],
+          "conf": "ai"
+        },
+        {
+          "id": "ttolbae",
+          "faction": "baekui",
+          "role": "백의 결성 때 편입",
+          "rank": "경호대급",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "woojin",
+          "faction": "baekui",
+          "role": "해외 새 지부장",
+          "rank": "외성 중위",
+          "learn": ["woojin_core_counter"],
+          "conf": "ai"
+        },
+        {
+          "id": "yeominsu",
+          "faction": "baekui",
+          "role": "순천 세력 대표 · 간부",
+          "rank": "이스크라 평 킬러급",
+          "learn": [],
+          "conf": "ai"
+        },
+        {"id": "songikcheon", "faction": "bandopa", "role": "간부", "rank": "그 아래급", "learn": [], "conf": "ai"},
+        {"id": "ilguk", "faction": "bujinpa", "role": "보스(당시)", "rank": null, "learn": [], "conf": "ai"},
+        {
+          "id": "ihwan",
+          "faction": "bulhwi",
+          "role": "불휘 단장(회상 당시 부단장)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "jeongseono",
+          "faction": "busanseryeok",
+          "role": "백의 부산지부(모리 포위 즈음부터)",
+          "rank": "그 아래급",
+          "learn": [],
+          "conf": "ai"
+        },
+        {"id": "neopchi", "faction": "busanseryeok", "role": "대외담당", "rank": null, "learn": [], "conf": "ai"},
+        {
+          "id": "pyoyoung",
+          "faction": "busanseryeok",
+          "role": "백의 부산지부장",
+          "rank": "준10강",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "seojeongchi",
+          "faction": "busanseryeok",
+          "role": "표영 곁 보호자",
+          "rank": "전국구",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "seungyeong",
+          "faction": "busanseryeok",
+          "role": "조직원",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "choeminuk",
+          "faction": "castle_holdings",
+          "role": "회장(캐슬 정점 · 7기둥 대표격)",
+          "rank": "내성 중위",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "ihuiseong",
+          "faction": "castle_holdings",
+          "role": "비서실장",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "mark",
+          "faction": "castle_holdings",
+          "role": "홀딩스 측 교류회 출전 선수",
+          "rank": "준10강",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "ryujihak",
+          "faction": "castle_holdings",
+          "role": "하성에서 홀딩스로 파견(볼모)",
+          "rank": "내성 상위",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "cheonildo",
+          "faction": "castle_hotel",
+          "role": "호텔 캐슬 대표 · 캐슬 원로",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {"id": "ipildo", "faction": "castle_hotel", "role": "벨보이", "rank": "준10강", "learn": [], "conf": "ai"},
+        {
+          "id": "blackmamba",
+          "faction": "chagaunpi",
+          "role": "킬러(차가운 피 팀) · 리사 쪽 도우미",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "sainjin",
+          "faction": "chiseongdae",
+          "role": "홀딩스에서 하성으로 파견된 경호부대장",
+          "rank": "이스크라 평 킬러급",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "juro",
+          "faction": "daeguk_amsaljo",
+          "role": "교관('손가락')",
+          "rank": "외성 상위",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "juwon",
+          "faction": "daeguk_amsaljo",
+          "role": "손가락 조원",
+          "rank": "준10강",
+          "learn": [],
+          "conf": "ai"
+        },
+        {"id": "kimjeon", "faction": "gold", "role": "김황의 장남", "rank": null, "learn": [], "conf": "ai"},
+        {
+          "id": "choedalcheon",
+          "faction": "gyeonghodae",
+          "role": "부대장",
+          "rank": "외성 하위",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "gyeonghodaechoehuui4in",
+          "faction": "gyeonghodae",
+          "role": "최후의 방패(회장 호위)",
+          "rank": "전국구",
+          "learn": ["g4_chop", "g4_heelkick", "g4_shot"],
+          "conf": "ai"
+        },
+        {
+          "id": "jeongdan",
+          "faction": "gyeonghodae",
+          "role": "부대장 · 교류회 진행",
+          "rank": "외성 중위",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "mahakyoung",
+          "faction": "gyeonghodae",
+          "role": "경호대장 · 캐슬홀딩스 전무",
+          "rank": "톱",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "majunyeong",
+          "faction": "gyeonghodae",
+          "role": "부대장(수감 중)",
+          "rank": "외성 상위",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "choemyeonghui",
+          "faction": "haseong",
+          "role": "하성 창립자(고인, 회상)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "gangchangseok",
+          "faction": "haseong",
+          "role": "하성 쪽으로 옮겨 김재훈에게 보고",
+          "rank": "그 아래급",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "hwangbomincheol",
+          "faction": "haseong",
+          "role": "부장(로비 대장)",
+          "rank": "전국구",
+          "learn": ["hwangbo_bait", "hwangbo_face_counter"],
+          "conf": "ai"
+        },
+        {
+          "id": "hyeonseok",
+          "faction": "haseong",
+          "role": "넘버 2 · 전 캐슬 10강",
+          "rank": "외성 상위",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "joseokjung",
+          "faction": "haseong",
+          "role": "하성 쪽 대결 출전자",
+          "rank": "전국구",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "kimjaehoon",
+          "faction": "haseong",
+          "role": "하성건설 대표이사",
+          "rank": "건달급",
+          "learn": [],
+          "conf": "ai",
+          "rank_src": "data/characters.json"
+        },
+        {"id": "kimtaehoon", "faction": "haseong", "role": "하성그룹 회장", "rank": null, "learn": [], "conf": "ai"},
+        {
+          "id": "kimyongseong",
+          "faction": "haseong",
+          "role": "전 회장 · 명예회장 (일선 뒤 실권 유지)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "ojiin",
+          "faction": "haseong",
+          "role": "실장 · 회장 김태훈 측근",
+          "rank": "경호대급",
+          "learn": ["ojiin_skirt_dagger"],
+          "conf": "ai"
+        },
+        {
+          "id": "gwoan",
+          "faction": "hwajin",
+          "role": "용병(롱터우 유우성 수하)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "kimseongyu",
+          "faction": "hyeoksindang",
+          "role": "대표 · 대선후보",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "bison",
+          "faction": "iskra",
+          "role": "이스크라 킬러",
+          "rank": "이스크라 평 킬러급",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "gustav",
+          "faction": "iskra",
+          "role": "이스크라 최상위 킬러",
+          "rank": "내성 상위",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "krot",
+          "faction": "iskra",
+          "role": "한국 · 일본 브로커",
+          "rank": "이스크라 평 킬러급",
+          "learn": [],
+          "conf": "ai"
+        },
+        {"id": "marina", "faction": "iskra", "role": "정보원", "rank": null, "learn": [], "conf": "ai"},
+        {
+          "id": "peurikit",
+          "faction": "iskra",
+          "role": "킬러(아킬라 아래)",
+          "rank": "준10강",
+          "learn": [],
+          "conf": "ai"
+        },
+        {"id": "reperi", "faction": "iskra", "role": "킬러", "rank": null, "learn": [], "conf": "ai"},
+        {"id": "risa", "faction": "iskra", "role": "마담(청부 브로커)", "rank": null, "learn": [], "conf": "ai"},
+        {"id": "shamo", "faction": "iskra", "role": "킬러", "rank": null, "learn": [], "conf": "ai"},
+        {"id": "shire", "faction": "iskra", "role": "크로트 수행 부하", "rank": "전국구", "learn": [], "conf": "ai"},
+        {
+          "id": "ivanpushkin",
+          "faction": "iskra_wonrowon",
+          "role": "원로(전 소련 MGB)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "missbarbara",
+          "faction": "iskra_wonrowon",
+          "role": "원로 · CIS 로비스트",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "monica",
+          "faction": "iskra_wonrowon",
+          "role": "원로(전대 리사)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "hayabusa",
+          "faction": "iwashirogumi",
+          "role": "신겐의 제1 부하",
+          "rank": "준10강",
+          "learn": ["hayabusa_arc", "hayabusa_low"],
+          "conf": "ai"
+        },
+        {
+          "id": "iwashiro",
+          "faction": "iwashirogumi",
+          "role": "야마구치구미 회장 · 전 일본 야쿠자 의장",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {"id": "kevin", "faction": "iwashirogumi", "role": "구로다의 용병", "rank": null, "learn": [], "conf": "ai"},
+        {
+          "id": "shingen",
+          "faction": "iwashirogumi",
+          "role": "간부 · 후계 후보",
+          "rank": "내성 상위",
+          "learn": ["shingen_daegeuk", "shingen_dive", "shingen_frontkick", "shingen_leap"],
+          "conf": "ai"
+        },
+        {
+          "id": "toishi",
+          "faction": "iwashirogumi",
+          "role": "이와시로 곁 통역 · 호위",
+          "rank": "준10강",
+          "learn": [],
+          "conf": "ai"
+        },
+        {"id": "hide", "faction": "mori", "role": "새 오야붕", "rank": "외성 중위", "learn": [], "conf": "ai"},
+        {
+          "id": "masa",
+          "faction": "mori",
+          "role": "오도화의 최측근 부하",
+          "rank": "이스크라 평 킬러급",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "moseunggyu",
+          "faction": "mori",
+          "role": "부산 거처 실무 책임",
+          "rank": "전국구",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "insu",
+          "faction": "namgucheongnyeonhoe",
+          "role": "2인자",
+          "rank": "그 아래급",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "namyong",
+          "faction": "namgucheongnyeonhoe",
+          "role": "회원",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "wonyong",
+          "faction": "namgucheongnyeonhoe",
+          "role": "회원",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {"id": "komodo", "faction": "scale", "role": "킬러단 간부", "rank": "외성 하위", "learn": [], "conf": "ai"},
+        {
+          "id": "bakcheolgyu",
+          "faction": "suwonnammunobpa",
+          "role": "수원 남문OB파 보스",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "grolla",
+          "faction": "tteugeounpi",
+          "role": "리사가 데려온 새 팀 · 뜨거운 피 새 리더(킬러)",
+          "rank": "내성 중위",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "pantera",
+          "faction": "tteugeounpi",
+          "role": "킬러(이스크라 뜨거운 피 소속)",
+          "rank": "이스크라 평 킬러급",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "ratel",
+          "faction": "tteugeounpi",
+          "role": "킬러(이스크라 뜨거운 피 소속)",
+          "rank": "외성 하위",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "wangdokpil",
+          "faction": "wangdokpilpa",
+          "role": "대전 대보스 (캐슬에 당함)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {"id": "alleksya", "faction": null, "role": null, "rank": null, "learn": [], "conf": "ai"},
+        {
+          "id": "bulgom",
+          "faction": null,
+          "role": null,
+          "rank": "네임드",
+          "learn": [],
+          "conf": "ai",
+          "rank_src": "data/characters.json",
+          "rank_provisional": true
+        },
+        {"id": "carlo", "faction": null, "role": null, "rank": null, "learn": [], "conf": "ai"},
+        {"id": "chasumin", "faction": null, "role": null, "rank": null, "learn": [], "conf": "ai"},
+        {
+          "id": "gangmanjae",
+          "faction": null,
+          "role": null,
+          "rank": "네임드",
+          "learn": [],
+          "conf": "ai",
+          "rank_src": "data/characters.json",
+          "rank_provisional": true
+        },
+        {"id": "gimyeonggyun", "faction": null, "role": null, "rank": null, "learn": [], "conf": "ai"},
+        {
+          "id": "gunter",
+          "faction": null,
+          "role": null,
+          "rank": "조장급",
+          "learn": [],
+          "conf": "ai",
+          "rank_src": "data/characters.json",
+          "rank_provisional": true
+        },
+        {"id": "gusanghun", "faction": null, "role": null, "rank": null, "learn": [], "conf": "ai"},
+        {
+          "id": "icheolmin",
+          "faction": null,
+          "role": "전 부진파 · 차수민 수하",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "iriwon",
+          "faction": null,
+          "role": "가게 주인(치료를 해 주는 여자)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {"id": "janghun", "faction": null, "role": null, "rank": null, "learn": [], "conf": "ai"},
+        {"id": "jangpyeong", "faction": null, "role": "화교 거주지 주민", "rank": null, "learn": [], "conf": "ai"},
+        {"id": "jeondaeamur", "faction": null, "role": null, "rank": null, "learn": [], "conf": "ai"},
+        {"id": "jina", "faction": null, "role": "서진태의 여동생(민간)", "rank": null, "learn": [], "conf": "ai"},
+        {"id": "kenzo", "faction": null, "role": null, "rank": null, "learn": [], "conf": "ai"},
+        {
+          "id": "kimhyeokju",
+          "faction": null,
+          "role": null,
+          "rank": "네임드",
+          "learn": [],
+          "conf": "ai",
+          "rank_src": "data/characters.json",
+          "rank_provisional": true
+        },
+        {"id": "kimhyeongcheol", "faction": null, "role": null, "rank": null, "learn": [], "conf": "ai"},
+        {"id": "kkuldanji", "faction": null, "role": "홍콩 사기꾼 · 정보원", "rank": null, "learn": [], "conf": "ai"},
+        {"id": "monkey", "faction": null, "role": null, "rank": null, "learn": [], "conf": "ai"},
+        {"id": "nishijimadaichi", "faction": null, "role": null, "rank": null, "learn": [], "conf": "ai"},
+        {"id": "nishijimakyoko", "faction": null, "role": null, "rank": null, "learn": [], "conf": "ai"},
+        {"id": "ogyudong", "faction": null, "role": null, "rank": null, "learn": [], "conf": "ai"},
+        {"id": "oota", "faction": null, "role": null, "rank": null, "learn": [], "conf": "ai"},
+        {
+          "id": "ryuwangsaeng",
+          "faction": null,
+          "role": "[류왕생의 금룡 조직(홍콩, 이름 미상)] 우두머리",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {"id": "shinodaken", "faction": null, "role": null, "rank": null, "learn": [], "conf": "ai"},
+        {
+          "id": "wanghaoming",
+          "faction": null,
+          "role": "대륙 재벌 3세 · 유우성의 후원자",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {"id": "wonil", "faction": null, "role": "자동차 가게 주인(원일 아저씨)", "rank": null, "learn": [], "conf": "ai"},
+        {"id": "yusehui", "faction": null, "role": "고교생", "rank": null, "learn": [], "conf": "ai"}
+      ],
+      "zones": [
+        {
+          "zone": "hoeamsi",
+          "owner": "baekui",
+          "contested": ["haseong"],
+          "why": "호텔 캐슬 습격 뒤에도 백의 · 회암시는 무사, 하성 강창석 무리 쳐들어옴",
+          "refs": ["038", "063"],
+          "conf": "ai"
+        },
+        {
+          "zone": "seoul",
+          "owner": "castle_holdings",
+          "contested": ["baekui", "haseong"],
+          "why": "최민욱의 홀딩스가 호텔 캐슬 · 경호대로 장악하나 백의 · 하성이 반격",
+          "refs": ["051", "063"],
+          "conf": "ai"
+        },
+        {"zone": "incheon", "owner": null, "contested": [], "why": "기록 없음", "refs": ["064"], "conf": "ai"},
+        {
+          "zone": "busan",
+          "owner": "baekui",
+          "contested": [],
+          "why": "백의 부산지부(표영)",
+          "refs": ["003"],
+          "conf": "ai"
+        },
+        {"zone": "chungnam", "owner": null, "contested": [], "why": "기록 없음", "refs": ["064"], "conf": "ai"},
+        {
+          "zone": "honam",
+          "owner": "castle_holdings",
+          "contested": [],
+          "why": "목포 김황 본가를 홀딩스 경호대가 장악",
+          "refs": ["006"],
+          "conf": "ai"
+        },
+        {
+          "zone": "vladivostok",
+          "owner": "iskra",
+          "contested": [],
+          "why": "이스크라 근거지, 아킬라의 마지막 싸움 등",
+          "refs": ["010", "046"],
+          "conf": "ai"
+        },
+        {
+          "zone": "japan",
+          "owner": "iwashirogumi",
+          "contested": [],
+          "why": "이와시로 쪽 신겐이 홀딩스에 합류하나 본거지는 이와시로",
+          "refs": ["017", "033"],
+          "conf": "ai"
+        },
+        {
+          "zone": "hongkong",
+          "owner": null,
+          "contested": [],
+          "why": "유우성 사망 이후 홍콩 주인 기록 없음",
+          "refs": ["051"],
+          "conf": "ai"
+        },
+        {"zone": "sea", "owner": null, "contested": [], "why": "기록 없음", "refs": ["064"], "conf": "ai"}
+      ],
+      "src": "명단 = tools/asof.py(canon status_by_ep) · 구역 = 서브에이전트 후보",
+      "conf": "ai",
+      "provisional": true,
+      "playable": ["baekui", "castle_holdings", "haseong", "iskra", "iwashirogumi"],
+      "pillars": ["castle_holdings", "castle_hotel", "haseong", "baekui", "iskra"],
+      "assign": []
+    },
+    {
+      "id": "F",
+      "name": "기둥들의 시대",
+      "at": null,
+      "range": null,
+      "player": [],
+      "board": "IF — 1 · 2부 인물 전원 생존 · 모든 기둥 독립",
+      "factions": {
+        "iskra": 15,
+        "baekui": 12,
+        "haseong": 10,
+        "mori": 6,
+        "hwajin": 5,
+        "iwashirogumi": 5,
+        "gyeonghodae": 4,
+        "namgucheongnyeonhoe": 4,
+        "bandopa": 3,
+        "castle_holdings": 3,
+        "gold": 3,
+        "iskra_wonrowon": 3,
+        "tteugeounpi": 3,
+        "bujinpa": 2,
+        "bulhwi": 2,
+        "busanseryeok": 2,
+        "castle_hotel": 2,
+        "daeguk_amsaljo": 2,
+        "dssecurity": 2,
+        "sunjin": 2,
+        "chagaunpi": 1,
+        "chiseongdae": 1,
+        "guilhwapa": 1,
+        "hyeoksindang": 1,
+        "sacheonwang": 1,
+        "scale": 1,
+        "wangdokpilpa": 1
+      },
+      "roster": [
+        {
+          "id": "bakcheolgyu",
+          "faction": "baekui",
+          "role": "수원 남문OB파 보스 · 백의 간부",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": "C"
+        },
+        {
+          "id": "chasumin",
+          "faction": "baekui",
+          "role": "간부",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": "C"
+        },
+        {
+          "id": "choehyeokjin",
+          "faction": "baekui",
+          "role": "해외 파견직 현장 책임자",
+          "rank": "전국구",
+          "learn": [],
+          "conf": "ai",
+          "from": "D"
+        },
+        {
+          "id": "dohaksu",
+          "faction": "baekui",
+          "role": "포항 세력 대표",
+          "rank": "전국구",
+          "learn": [],
+          "conf": "ai",
+          "from": "C"
+        },
+        {
+          "id": "eogwangdeuk",
+          "faction": "baekui",
+          "role": "대구 동성로 세력 간부",
+          "rank": "전국구",
+          "learn": [],
+          "conf": "ai",
+          "from": "C"
+        },
+        {
+          "id": "hantaecheol",
+          "faction": "baekui",
+          "role": "성남제일파 병력으로 백의 원군(합류)",
+          "rank": "이스크라 평 킬러급",
+          "learn": [],
+          "conf": "ai",
+          "from": "E"
+        },
+        {
+          "id": "imjongtae",
+          "faction": "baekui",
+          "role": "밀항 · 보트 담당 협력자",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": "D"
+        },
+        {
+          "id": "kimseongjun",
+          "faction": "baekui",
+          "role": "백의 쪽 지휘",
+          "rank": "네임드",
+          "learn": [],
+          "conf": "ai",
+          "from": "C",
+          "rank_src": "data/characters.json",
+          "rank_provisional": true
+        },
+        {
+          "id": "kimshin",
+          "faction": "baekui",
+          "role": "우두머리",
+          "rank": "재앙",
+          "learn": [
+            "amur_dash",
+            "amur_triple",
+            "amur_weaving",
+            "inch",
+            "jesus_zone",
+            "kickarts",
+            "offbeat",
+            "offbeat2",
+            "offbeat_rev",
+            "triple",
+            "vanish_step"
+          ],
+          "conf": "ai",
+          "from": "C",
+          "rank_src": "data/characters.json"
+        },
+        {
+          "id": "ttolbae",
+          "faction": "baekui",
+          "role": "백의 결성 때 편입",
+          "rank": "경호대급",
+          "learn": [],
+          "conf": "ai",
+          "from": "C"
+        },
+        {
+          "id": "woojin",
+          "faction": "baekui",
+          "role": "김신 호위 · 동료",
+          "rank": "외성 중위",
+          "learn": ["woojin_core_counter"],
+          "conf": "ai",
+          "from": "C"
+        },
+        {
+          "id": "yeominsu",
+          "faction": "baekui",
+          "role": "순천 세력 대표 · 간부",
+          "rank": "이스크라 평 킬러급",
+          "learn": [],
+          "conf": "ai",
+          "from": "C"
+        },
+        {
+          "id": "neopchi",
+          "faction": "bandopa",
+          "role": "서정치 대리인",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": "C"
+        },
+        {
+          "id": "seojeongchi",
+          "faction": "bandopa",
+          "role": "표영을 보스로 따르는 측근",
+          "rank": "전국구",
+          "learn": [],
+          "conf": "ai",
+          "from": "C"
+        },
+        {
+          "id": "songikcheon",
+          "faction": "bandopa",
+          "role": "간부",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": "C"
+        },
+        {
+          "id": "ilguk",
+          "faction": "bujinpa",
+          "role": "보스(당시)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": null
+        },
+        {
+          "id": "kimdaegeon",
+          "faction": "bujinpa",
+          "role": "김신 일파 · 회암시 사업 관리자(부진파 연합)",
+          "rank": "경호대급",
+          "learn": [],
+          "conf": "ai",
+          "from": null
+        },
+        {
+          "id": "ihwan",
+          "faction": "bulhwi",
+          "role": "불휘 단장(회상 당시 부단장)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": "C"
+        },
+        {
+          "id": "namilho",
+          "faction": "bulhwi",
+          "role": "칼잡이(표영의 일호 삼촌)",
+          "rank": "이스크라 평 킬러급",
+          "learn": [],
+          "conf": "ai",
+          "from": "C"
+        },
+        {
+          "id": "jeongseono",
+          "faction": "busanseryeok",
+          "role": "백의 부산지부(모리 포위 즈음부터)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": "D"
+        },
+        {
+          "id": "seungyeong",
+          "faction": "busanseryeok",
+          "role": "조직원",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": "E"
+        },
+        {
+          "id": "choeminuk",
+          "faction": "castle_holdings",
+          "role": "회장(캐슬 정점 · 7기둥 대표격)",
+          "rank": "내성 중위",
+          "learn": [],
+          "conf": "ai",
+          "from": "B"
+        },
+        {
+          "id": "ihuiseong",
+          "faction": "castle_holdings",
+          "role": "비서실장",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": "D"
+        },
+        {
+          "id": "mark",
+          "faction": "castle_holdings",
+          "role": "홀딩스 측 교류회 출전 선수",
+          "rank": "준10강",
+          "learn": [],
+          "conf": "ai",
+          "from": "D"
+        },
+        {
+          "id": "cheonildo",
+          "faction": "castle_hotel",
+          "role": "호텔 캐슬 대표 · 캐슬 원로",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": "B"
+        },
+        {
+          "id": "ipildo",
+          "faction": "castle_hotel",
+          "role": "벨보이",
+          "rank": "준10강",
+          "learn": [],
+          "conf": "ai",
+          "from": "D"
+        },
+        {
+          "id": "blackmamba",
+          "faction": "chagaunpi",
+          "role": "킬러(차가운 피 팀) · 리사 쪽 도우미",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": "C"
+        },
+        {
+          "id": "sainjin",
+          "faction": "chiseongdae",
+          "role": "홀딩스에서 하성으로 파견된 경호부대장",
+          "rank": "이스크라 평 킬러급",
+          "learn": [],
+          "conf": "ai",
+          "from": "D"
+        },
+        {
+          "id": "juro",
+          "faction": "daeguk_amsaljo",
+          "role": "교관('손가락')",
+          "rank": "외성 상위",
+          "learn": [],
+          "conf": "ai",
+          "from": "D"
+        },
+        {
+          "id": "juwon",
+          "faction": "daeguk_amsaljo",
+          "role": "손가락 조원",
+          "rank": "준10강",
+          "learn": [],
+          "conf": "ai",
+          "from": "E"
+        },
+        {
+          "id": "jangho",
+          "faction": "dssecurity",
+          "role": "김대건 부하",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": null
+        },
+        {
+          "id": "yundeoksu",
+          "faction": "dssecurity",
+          "role": "대표(우두머리)",
+          "rank": "전국구",
+          "learn": [],
+          "conf": "ai",
+          "from": null
+        },
+        {
+          "id": "choedalcheon",
+          "faction": "gold",
+          "role": "사장(골드 캐피털 최강 주먹)",
+          "rank": "외성 중위",
+          "learn": [],
+          "conf": "ai",
+          "from": "C"
+        },
+        {
+          "id": "kimhwang",
+          "faction": "gold",
+          "role": "골드 캐피털 회장 · 캐슬 기둥",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": "B"
+        },
+        {
+          "id": "kimjeon",
+          "faction": "gold",
+          "role": "김황의 장남",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": "D"
+        },
+        {
+          "id": "guilhwa",
+          "faction": "guilhwapa",
+          "role": "충남 지역 실력자",
+          "rank": "전국구",
+          "learn": ["guilhwa_forearm", "guilhwa_headbutt"],
+          "conf": "ai",
+          "from": "B",
+          "rank_src": "data/characters.json"
+        },
+        {
+          "id": "gyeonghodaechoehuui4in",
+          "faction": "gyeonghodae",
+          "role": "최후의 방패(회장 호위)",
+          "rank": "전국구",
+          "learn": ["g4_chop", "g4_heelkick", "g4_shot"],
+          "conf": "ai",
+          "from": "E"
+        },
+        {
+          "id": "jeongdan",
+          "faction": "gyeonghodae",
+          "role": "부대장 · 교류회 진행",
+          "rank": "외성 중위",
+          "learn": [],
+          "conf": "ai",
+          "from": "D"
+        },
+        {
+          "id": "mahakyoung",
+          "faction": "gyeonghodae",
+          "role": "경호대장 · 캐슬홀딩스 전무",
+          "rank": "톱",
+          "learn": [],
+          "conf": "ai",
+          "from": "C"
+        },
+        {
+          "id": "majunyeong",
+          "faction": "gyeonghodae",
+          "role": "부대장(수감 중)",
+          "rank": "외성 상위",
+          "learn": [],
+          "conf": "ai",
+          "from": "D"
+        },
+        {
+          "id": "choemyeonghui",
+          "faction": "haseong",
+          "role": "하성 창립자(고인, 회상)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": "D"
+        },
+        {
+          "id": "gangchangseok",
+          "faction": "haseong",
+          "role": "하성 쪽으로 옮겨 김재훈에게 보고",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": "B"
+        },
+        {
+          "id": "hwangbomincheol",
+          "faction": "haseong",
+          "role": "부장(로비 대장)",
+          "rank": "전국구",
+          "learn": ["hwangbo_bait", "hwangbo_face_counter"],
+          "conf": "ai",
+          "from": "B"
+        },
+        {
+          "id": "hyeonseok",
+          "faction": "haseong",
+          "role": "넘버 2 · 전 캐슬 10강",
+          "rank": "외성 상위",
+          "learn": [],
+          "conf": "ai",
+          "from": "D"
+        },
+        {
+          "id": "joseokjung",
+          "faction": "haseong",
+          "role": "하성 쪽 대결 출전자",
+          "rank": "전국구",
+          "learn": [],
+          "conf": "ai",
+          "from": "D"
+        },
+        {
+          "id": "kimjaehoon",
+          "faction": "haseong",
+          "role": "하성건설 대표이사",
+          "rank": "건달급",
+          "learn": [],
+          "conf": "ai",
+          "from": "A",
+          "rank_src": "data/characters.json"
+        },
+        {
+          "id": "kimtaehoon",
+          "faction": "haseong",
+          "role": "하성그룹 회장",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": "B"
+        },
+        {
+          "id": "kimyongseong",
+          "faction": "haseong",
+          "role": "전 회장 · 명예회장 (일선 뒤 실권 유지)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": "B"
+        },
+        {
+          "id": "ojiin",
+          "faction": "haseong",
+          "role": "실장 · 회장 김태훈 측근",
+          "rank": "경호대급",
+          "learn": ["ojiin_skirt_dagger"],
+          "conf": "ai",
+          "from": "B"
+        },
+        {
+          "id": "ryujihak",
+          "faction": "haseong",
+          "role": "하성 제일 실력자(경호 · 킬러)",
+          "rank": "내성 상위",
+          "learn": [],
+          "conf": "ai",
+          "from": "B"
+        },
+        {
+          "id": "andycheong",
+          "faction": "hwajin",
+          "role": "유우성 쪽 실행자 · 내통자",
+          "rank": "준10강",
+          "learn": [],
+          "conf": "ai",
+          "from": "D"
+        },
+        {
+          "id": "douchen",
+          "faction": "hwajin",
+          "role": "유우성 측근 참모",
+          "rank": "외성 하위",
+          "learn": [],
+          "conf": "ai",
+          "from": "D"
+        },
+        {
+          "id": "gwoan",
+          "faction": "hwajin",
+          "role": "용병(롱터우 유우성 수하)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": "D"
+        },
+        {
+          "id": "lingling",
+          "faction": "hwajin",
+          "role": "유우성 특수경호원",
+          "rank": "외성 하위",
+          "learn": [],
+          "conf": "ai",
+          "from": "B"
+        },
+        {
+          "id": "yuwoosung",
+          "faction": "hwajin",
+          "role": "화진기획 대표 · 삼합회 흑룡지부 간부 출신",
+          "rank": "내성 하위",
+          "learn": [],
+          "conf": "ai",
+          "from": "B"
+        },
+        {
+          "id": "kimseongyu",
+          "faction": "hyeoksindang",
+          "role": "대표 · 대선후보",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": null
+        },
+        {
+          "id": "akila",
+          "faction": "iskra",
+          "role": "이스크라 킬러(프리깃의 대장)",
+          "rank": "내성 상위",
+          "learn": ["jesus_zone"],
+          "conf": "ai",
+          "from": "C",
+          "rank_src": "data/characters.json"
+        },
+        {
+          "id": "baekdochan",
+          "faction": "iskra",
+          "role": "코드명 파이톤 · 선진 대표 · 스케일 킬러단 지휘 · 캐슬 홀딩스의 한 축",
+          "rank": "톱",
+          "learn": ["baek_sidekick", "baek_vital", "baek_wide", "offbeat"],
+          "conf": "ai",
+          "from": "B"
+        },
+        {
+          "id": "bison",
+          "faction": "iskra",
+          "role": "이스크라 킬러",
+          "rank": "이스크라 평 킬러급",
+          "learn": [],
+          "conf": "ai",
+          "from": "D"
+        },
+        {
+          "id": "gustav",
+          "faction": "iskra",
+          "role": "이스크라 최상위 킬러",
+          "rank": "내성 상위",
+          "learn": [],
+          "conf": "ai",
+          "from": "C"
+        },
+        {
+          "id": "jintae",
+          "faction": "iskra",
+          "role": "이스크라 출신 킬러 '사로카' · 김신의 오른팔",
+          "rank": "내성 하위",
+          "learn": ["inch", "jin_original", "jintae_storm", "jintae_vital", "roulette"],
+          "conf": "ai",
+          "from": "A"
+        },
+        {
+          "id": "keurisa",
+          "faction": "iskra",
+          "role": "킬러",
+          "rank": "준10강",
+          "learn": [],
+          "conf": "ai",
+          "from": "B"
+        },
+        {
+          "id": "krot",
+          "faction": "iskra",
+          "role": "한국 · 일본 브로커",
+          "rank": "이스크라 평 킬러급",
+          "learn": [],
+          "conf": "ai",
+          "from": "B"
+        },
+        {
+          "id": "marina",
+          "faction": "iskra",
+          "role": "정보원",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": "C"
+        },
+        {
+          "id": "medvedi",
+          "faction": "iskra",
+          "role": "클럽 발레리노 수장",
+          "rank": "외성 상위",
+          "learn": [],
+          "conf": "ai",
+          "from": "B"
+        },
+        {
+          "id": "peurikit",
+          "faction": "iskra",
+          "role": "킬러(아킬라 아래)",
+          "rank": "준10강",
+          "learn": [],
+          "conf": "ai",
+          "from": "C"
+        },
+        {
+          "id": "reperi",
+          "faction": "iskra",
+          "role": "킬러",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": "D"
+        },
+        {
+          "id": "risa",
+          "faction": "iskra",
+          "role": "마담(청부 브로커)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": "A"
+        },
+        {
+          "id": "shamo",
+          "faction": "iskra",
+          "role": "킬러",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": "C"
+        },
+        {
+          "id": "shire",
+          "faction": "iskra",
+          "role": "크로트 수행 부하",
+          "rank": "전국구",
+          "learn": [],
+          "conf": "ai",
+          "from": "C"
+        },
+        {
+          "id": "vasily",
+          "faction": "iskra",
+          "role": "클럽 발레리노 파이터",
+          "rank": "전국구",
+          "learn": [],
+          "conf": "ai",
+          "from": "C"
+        },
+        {
+          "id": "ivanpushkin",
+          "faction": "iskra_wonrowon",
+          "role": "원로(전 소련 MGB)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": "D"
+        },
+        {
+          "id": "missbarbara",
+          "faction": "iskra_wonrowon",
+          "role": "원로 · CIS 로비스트",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": "D"
+        },
+        {
+          "id": "monica",
+          "faction": "iskra_wonrowon",
+          "role": "원로(전대 리사)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": "D"
+        },
+        {
+          "id": "hayabusa",
+          "faction": "iwashirogumi",
+          "role": "신겐의 제1 부하",
+          "rank": "준10강",
+          "learn": ["hayabusa_arc", "hayabusa_low"],
+          "conf": "ai",
+          "from": "D"
+        },
+        {
+          "id": "iwashiro",
+          "faction": "iwashirogumi",
+          "role": "야마구치구미 회장 · 전 일본 야쿠자 의장",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": "D"
+        },
+        {
+          "id": "kevin",
+          "faction": "iwashirogumi",
+          "role": "구로다의 용병",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": "D"
+        },
+        {
+          "id": "shingen",
+          "faction": "iwashirogumi",
+          "role": "간부 · 후계 후보",
+          "rank": "내성 상위",
+          "learn": ["shingen_daegeuk", "shingen_dive", "shingen_frontkick", "shingen_leap"],
+          "conf": "ai",
+          "from": "D"
+        },
+        {
+          "id": "toishi",
+          "faction": "iwashirogumi",
+          "role": "이와시로 곁 통역 · 호위",
+          "rank": "준10강",
+          "learn": [],
+          "conf": "ai",
+          "from": "D"
+        },
+        {
+          "id": "hide",
+          "faction": "mori",
+          "role": "오도화의 오른팔 · 잠입자(전 니시지마구미)",
+          "rank": "외성 중위",
+          "learn": [],
+          "conf": "ai",
+          "from": "C"
+        },
+        {
+          "id": "immuyeol",
+          "faction": "mori",
+          "role": "수장(타케바야시 구미)",
+          "rank": "준10강",
+          "learn": [],
+          "conf": "ai",
+          "from": "B"
+        },
+        {
+          "id": "masa",
+          "faction": "mori",
+          "role": "오도화의 최측근 부하",
+          "rank": "이스크라 평 킬러급",
+          "learn": [],
+          "conf": "ai",
+          "from": "C"
+        },
+        {
+          "id": "moseunggyu",
+          "faction": "mori",
+          "role": "부산 거처 실무 책임",
+          "rank": "전국구",
+          "learn": [],
+          "conf": "ai",
+          "from": "C"
+        },
+        {
+          "id": "odohwa",
+          "faction": "mori",
+          "role": "부대표(해결사)",
+          "rank": "내성 하위",
+          "learn": [],
+          "conf": "ai",
+          "from": "C"
+        },
+        {
+          "id": "pyoyoung",
+          "faction": "mori",
+          "role": "부산 관리 말단(위장 투항)",
+          "rank": "준10강",
+          "learn": [],
+          "conf": "ai",
+          "from": "C"
+        },
+        {
+          "id": "insu",
+          "faction": "namgucheongnyeonhoe",
+          "role": "2인자",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": "B"
+        },
+        {
+          "id": "iseul",
+          "faction": "namgucheongnyeonhoe",
+          "role": "회장",
+          "rank": "전국구",
+          "learn": ["iseul_double_slam", "iseul_throw"],
+          "conf": "ai",
+          "from": "B"
+        },
+        {
+          "id": "namyong",
+          "faction": "namgucheongnyeonhoe",
+          "role": "회원",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": "B"
+        },
+        {
+          "id": "wonyong",
+          "faction": "namgucheongnyeonhoe",
+          "role": "회원",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": "B"
+        },
+        {
+          "id": "eunbo",
+          "faction": "sacheonwang",
+          "role": "사천왕",
+          "rank": "전국구",
+          "learn": [],
+          "conf": "ai",
+          "from": "D"
+        },
+        {
+          "id": "komodo",
+          "faction": "scale",
+          "role": "킬러단 간부",
+          "rank": "외성 하위",
+          "learn": [],
+          "conf": "ai",
+          "from": "B"
+        },
+        {
+          "id": "barista",
+          "faction": "sunjin",
+          "role": "백도찬의 왼팔 · 약 거래 간부",
+          "rank": "준10강",
+          "learn": [],
+          "conf": "ai",
+          "from": "B"
+        },
+        {
+          "id": "namgunghyuk",
+          "faction": "sunjin",
+          "role": "이사 · 백도찬의 오른팔",
+          "rank": "외성 하위",
+          "learn": ["namgung_knuckle_counter", "namgung_knuckle_hook"],
+          "conf": "ai",
+          "from": "B"
+        },
+        {
+          "id": "grolla",
+          "faction": "tteugeounpi",
+          "role": "리사가 데려온 새 팀 · 뜨거운 피 새 리더(킬러)",
+          "rank": "내성 중위",
+          "learn": [],
+          "conf": "ai",
+          "from": "D"
+        },
+        {
+          "id": "pantera",
+          "faction": "tteugeounpi",
+          "role": "킬러(이스크라 뜨거운 피 소속)",
+          "rank": "이스크라 평 킬러급",
+          "learn": [],
+          "conf": "ai",
+          "from": "D"
+        },
+        {
+          "id": "ratel",
+          "faction": "tteugeounpi",
+          "role": "킬러(이스크라 뜨거운 피 소속)",
+          "rank": "외성 하위",
+          "learn": [],
+          "conf": "ai",
+          "from": "C"
+        },
+        {
+          "id": "wangdokpil",
+          "faction": "wangdokpilpa",
+          "role": "대전 대보스 (캐슬에 당함)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": "C"
+        },
+        {
+          "id": "alleksya",
+          "faction": null,
+          "role": null,
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": null
+        },
+        {
+          "id": "bulgom",
+          "faction": null,
+          "role": null,
+          "rank": "네임드",
+          "learn": [],
+          "conf": "ai",
+          "from": null,
+          "rank_src": "data/characters.json",
+          "rank_provisional": true
+        },
+        {"id": "carlo", "faction": null, "role": null, "rank": null, "learn": [], "conf": "ai", "from": null},
+        {
+          "id": "dojiung",
+          "faction": null,
+          "role": "김신 쪽에 협력한 삼겹살집 주인(남구 청년회 회장 이슬의 선배)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": null
+        },
+        {
+          "id": "gangmanjae",
+          "faction": null,
+          "role": null,
+          "rank": "네임드",
+          "learn": [],
+          "conf": "ai",
+          "from": null,
+          "rank_src": "data/characters.json",
+          "rank_provisional": true
+        },
+        {
+          "id": "gimyeonggyun",
+          "faction": null,
+          "role": null,
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": null
+        },
+        {
+          "id": "gunter",
+          "faction": null,
+          "role": null,
+          "rank": "조장급",
+          "learn": [],
+          "conf": "ai",
+          "from": null,
+          "rank_src": "data/characters.json",
+          "rank_provisional": true
+        },
+        {
+          "id": "gusanghun",
+          "faction": null,
+          "role": null,
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": null
+        },
+        {
+          "id": "icheolmin",
+          "faction": null,
+          "role": "전 부진파 · 차수민 수하",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": null
+        },
+        {
+          "id": "iriwon",
+          "faction": null,
+          "role": "가게 주인(치료를 해 주는 여자)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": null
+        },
+        {
+          "id": "janghun",
+          "faction": null,
+          "role": null,
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": null
+        },
+        {
+          "id": "jangibo",
+          "faction": null,
+          "role": "화교 거주지 주민(사고뭉치)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": null
+        },
+        {
+          "id": "jangpyeong",
+          "faction": null,
+          "role": "화교 거주지 주민",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": null
+        },
+        {
+          "id": "jeondaeamur",
+          "faction": null,
+          "role": null,
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": null
+        },
+        {
+          "id": "jina",
+          "faction": null,
+          "role": "서진태의 여동생(민간)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": null
+        },
+        {"id": "kenzo", "faction": null, "role": null, "rank": null, "learn": [], "conf": "ai", "from": null},
+        {
+          "id": "kimhyeokju",
+          "faction": null,
+          "role": null,
+          "rank": "네임드",
+          "learn": [],
+          "conf": "ai",
+          "from": null,
+          "rank_src": "data/characters.json",
+          "rank_provisional": true
+        },
+        {
+          "id": "kimhyeongcheol",
+          "faction": null,
+          "role": null,
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": null
+        },
+        {
+          "id": "kkuldanji",
+          "faction": null,
+          "role": "홍콩 사기꾼 · 정보원",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": null
+        },
+        {"id": "monkey", "faction": null, "role": null, "rank": null, "learn": [], "conf": "ai", "from": null},
+        {
+          "id": "nishijimadaichi",
+          "faction": null,
+          "role": null,
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": null
+        },
+        {
+          "id": "nishijimakyoko",
+          "faction": null,
+          "role": null,
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": null
+        },
+        {
+          "id": "ogyudong",
+          "faction": null,
+          "role": null,
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": null
+        },
+        {"id": "oota", "faction": null, "role": null, "rank": null, "learn": [], "conf": "ai", "from": null},
+        {
+          "id": "richeon",
+          "faction": null,
+          "role": "고용된 킬러(중국 최고 살수)",
+          "rank": "톱",
+          "learn": ["triple"],
+          "conf": "ai",
+          "from": null
+        },
+        {
+          "id": "ryuwangsaeng",
+          "faction": null,
+          "role": "[류왕생의 금룡 조직(홍콩, 이름 미상)] 우두머리",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": null
+        },
+        {
+          "id": "shinodaken",
+          "faction": null,
+          "role": null,
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": null
+        },
+        {
+          "id": "sintaejin",
+          "faction": null,
+          "role": "하성 이탈 · 도피 중",
+          "rank": "준10강",
+          "learn": ["sintaejin_pistol", "sintaejin_second_blade", "sintaejin_sweep"],
+          "conf": "ai",
+          "from": null
+        },
+        {
+          "id": "wanghaoming",
+          "faction": null,
+          "role": "대륙 재벌 3세 · 유우성의 후원자",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": null
+        },
+        {
+          "id": "wonil",
+          "faction": null,
+          "role": "자동차 가게 주인(원일 아저씨)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": null
+        },
+        {
+          "id": "yusehui",
+          "faction": null,
+          "role": "고교생",
+          "rank": null,
+          "learn": [],
+          "conf": "ai",
+          "from": null
+        }
+      ],
+      "zones": [
+        {
+          "zone": "hoeamsi",
+          "owner": "baekui",
+          "contested": [],
+          "why": "districts.json F 주인 중 가장 많은 조직(구역 수)",
+          "refs": [],
+          "conf": "ai"
+        },
+        {
+          "zone": "seoul",
+          "owner": "castle_hotel",
+          "contested": ["mori", "gold", "haseong"],
+          "why": "districts.json F 주인 중 가장 많은 조직(구역 수)",
+          "refs": [],
+          "conf": "ai"
+        },
+        {
+          "zone": "incheon",
+          "owner": "sunjin",
+          "contested": [],
+          "why": "districts.json F 주인 중 가장 많은 조직(구역 수)",
+          "refs": [],
+          "conf": "ai"
+        },
+        {
+          "zone": "busan",
+          "owner": "baekui",
+          "contested": [],
+          "why": "districts.json F 주인 중 가장 많은 조직(구역 수)",
+          "refs": [],
+          "conf": "ai"
+        },
+        {
+          "zone": "chungnam",
+          "owner": "baekui",
+          "contested": [],
+          "why": "districts.json F 주인 중 가장 많은 조직(구역 수)",
+          "refs": [],
+          "conf": "ai"
+        },
+        {
+          "zone": "honam",
+          "owner": "baekui",
+          "contested": ["gold"],
+          "why": "districts.json F 주인 중 가장 많은 조직(구역 수)",
+          "refs": [],
+          "conf": "ai"
+        },
+        {
+          "zone": "vladivostok",
+          "owner": "iskra",
+          "contested": [],
+          "why": "districts.json F 주인 중 가장 많은 조직(구역 수)",
+          "refs": [],
+          "conf": "ai"
+        },
+        {
+          "zone": "japan",
+          "owner": "iwashirogumi",
+          "contested": ["mori"],
+          "why": "districts.json F 주인 중 가장 많은 조직(구역 수)",
+          "refs": [],
+          "conf": "ai"
+        },
+        {
+          "zone": "hongkong",
+          "owner": "hwajin",
+          "contested": [],
+          "why": "districts.json F 주인 중 가장 많은 조직(구역 수)",
+          "refs": [],
+          "conf": "ai"
+        },
+        {
+          "zone": "sea",
+          "owner": "sunjin",
+          "contested": [],
+          "why": "districts.json F 주인 중 가장 많은 조직(구역 수)",
+          "refs": [],
+          "conf": "ai"
+        }
+      ],
+      "src": "07 9절 · 08 7절(IF — 원작 시점 없음) · 명단 = A~E 명단에서 기계로(strategy_pack.py build08)",
+      "conf": "ai",
+      "provisional": true,
+      "roster_note": "IF 명단(castle_strategy 요청 #28 · 2026-11-10 추천값): A~E 명단에 한 번이라도 나온 인물 전원 생존 · 소속 = 가장 이른 시나리오에서 F 판 조직으로 풀리는 소속(원래 기둥 — from = 그 시나리오) · 없으면 마지막 소속 · 등급 = A~E 중 가장 높은 등급(전성기) · 습득 = 합집합 · early 줄은 뺌. 구역 = districts.json owners.F 를 굵은 구역별로 셈",
+      "playable": [
+        "castle_holdings",
+        "castle_hotel",
+        "gold",
+        "mori",
+        "hwajin",
+        "haseong",
+        "sunjin",
+        "baekui",
+        "iskra",
+        "iwashirogumi"
+      ],
+      "pillars": [
+        "castle_holdings",
+        "castle_hotel",
+        "gold",
+        "mori",
+        "hwajin",
+        "haseong",
+        "sunjin",
+        "baekui",
+        "iskra",
+        "iwashirogumi"
+      ],
+      "assign": []
+    },
+    {
+      "id": "P",
+      "name": "파천",
+      "at": {"part": "castle2", "ep": 130, "flashback": true},
+      "range": "130~134(2부 회상)",
+      "player": ["choeminuk"],
+      "board": "2000년대 초 회암시 — 파천(젊은 최민욱 · 강민성 · 차일국) 대 대국(천일도 · 1~3석) · 그 위 청와대 정필성. 대국을 무너뜨린다",
+      "factions": {"pacheon": 5, "daeguk": 4, "bandopa": 1, "bujinpa": 1, "bulhwi": 1, "cheongwadae": 1},
+      "roster": [
+        {
+          "id": "choeminuk",
+          "faction": "pacheon",
+          "role": "파천의 머리 — 장례식 상주(130/009-017)",
+          "rank": "내성 중위",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "gangminseong",
+          "faction": "pacheon",
+          "role": "불휘 최강자 — 파천 합류(130/043-044)",
+          "rank": "내성 상위",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "ilguk",
+          "faction": "bujinpa",
+          "role": "부진파 보스 — 파천(130/043-044)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "gwonsuchan",
+          "faction": "pacheon",
+          "role": "불휘 쪽 청년 — 최민욱 곁(130/023-030)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "pyoseong",
+          "faction": "pacheon",
+          "role": "불휘 최고의 암살자 — 파천에 몸담았다 떠남(130/056-058)",
+          "rank": "내성 중위",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "dojiung",
+          "faction": "pacheon",
+          "role": "지웅 — 파천 은신처(131/062-068)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "ihwan",
+          "faction": "bulhwi",
+          "role": "불휘 부단장(회상 당시 — `ihwan` 소개)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "gwakjungheon",
+          "faction": "bandopa",
+          "role": "부산대형 — 반 대국파 영입 1호(130/050-055)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "cheonildo",
+          "faction": "daeguk",
+          "role": "대국 — 천일도(131/030-033)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "wigilseong",
+          "faction": "daeguk",
+          "role": "대국 1석(131/052@0)",
+          "rank": "외성 중위",
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "baekganghoe",
+          "faction": "daeguk",
+          "role": "대국 2석(131/024-026)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "ssanggae",
+          "faction": "daeguk",
+          "role": "대국 3석 인천 쌍개(131/011-016)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        },
+        {
+          "id": "jeongpilseong",
+          "faction": "cheongwadae",
+          "role": "청와대 민정수석 — 천일도 위(`jeongpilseong` 소개)",
+          "rank": null,
+          "learn": [],
+          "conf": "ai"
+        }
+      ],
+      "zones": [],
+      "rank_note": "회상 시점 등급은 원작에 없다 — 강함표의 조건 없는 줄(data/ranks.json strength_ref)을 그대로 두고, 없으면 null(게임은 잠정 표시)",
+      "src": "08 7절 · canon arc:pacheon_hoesang · 130 · 131 판독(회상이라 status_by_ep 로 못 내 손으로) · 구역 주인은 districts.json",
+      "conf": "ai",
+      "provisional": true,
+      "playable": ["pacheon"],
+      "pillars": [],
+      "assign": [{"id": "choeminuk", "faction": "pacheon", "post": "boss"}]
+    }
+  ]
+}
