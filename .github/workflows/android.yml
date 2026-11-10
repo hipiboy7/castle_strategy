@@ -157,6 +157,18 @@ jobs:
             build/apk_list.txt
           retention-days: 1
 
+      # 잡 하나에서 빌드 뒤 에뮬레이터를 띄우면 디스크가 모자라다 — run #2(42735744915): "Not enough space to create userdata
+      # partition. Available: 7126 MB, need 7373 MB" → 쓰지 않는 도구 · 빌드 찌꺼기를 지운다(docs/트러블슈팅.md T-1)
+      - name: 디스크 비우기 (에뮬레이터용)
+        if: ${{ env.EMULATOR == 'true' }}
+        run: |
+          df -h / | tail -1
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/.ghcup /usr/local/share/boost /usr/local/lib/node_modules \
+            /usr/share/swift /opt/hostedtoolcache/CodeQL /usr/local/julia* || true
+          rm -rf .godot .tools ~/godot-cache/android_templates.tmp || true
+          sudo docker image prune --all --force > /dev/null 2>&1 || true
+          df -h / | tail -1
+
       - name: KVM 켜기
         if: ${{ env.EMULATOR == 'true' }}
         run: |
