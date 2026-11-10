@@ -1,0 +1,66 @@
+[gd_resource type="Theme" load_steps=6 format=3]
+
+[ext_resource type="FontFile" path="res://assets/fonts/Galmuri11-Bold.ttf" id="1_font"]
+
+[sub_resource type="StyleBoxFlat" id="btn_normal"]
+content_margin_left = 32.0
+content_margin_top = 24.0
+content_margin_right = 32.0
+content_margin_bottom = 24.0
+bg_color = Color(0.925, 0.92, 0.9, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="btn_pressed"]
+content_margin_left = 32.0
+content_margin_top = 24.0
+content_margin_right = 32.0
+content_margin_bottom = 24.0
+bg_color = Color(0.7, 0.125, 0.12, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxEmpty" id="btn_focus"]
+
+[sub_resource type="StyleBoxFlat" id="panel"]
+content_margin_left = 24.0
+content_margin_top = 20.0
+content_margin_right = 24.0
+content_margin_bottom = 20.0
+bg_color = Color(0.11, 0.12, 0.16, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[resource]
+BigLabel/base_type = &"Label"
+BigLabel/font_sizes/font_size = 88
+default_font = ExtResource("1_font")
+default_font_size = 44
+Button/colors/font_color = Color(0.055, 0.06, 0.085, 1)
+Button/colors/font_hover_color = Color(0.055, 0.06, 0.085, 1)
+Button/colors/font_focus_color = Color(0.055, 0.06, 0.085, 1)
+Button/colors/font_pressed_color = Color(0.925, 0.92, 0.9, 1)
+Button/font_sizes/font_size = 55
+Button/styles/focus = SubResource("btn_focus")
+Button/styles/hover = SubResource("btn_normal")
+Button/styles/normal = SubResource("btn_normal")
+Button/styles/pressed = SubResource("btn_pressed")
+Label/colors/font_color = Color(0.925, 0.92, 0.9, 1)
+Label/font_sizes/font_size = 44
+MarginContainer/constants/margin_bottom = 48
+MarginContainer/constants/margin_left = 48
+MarginContainer/constants/margin_right = 48
+MarginContainer/constants/margin_top = 48
+PanelContainer/styles/panel = SubResource("panel")
+SmallLabel/base_type = &"Label"
+SmallLabel/colors/font_color = Color(0.66, 0.67, 0.7, 1)
+SmallLabel/font_sizes/font_size = 33
+TitleLabel/base_type = &"Label"
+TitleLabel/font_sizes/font_size = 77
+VBoxContainer/constants/separation = 28

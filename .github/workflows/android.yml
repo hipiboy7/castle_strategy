@@ -1,0 +1,233 @@
+# 캐슬 제패 — 검증 · APK · 화면 찍기 · 에뮬레이터 점검 · 릴리스 (castle_M3D .github/workflows/android.yml 을 옮겼다)
+#  잡 하나(android)에서 차례로 한다. 계정 Artifact 저장 한도가 이미 차 있어서(2026-11-09 castle_M3D run #65 · #66),
+#  APK 를 잡 사이에 artifact 로 넘기지 않는다(docs/기획_차이.md (다)8). 2026-11-10 부터 공개 저장소라 Actions 분 · artifact 가
+#  계정 한도에 들지 않지만, 비공개로 되돌릴 때를 위해 그대로 둔다(CLAUDE.md 0절 외부 서비스).
+#  push(main · impl-* · 경로 필터): 검증(scripts/verify.py) → APK 내보내기 → APK 안 파일 점검 → 세로 스크린샷(실패해도 계속 · 1일)
+#  수동 실행(emulator=true) · 태그: 위에 더해 에뮬레이터 점검(scripts/emu_check.sh — API 34 x86_64 · 세로 · 자가 해시 대조)
+#  태그(v*): 위에 더해 GitHub Releases 에 APK 를 붙이고 **Latest** 로 둔다(-rc 도 프리릴리스로 두지 않는다 — 폰 GitHub 앱 → Releases
+#             → 맨 위에서 바로 받게 · castle_M3D 와 같게 · 사용자 2026-11-10 · docs/트러블슈팅.md T-2). 본문 = 바로 받기 링크 + docs/폰확인.md + sha256
+#  서명: android/debug.keystore(castle_M3D 와 같은 고정 디버그 키 — 패키지 이름이 달라 서로 덮어쓰지 않는다 · CLAUDE.md 7절)
+name: android
+
+on:
+  push:
+    branches: [main, "impl-*"]
+    tags: ["v*"]                      # 태그는 경로 필터 없이 돌고 에뮬레이터 · 릴리스까지
+    paths:
+      - "sim/**"
+      - "src/**"
+      - "ui/**"
+      - "data/**"
+      - "assets/**"
+      - "tests/**"
+      - "tools/rng_ref.py"
+      - "android/**"
+      - "scripts/**"
+      - "project.godot"
+      - "main.tscn"
+      - "export_presets.cfg"
+      - ".github/workflows/android.yml"
+  workflow_dispatch:
+    inputs:
+      emulator:
+        description: "에뮬레이터 점검까지 (약 8 ~ 12분 더)"
+        type: boolean
+        default: false
+
+# 같은 가지에 새 push 가 오면 앞 push 실행을 취소한다. 태그 · 수동 실행은 취소하지 않는다(그룹이 따로다)
+concurrency:
+  group: android-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'push' && github.ref_type == 'branch' }}
+
+env:
+  GODOT_VERSION: 4.7.2-stable
+  APK: castle_strategy
+
+jobs:
+  android:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    permissions:
+      contents: write                 # 태그 때 릴리스를 만든다
+    env:
+      GODOT_ANDROID_KEYSTORE_DEBUG_PATH: ${{ github.workspace }}/android/debug.keystore
+      GODOT_ANDROID_KEYSTORE_DEBUG_USER: androiddebugkey
+      GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD: android
+      EMULATOR: ${{ startsWith(github.ref, 'refs/tags/') || (github.event_name == 'workflow_dispatch' && inputs.emulator) }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Godot · 템플릿 캐시
+        uses: actions/cache@v6
+        with:
+          path: ~/godot-cache
+          key: godot-${{ env.GODOT_VERSION }}-android
+
+      - name: Godot · 안드로이드 템플릿 설치
+        run: |
+          set -e
+          V=$GODOT_VERSION
+          mkdir -p ~/godot-cache && cd ~/godot-cache
+          if [ ! -f "Godot_v${V}_linux.x86_64" ]; then
+            curl -sSLo g.zip "https://github.com/godotengine/godot/releases/download/${V}/Godot_v${V}_linux.x86_64.zip"
+            unzip -q g.zip && rm g.zip
+          fi
+          if [ ! -d android_templates ]; then
+            curl -sSLo t.tpz "https://github.com/godotengine/godot/releases/download/${V}/Godot_v${V}_export_templates.tpz"
+            mkdir -p android_templates
+            unzip -q -j t.tpz 'templates/android_*' 'templates/version.txt' -d android_templates
+            rm t.tpz
+          fi
+          T="$HOME/.local/share/godot/export_templates/${V/-/.}"
+          mkdir -p "$T" && cp android_templates/* "$T/"
+          ls -la "$T"
+          echo "GODOT=$HOME/godot-cache/Godot_v${V}_linux.x86_64" >> "$GITHUB_ENV"
+
+      - name: 안드로이드 내보내기 설정 (SDK · JDK · 고정 디버그 키)
+        run: |
+          set -e
+          mkdir -p ~/.config/godot
+          for f in editor_settings-4.tres editor_settings-4.7.tres; do
+            {
+              echo '[gd_resource type="EditorSettings" format=3]'
+              echo ''
+              echo '[resource]'
+              echo "export/android/android_sdk_path = \"$ANDROID_HOME\""
+              echo "export/android/java_sdk_path = \"$JAVA_HOME\""
+              echo "export/android/debug_keystore = \"$GITHUB_WORKSPACE/android/debug.keystore\""
+              echo 'export/android/debug_keystore_user = "androiddebugkey"'
+              echo 'export/android/debug_keystore_pass = "android"'
+            } > ~/.config/godot/$f
+          done
+          keytool -list -keystore android/debug.keystore -storepass android -alias androiddebugkey | head -3
+
+      - name: 검증 (기준 구현 · 가져오기 · 시험 · 커버리지 · 자동 진행 · 화면 · 문서)
+        run: python3 scripts/verify.py
+
+      # versionCode 는 늘 올린다(run 번호), versionName 은 태그(앞의 v 뺌) — 가지 빌드는 0.1.0-dev.<run 번호>
+      - name: 버전 (versionCode = run 번호 · versionName = 태그)
+        run: |
+          set -e
+          CODE=$GITHUB_RUN_NUMBER
+          if [ "$GITHUB_REF_TYPE" = "tag" ]; then NAME="${GITHUB_REF_NAME#v}"; else NAME="0.1.0-dev.$GITHUB_RUN_NUMBER"; fi
+          sed -i "s|^version/code=.*|version/code=$CODE|; s|^version/name=.*|version/name=\"$NAME\"|" export_presets.cfg
+          grep "^version/" export_presets.cfg
+
+      - name: APK 내보내기
+        run: |
+          set -e
+          mkdir -p build
+          "$GODOT" --headless --path . --export-debug "Android" "build/$APK.apk" 2>&1 | tee build/export.log
+          test -f "build/$APK.apk"
+          ls -la build
+          sha256sum "build/$APK.apk" | tee "build/$APK.apk.sha256"
+
+      # 판정 코드는 들어 있고(sim/ · src/ · ui/) 시험(tests/)은 빠졌는지
+      - name: APK 안 파일 점검
+        run: |
+          set -e
+          unzip -l "build/$APK.apk" > build/apk_list.txt
+          for f in sim/rng.gd sim/hash.gd sim/turn.gd sim/rules_common.gd sim/tables.gd src/main.gd ui/home.gd \
+                   data/game/economy.json data/common/packs/strategy/scenarios.json data/common/canon/characters.json; do
+            grep -qE "assets/${f}c?$" build/apk_list.txt || { echo "::error::APK 에 $f 가 없다"; exit 1; }
+          done
+          if grep -q "assets/tests/" build/apk_list.txt; then echo "::error::시험(tests/)이 APK 에 들었다"; exit 1; fi
+          if grep -q "assets/data/common/cases/" build/apk_list.txt; then echo "::error::cases 가 APK 에 들었다"; exit 1; fi
+          echo "APK 에 판정 · 화면 코드 있음 · 시험 없음 · 크기 $(stat -c %s "build/$APK.apk") 바이트"
+
+      - name: 화면 찍기 (가상 화면 · 폰 세로 1080x2340 · 폴드 안쪽 1812x2176)
+        if: ${{ !cancelled() }}
+        continue-on-error: true
+        timeout-minutes: 10
+        run: |
+          sudo apt-get update -q && sudo apt-get install -y -q xvfb libgl1 libgl1-mesa-dri libglx-mesa0 libegl1 \
+            libx11-6 libxcursor1 libxinerama1 libxrandr2 libxi6 libxext6 libxrender1 libxkbcommon0 > /dev/null
+          mkdir -p shots
+          for s in 1080x2340:phone 1812x2176:fold_inner; do
+            R=${s%%:*}; N=${s##*:}
+            timeout 240 xvfb-run -a -s "-screen 0 ${R}x24" "$GODOT" --path . --rendering-driver opengl3 --audio-driver Dummy \
+              --resolution "$R" -- --shot "$PWD/shots/$N.png" --shot-frame 30 2>&1 | grep --line-buffered -vE "^\s*$" || true
+          done
+          ls -la shots
+
+      - uses: actions/upload-artifact@v7
+        if: ${{ !cancelled() }}
+        continue-on-error: true
+        with:
+          name: shots
+          path: |
+            shots/
+            build/export.log
+            build/apk_list.txt
+          retention-days: 1
+
+      # 잡 하나에서 빌드 뒤 에뮬레이터를 띄우면 디스크가 모자라다 — run #2(42735744915): "Not enough space to create userdata
+      # partition. Available: 7126 MB, need 7373 MB" → 쓰지 않는 도구 · 빌드 찌꺼기를 지운다(docs/트러블슈팅.md T-1)
+      - name: 디스크 비우기 (에뮬레이터용)
+        if: ${{ env.EMULATOR == 'true' }}
+        run: |
+          df -h / | tail -1
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/.ghcup /usr/local/share/boost /usr/local/lib/node_modules \
+            /usr/share/swift /opt/hostedtoolcache/CodeQL /usr/local/julia* || true
+          rm -rf .godot .tools ~/godot-cache/android_templates.tmp || true
+          sudo docker image prune --all --force > /dev/null 2>&1 || true
+          df -h / | tail -1
+
+      - name: KVM 켜기
+        if: ${{ env.EMULATOR == 'true' }}
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+          sudo udevadm settle || true
+          if [ -r /dev/kvm ] && [ -w /dev/kvm ]; then echo "KVM 사용 가능"; else echo "::error::/dev/kvm 을 쓸 수 없다"; exit 1; fi
+
+      # castle_M3D 와 같은 에뮬레이터(pixel_6 — 세로 1080x2400 · 2코어 · 3GB). -gpu swangle_indirect 는 M3D 에서 돈 설정을 그대로 쓴다
+      - name: 에뮬레이터에서 설치 · 실행 · 스크린샷 · 자가 해시
+        if: ${{ env.EMULATOR == 'true' }}
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          profile: pixel_6
+          cores: 2
+          ram-size: 3072M
+          emulator-boot-timeout: 900
+          emulator-options: -no-window -gpu swangle_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none -camera-front none
+          disable-animations: true
+          script: bash scripts/emu_check.sh
+
+      - uses: actions/upload-artifact@v7
+        if: ${{ !cancelled() && env.EMULATOR == 'true' }}
+        continue-on-error: true
+        with:
+          name: emulator
+          path: emu/
+          retention-days: 1
+
+      - name: GitHub Releases 에 APK 붙이기 (고정 디버그 키 서명 — 덮어 설치 · 저장 유지)
+        if: ${{ startsWith(github.ref, 'refs/tags/') }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -e
+          T="$GITHUB_REF_NAME"
+          F="$APK-$T.apk"
+          cp "build/$APK.apk" "$F"
+          sha256sum "$F" | tee "$F.sha256"
+          {
+            echo "커밋 \`${GITHUB_SHA::7}\` · run #$GITHUB_RUN_NUMBER · \`$F\` · 고정 디버그 키 서명(덮어 설치 · 저장 유지) · 이 저장소 Releases 의 APK 만 까세요"
+            echo ""
+            echo "**바로 받기**: [$F](https://github.com/$GITHUB_REPOSITORY/releases/download/$T/$F) — 눌러서 받은 뒤 열어 설치"
+            echo ""
+            cat docs/폰확인.md
+            echo ""
+            echo "sha256 \`$(cut -d' ' -f1 "$F.sha256")\`"
+          } > notes.md
+          gh release create "$T" "$F" "$F.sha256" --repo "$GITHUB_REPOSITORY" --title "캐슬 제패 $T" --latest --notes-file notes.md

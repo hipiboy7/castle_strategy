@@ -1,0 +1,1615 @@
+{
+  "_about": "전략 장르 팩(기획서 07 · 00 결정 9) — 전부 AI 후보(conf ai · provisional). 사용자 확정 전엔 게임에서 잠정 표시. work/pilot/strategy_pack.py(2026-11-05 65차 · 원본 다시 읽지 않음 — canon · 판독 기록 · status_by_ep)",
+  "stats": {"command": "지휘", "scheming": "계산", "business": "수완", "loyalty": "의리", "ambition": "야망"},
+  "scale": {"min": 1, "max": 100, "provisional": false, "src": "답47 #8 — 이름 · 범위 확정(값은 AI 후보)"},
+  "relation_kinds": ["가족", "의형제", "사제", "상관", "부하", "동료", "원수", "은인", "연인", "맞수"],
+  "characters": [
+    {
+      "id": "akila",
+      "name": "아킬라",
+      "stats": {"command": 62, "scheming": 78, "business": 25, "loyalty": 72, "ambition": 25},
+      "tags": ["냉정한 저격수", "원칙파", "조직 걱정"],
+      "relations": [
+        {
+          "to": "peurikit",
+          "kind": "부하",
+          "refs": ["p1:056"],
+          "note": "아킬라가 대장 — 프리깃이 아킬라를 대장으로 따른다(사용자 답54 #4)"
+        },
+        {"to": "kimshin", "kind": "동료", "refs": ["p1:078"], "note": "형제로 부를 만큼 함께한 사이이나 리사 일로 갈릴 수 있다"},
+        {"to": "gustav", "kind": "맞수", "refs": ["060/002-018"], "note": "구스타프가 오래 기다린 대결 상대"},
+        {"to": "jintae", "kind": "동료", "refs": ["020/080-093"], "note": "같은 이스크라 팀, 처지에는 끼어들지 않음"},
+        {"to": "grolla", "kind": "맞수", "refs": ["022/088-104"], "note": "스카우트하듯 말을 건 킬러"}
+      ],
+      "why": "확률로 판을 재고 덫을 놓는 저격수이자 원로 앞에서도 물러서지 않는 원칙파. 조직 안에 머물러 수장은 아니라 지휘는 중상, 야망은 낮음.",
+      "refs": ["053/045-073", "022/174-216"],
+      "conf": "ai",
+      "provisional": true,
+      "flag": "p1:078 의 김신과의 '형제' 발언이 아킬라 본인 말인지 컷 확인 필요"
+    },
+    {
+      "id": "andycheong",
+      "name": "앤디청",
+      "stats": {"command": 35, "scheming": 72, "business": 30, "loyalty": 55, "ambition": 45},
+      "tags": ["냉정한 기술가", "내통자"],
+      "relations": [
+        {"to": "yuwoosung", "kind": "부하", "refs": ["026/157-162"], "note": "전화 지시를 받는 실행자(소속 기록)"}
+      ],
+      "why": "냉정하게 위험을 따지고 시간 끌기를 계산하는 실행자. 속으로는 다른 목적이 있어 의리는 중간.",
+      "refs": ["027/087-129", "027/146-154"],
+      "conf": "ai",
+      "provisional": true,
+      "flag": "유우성 쪽 내통자인지 다른 소속인지 027/146-154 확인"
+    },
+    {
+      "id": "baekdochan",
+      "name": "백도찬",
+      "stats": {"command": 92, "scheming": 78, "business": 45, "loyalty": 50, "ambition": 80},
+      "tags": ["최강 킬러", "냉혹", "이스크라 전설", "효율주의"],
+      "relations": [
+        {"to": "krot", "kind": "부하", "refs": ["p1:012/011@2281-016@2262"], "note": "크로트가 '그 사람'이라 부르며 섬기는 쪽"},
+        {"to": "choeminuk", "kind": "상관", "refs": ["p1:058"], "note": "최민욱이 러시아에서 발탁, 윗선으로 지시"},
+        {"to": "komodo", "kind": "부하", "refs": ["p1:035/027-158"], "note": "자기를 노린 킬러를 꺾고 수하로 거둠"},
+        {"to": "kimshin", "kind": "원수", "refs": ["p1:017"], "note": "김신 아버지를 죽인 상대"},
+        {"to": "gangminseong", "kind": "원수", "refs": ["p1:017"], "note": "강민성을 죽임"},
+        {"to": "sintaejin", "kind": "원수", "refs": ["p1:034"], "note": "합류 시험 때 신태진을 꺾음"}
+      ],
+      "why": "조직 지휘와 개인 무력 모두 최상급인 이스크라 전설. 최민욱 자리를 노리는 야망이 보이고 의리는 조직 밖에선 불투명.",
+      "refs": ["p1:013/000@2682", "p1:089/000@18555-000@19995"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "bakcheolgyu",
+      "name": "박철규",
+      "stats": {"command": 55, "scheming": 60, "business": 35, "loyalty": 40, "ambition": 35},
+      "tags": ["현실파", "보스", "발 빼는 계산형"],
+      "relations": [
+        {"to": "kimshin", "kind": "상관", "refs": ["p1:088"], "note": "'따르겠습니다'로 대장으로 인정"},
+        {"to": "eogwangdeuk", "kind": "동료", "refs": ["p1:089"], "note": "옛 동지, 투닥거림을 말림"},
+        {"to": "dohaksu", "kind": "동료", "refs": ["p1:089"], "note": "옛 동지"}
+      ],
+      "why": "수원 지역 보스. 판이 위험하면 발을 빼라 권하는 현실 계산형이고, 백의 편입에는 반발해 이탈한 전력이 있어 의리는 중하.",
+      "refs": ["064/030-036", "p1:119/104-107"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "barista",
+      "name": "바리스타",
+      "stats": {"command": 68, "scheming": 72, "business": 70, "loyalty": 60, "ambition": 55},
+      "tags": ["약팔이", "잔혹한 심리전", "조직 우선"],
+      "relations": [
+        {"to": "baekdochan", "kind": "상관", "refs": ["p1:051"], "note": "백도찬의 왼팔"},
+        {"to": "namgunghyuk", "kind": "동료", "refs": ["p1:052"], "note": "옛 동료, 형제로 부름"},
+        {"to": "monkey", "kind": "부하", "refs": ["p1:052"], "note": "몽키를 풀어 준 주인"},
+        {"to": "sintaejin", "kind": "원수", "refs": ["p1:063"], "note": "한때 전우, 이제 사냥감"},
+        {"to": "kimdaegeon", "kind": "원수", "refs": ["p1:082"], "note": "신태진 건으로 맞붙음"}
+      ],
+      "why": "약 거래 간부로 신용과 값 흥정에 능하고 함정과 심리전을 즐김. 명령 우선이라 의리는 중상.",
+      "refs": ["p1:080/000@0-002@11593", "p1:064/034-069"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "bison",
+      "name": "바이슨",
+      "stats": {"command": 45, "scheming": 62, "business": 35, "loyalty": 55, "ambition": 35},
+      "tags": ["분석형", "이스크라 킬러"],
+      "relations": [],
+      "why": "등급 정보로 상대를 평가하고 미끼를 간파하는 분석형 평 킬러. 기록 적음.",
+      "refs": ["020/041-046", "077/004"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "blackmamba",
+      "name": "블랙맘바",
+      "stats": {"command": 40, "scheming": 70, "business": 30, "loyalty": 30, "ambition": 50},
+      "tags": ["광기", "냉소 킬러", "피아불문"],
+      "relations": [
+        {"to": "risa", "kind": "동료", "refs": ["p1:106"], "note": "리사가 보낸 이스크라 쪽 도우미"},
+        {"to": "gustav", "kind": "동료", "refs": ["p1:070"], "note": "'차가운 피' 팀 동료(자막)"},
+        {"to": "komodo", "kind": "동료", "refs": ["p1:070"], "note": "'차가운 피' 팀 동료(자막)"},
+        {"to": "snapper", "kind": "동료", "refs": ["p1:070"], "note": "'차가운 피' 팀 동료(자막)"}
+      ],
+      "why": "관찰력과 계산은 높지만 피아를 가리지 않고 갱단 편인 척 떠보는 등 신의가 없다.",
+      "refs": ["p1:070/104-124", "111/021-030"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "chasumin",
+      "name": "차수민",
+      "stats": {"command": 55, "scheming": 72, "business": 60, "loyalty": 50, "ambition": 55},
+      "tags": ["여걸", "협상가", "복수자"],
+      "relations": [
+        {"to": "ilguk", "kind": "가족", "refs": ["p1:010"], "note": "친부(자막)"},
+        {"to": "choeminuk", "kind": "원수", "refs": ["p1:061"], "note": "아버지의 원수"},
+        {"to": "gangmanjae", "kind": "원수", "refs": ["p1:005"], "note": "폐차장 압박 · 적대"},
+        {"to": "kimshin", "kind": "동료", "refs": ["p1:006"], "note": "학창 시절부터 아는 사이, 거래 수락"},
+        {"to": "yundeoksu", "kind": "원수", "refs": ["p1:006"], "note": "차수민 패거리를 적으로 봄"},
+        {"to": "jintae", "kind": "동료", "refs": ["p1:007"], "note": "잠입 지원"}
+      ],
+      "why": "보스대리로 협상을 주도하며 정보를 쥐고 흔든다. 열세에서도 물러서지 않지만 세력은 작다.",
+      "refs": ["p1:010/003@2287-004@0", "p1:014/022@0-024@1075"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "cheonildo",
+      "name": "천일도",
+      "stats": {"command": 72, "scheming": 90, "business": 80, "loyalty": 35, "ambition": 70},
+      "tags": ["노회한 원로", "관조형", "자기 안위 우선"],
+      "relations": [
+        {"to": "choeminuk", "kind": "동료", "refs": ["p1:117"], "note": "같은 원탁에서 손짓으로 호응"},
+        {"to": "kimyongseong", "kind": "동료", "refs": ["p1:060"], "note": "원로 두 영감으로 묶임"},
+        {"to": "mahakyoung", "kind": "부하", "refs": ["p1:108"], "note": "'우리 마 전무'라 부름"},
+        {"to": "juro", "kind": "부하", "refs": ["p1:121"], "note": "주로가 어르신으로 모심"}
+      ],
+      "why": "판 전체를 관조하며 패를 쥐고 있음을 암시하는 노회한 원로. 안위 일순위, 배신자 늙은이라는 평도 있어 의리는 낮게 둠.",
+      "refs": ["111/043-047", "059/034@1082"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "choedalcheon",
+      "name": "최달천",
+      "stats": {"command": 58, "scheming": 45, "business": 25, "loyalty": 85, "ambition": 25},
+      "tags": ["최강 주먹", "충성형", "느긋한 전투광"],
+      "relations": [
+        {"to": "kimhwang", "kind": "상관", "refs": ["p1:059"], "note": "곁을 지키는 수행 주먹"},
+        {"to": "baekdochan", "kind": "맞수", "refs": ["p1:059"], "note": "백가 정도는 와야 상대가 된다고 함"},
+        {"to": "yeominsu", "kind": "원수", "refs": ["p1:099"], "note": "예전에 민수의 눈을 다치게 함"},
+        {"to": "ryujihak", "kind": "맞수", "refs": ["075/037-039"], "note": "놔준 것을 아까워하고 충성을 부러워함"}
+      ],
+      "why": "골드 쪽 최강 주먹으로 주인 식구 걱정이 먼저인 충성형. 계략과 사업은 부하 몫이고 야망도 낮음.",
+      "refs": ["006/090-131", "p1:099"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "choehyeokjin",
+      "name": "최혁진",
+      "stats": {"command": 55, "scheming": 40, "business": 35, "loyalty": 50, "ambition": 50},
+      "tags": ["현실주의자", "호전적", "현장 책임자"],
+      "relations": [{"to": "woojin", "kind": "상관", "refs": ["036/002@1131"], "note": "피우진에게 존대"}],
+      "why": "해외 현장 책임자급이나 눈으로 본 것만 믿는 냉소형 전투형 간부. 기록 적음.",
+      "refs": ["002/009-017", "004/061-073"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "choeminuk",
+      "name": "최민욱",
+      "stats": {"command": 90, "scheming": 88, "business": 90, "loyalty": 45, "ambition": 85},
+      "tags": ["회장", "냉혹한 승부사", "관용 연기"],
+      "relations": [
+        {"to": "baekdochan", "kind": "부하", "refs": ["p1:068"], "note": "러시아에서 직접 발탁"},
+        {"to": "mahakyoung", "kind": "부하", "refs": ["p1:045"], "note": "가장 신뢰하는 경호대장"},
+        {"to": "chasumin", "kind": "원수", "refs": ["p1:061"], "note": "수민의 아버지를 죽인 원수"},
+        {"to": "kimyongseong", "kind": "은인", "refs": ["p1:058"], "note": "김용성이 자신을 회장으로 세움"},
+        {"to": "gangminseong", "kind": "동료", "refs": ["p1:045"], "note": "'형님'이라 부르던 과거(경고 거부)"}
+      ],
+      "why": "캐슬 정점. 승리 지상주의로 우정을 내세우며 뒤에서 처형하는 이중성.",
+      "refs": ["p1:117/046-058", "122/043-045"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "choemyeonghui",
+      "name": "최명희",
+      "stats": {"command": 70, "scheming": 90, "business": 92, "loyalty": 75, "ambition": 70},
+      "tags": ["수완가", "살수 육성자", "고인(회상)"],
+      "relations": [
+        {"to": "kimtaehoon", "kind": "가족", "refs": ["p1:119"], "note": "어머니"},
+        {"to": "ryujihak", "kind": "사제", "refs": ["p1:119"], "note": "하성 킬러를 이면에서 길러 냄"},
+        {"to": "kimyongseong", "kind": "동료", "refs": ["p1:058"], "note": "함께 하성을 세움"},
+        {"to": "cheonildo", "kind": "맞수", "refs": ["083/000-020"], "note": "원로 앞에서도 비꼬며 협상 주도"}
+      ],
+      "why": "정치 접대와 재개발로 하성을 무에서 일군 수완가이자 판을 읽고 스스로를 본보기로 내준 계산가. 고인이라 현재 전력은 회상 기준.",
+      "refs": ["083/000-020", "083/061@1440"],
+      "conf": "ai",
+      "provisional": true,
+      "flag": "김용성과의 관계(부부 여부)는 기록에 명시 없음 — p1:058, p1:119 확인"
+    },
+    {
+      "id": "dohaksu",
+      "name": "도학수",
+      "stats": {"command": 55, "scheming": 65, "business": 60, "loyalty": 50, "ambition": 60},
+      "tags": ["셈 빠른 실력자", "세력 논리", "기회주의"],
+      "relations": [
+        {"to": "kimshin", "kind": "상관", "refs": ["p1:088"], "note": "반발하다 대세를 보고 따름"},
+        {"to": "eogwangdeuk", "kind": "동료", "refs": ["p1:089"], "note": "같은 경북 식구, 형님으로 부름"},
+        {"to": "bakcheolgyu", "kind": "동료", "refs": ["p1:089"], "note": "투닥거림을 말려 준 옛 동지"}
+      ],
+      "why": "포항 세력 대표로 캐슬 편입을 큰물에서 이름 날릴 기회로 계산함. 대세를 따르는 현실파.",
+      "refs": ["p1:088/006@3805-006@7328", "p1:119/115"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "dojiung",
+      "name": "도지웅",
+      "stats": {"command": 40, "scheming": 50, "business": 55, "loyalty": 75, "ambition": 25},
+      "tags": ["식당 사장", "의리파", "스승 노릇"],
+      "relations": [
+        {"to": "iseul", "kind": "사제", "refs": ["p1:054"], "note": "이슬이 선배로 부르며 대련을 졸랐다"},
+        {"to": "kimshin", "kind": "동료", "refs": ["p1:088"], "note": "각오를 시험한 뒤 힘써 주기로 함"},
+        {"to": "gangminseong", "kind": "동료", "refs": ["p1:036"], "note": "'민성 형님'"},
+        {"to": "choeminuk", "kind": "상관", "refs": ["127/052-062"], "note": "형으로 깍듯이 따름"}
+      ],
+      "why": "장사하는 현역 은퇴자로 부탁은 받아 주고 어른은 깍듯이 따르는 의리파. 조직 규모는 작음.",
+      "refs": ["p1:088/002@1064-003@2810", "127/052-062"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "douchen",
+      "name": "도우첸",
+      "stats": {"command": 55, "scheming": 78, "business": 55, "loyalty": 70, "ambition": 35},
+      "tags": ["참모", "직언", "분석형"],
+      "relations": [{"to": "yuwoosung", "kind": "상관", "refs": ["p1:117/073-084"], "note": "롱터우로 부르며 보좌 · 만류"}],
+      "why": "정세를 계산하고 직언하는 참모. 충성하되 망가진 왕은 따르지 않겠다는 선이 있다.",
+      "refs": ["p1:117/073-084", "023/192-214"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "eogwangdeuk",
+      "name": "어광득",
+      "stats": {"command": 55, "scheming": 45, "business": 35, "loyalty": 78, "ambition": 30},
+      "tags": ["의리파", "사투리 형님", "백의 간부"],
+      "relations": [
+        {"to": "kimshin", "kind": "부하", "refs": ["p1:119"], "note": "김신에게 빚을 졌다며 남음"},
+        {"to": "dohaksu", "kind": "동료", "refs": ["p1:089"], "note": "같은 경북 아우"},
+        {"to": "yeominsu", "kind": "동료", "refs": ["p1:088"], "note": "함께 꿇고 따르기로 함"}
+      ],
+      "why": "형님 기질로 후퇴 대신 남아 막는 의리파, 판단도 빠르다.",
+      "refs": ["037/089-092", "042/038"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "eunbo",
+      "name": "은보",
+      "stats": {"command": 48, "scheming": 50, "business": 25, "loyalty": 45, "ambition": 40},
+      "tags": ["유술형", "사천왕", "교활한 복수심"],
+      "relations": [
+        {"to": "wanghaoming", "kind": "맞수", "refs": ["027/079-085"], "note": "뒤에서 망나니라 부르며 경호원을 움직이려 함"}
+      ],
+      "why": "사천왕 체면을 따지고 앤디를 기다려 묶어 두려는 계산도 하나, 힘 위주로 두 번 졌다. 말을 듣지 않는 등 의리는 중간 아래.",
+      "refs": ["026/120", "027/079-085"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "gangchangseok",
+      "name": "강창석",
+      "stats": {"command": 40, "scheming": 55, "business": 20, "loyalty": 10, "ambition": 65},
+      "tags": ["배신자", "가학", "칼잡이"],
+      "relations": [
+        {"to": "yundeoksu", "kind": "상관", "refs": ["p1:013/023@2404-027@0"], "note": "옛 오른팔이었으나 훗날 배신해 죽임"},
+        {"to": "kimjaehoon", "kind": "부하", "refs": ["p1:023/029"], "note": "넘어가 아첨"},
+        {"to": "kimdaegeon", "kind": "원수", "refs": ["p1:013/023@2404-027@0"], "note": "과거 얼굴을 벤 자, 목을 원함"},
+        {"to": "woojin", "kind": "맞수", "refs": ["p1:017/092-112"], "note": "옛 상대, 재대결 예고"}
+      ],
+      "why": "윤덕수를 배신해 김재훈 쪽으로 넘어간 아첨꾼. 강자 숭배 · 약자 멸시.",
+      "refs": ["p1:019/044-055", "p1:023/029"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "grolla",
+      "name": "그롤라",
+      "stats": {"command": 40, "scheming": 72, "business": 45, "loyalty": 32, "ambition": 35},
+      "tags": ["직업 킬러", "냉정한 사냥꾼", "배후 은닉"],
+      "relations": [
+        {"to": "akila", "kind": "맞수", "refs": ["022/088-104"], "note": "탈퇴하면 연락하라며 스카우트하듯 말함"},
+        {"to": "kimshin", "kind": "맞수", "refs": ["089/018@0"], "note": "소리를 미끼로 간파하고 약점을 노림"}
+      ],
+      "why": "고용된 킬러로 배후를 끝까지 숨기고 상대 심리를 계산해 사냥함. 계약 의리뿐이라 충성은 낮다.",
+      "refs": ["089/018@0", "021/040-068"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "guilhwa",
+      "name": "구일화",
+      "stats": {"command": 72, "scheming": 55, "business": 60, "loyalty": 82, "ambition": 55},
+      "tags": ["호전형", "의리파", "지방 실력자"],
+      "relations": [
+        {"to": "iseul", "kind": "은인", "refs": ["p1:038"], "note": "8년 전 구원받아 형님으로 모심"},
+        {"to": "wangdokpil", "kind": "상관", "refs": ["p1:038"], "note": "아버지처럼 키워 준 대보스"}
+      ],
+      "why": "천안 쪽 실력자로 상대가 많을수록 반기는 호전형. 이슬과의 약속과 왕독필에 대한 의리가 강하다.",
+      "refs": ["p1:038", "112/041-042"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "gustav",
+      "name": "구스타프",
+      "stats": {"command": 45, "scheming": 45, "business": 10, "loyalty": 40, "ambition": 55},
+      "tags": ["전투광", "강자 집착", "외로운 최상위 킬러"],
+      "relations": [
+        {"to": "kimshin", "kind": "맞수", "refs": ["p1:054"], "note": "티그로를 가장 죽이고 싶어 함"},
+        {"to": "akila", "kind": "맞수", "refs": ["060/002-018"], "note": "지겹게 기다린 대결 상대"},
+        {"to": "risa", "kind": "부하", "refs": ["069/007-034"], "note": "강자 제공 약속으로 움직이나 위협도 함"}
+      ],
+      "why": "강한 상대와 싸우는 것 자체가 목적인 최상위 킬러. 무리를 이끌지 않고 계산은 전투 중 분석 정도.",
+      "refs": ["008/176-189", "069/007-034"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "gwoan",
+      "name": "궈안",
+      "stats": {"command": 30, "scheming": 30, "business": 25, "loyalty": 50, "ambition": 15},
+      "tags": ["용병", "가장"],
+      "relations": [{"to": "yuwoosung", "kind": "부하", "refs": ["049/036-042"], "note": "롱터우로 따르지만 불안해함"}],
+      "why": "유우성을 따르나 버려질까 불안해하는 용병. 기록 적음.",
+      "refs": ["049/036-042", "050/104-108"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "gyeonghodaechoehuui4in",
+      "name": "경호대 최후의 4인",
+      "stats": {"command": 50, "scheming": 40, "business": 10, "loyalty": 85, "ambition": 15},
+      "tags": ["최후의 방패", "호위"],
+      "relations": [],
+      "why": "회장을 지키는 최후의 방패라는 자부로 싸우는 호위 집단. 기록 적음.",
+      "refs": ["058/039-045"],
+      "conf": "ai",
+      "provisional": true,
+      "flag": "4명이 한 항목(집단)인데 개별 인물인지 확인 — 058/039-045"
+    },
+    {
+      "id": "hantaecheol",
+      "name": "한태철",
+      "stats": {"command": 62, "scheming": 65, "business": 40, "loyalty": 72, "ambition": 35},
+      "tags": ["노련한 원군", "능글맞은 꼰대", "의리파"],
+      "relations": [
+        {"to": "kimshin", "kind": "동료", "refs": ["105/024@0"], "note": "김신이 맡긴 지휘를 존중"},
+        {"to": "yeominsu", "kind": "동료", "refs": ["105/024@0"], "note": "여민수를 따라 움직임"}
+      ],
+      "why": "쉽게 한 편이 되지 않으나 젊은 리더를 시험하며 맡기는 노련함과 원군 의리가 있다. 싸움을 전술로 분석한다.",
+      "refs": ["038/142-152", "037/161-164"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "hayabusa",
+      "name": "하야부사",
+      "stats": {"command": 60, "scheming": 40, "business": 10, "loyalty": 95, "ambition": 10},
+      "tags": ["충신", "검객", "과묵"],
+      "relations": [
+        {"to": "shingen", "kind": "상관", "refs": ["017/150-158"], "note": "말없이 칼을 뽑아 명령을 실행"},
+        {"to": "pyoyoung", "kind": "맞수", "refs": ["098/000-031"], "note": "사용자 메모 위치의 싸움 상대"}
+      ],
+      "why": "신겐의 제1 부하로 명령에 말없이 복종하는 충신. 말수가 적어 기록이 단순함.",
+      "refs": ["017/150-158", "059/017@0"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "hide",
+      "name": "히데",
+      "stats": {"command": 85, "scheming": 82, "business": 60, "loyalty": 28, "ambition": 92},
+      "tags": ["야망가", "반란자", "현장 지휘관", "부하를 아낌"],
+      "relations": [
+        {"to": "odohwa", "kind": "원수", "refs": ["p1:096"], "note": "총애받던 부하였으나 반란, 다만 존경은 남음"},
+        {"to": "masa", "kind": "동료", "refs": ["p1:093"], "note": "함께 제거 명령을 받음"},
+        {"to": "pyoyoung", "kind": "사제", "refs": ["p1:079"], "note": "불씨를 보고 칼을 주며 키우려 함"},
+        {"to": "shingen", "kind": "원수", "refs": ["095/042-063"], "note": "본명으로 부르며 깔보는 상대"},
+        {"to": "kimshin", "kind": "동료", "refs": ["p1:096"], "note": "회상 속 동맹 제안"}
+      ],
+      "why": "오도화를 배신하고 새 오야붕이 되어 전 일본 통합을 꿈꾸는 야망가. 배신 장면 때문에 의리 28, 다만 부하에게는 의리가 깊다.",
+      "refs": ["p1:098/003@13274-006@8056", "079/025-037"],
+      "conf": "ai",
+      "provisional": true,
+      "flag": "배신(p1:096)과 부하 의리(p1:110) 사이 의리 수치 재검토"
+    },
+    {
+      "id": "hwangbomincheol",
+      "name": "황보민철",
+      "stats": {"command": 65, "scheming": 45, "business": 55, "loyalty": 80, "ambition": 40},
+      "tags": ["자존심파", "로비 대장", "위계 중시"],
+      "relations": [
+        {"to": "ryujihak", "kind": "상관", "refs": ["p1:099"], "note": "우리 류지학 이사님"},
+        {"to": "jintae", "kind": "맞수", "refs": ["p1:026"], "note": "칼싸움에서 완패"},
+        {"to": "yeominsu", "kind": "동료", "refs": ["p1:099"], "note": "신경전에서 전우로"},
+        {"to": "ojiin", "kind": "동료", "refs": ["p1:054"], "note": "수행 · 경호"},
+        {"to": "choedalcheon", "kind": "맞수", "refs": ["p1:099"], "note": "맞상대로 첫 칼을 넣음"}
+      ],
+      "why": "하성 로비 대장으로 위계를 중시하고 후퇴 방침에도 끝까지 버틴 자존심파. 3패라 실력은 중간.",
+      "refs": ["p1:099/067@560-083@430", "p1:101/012-020"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "hyeonseok",
+      "name": "현석",
+      "stats": {"command": 70, "scheming": 65, "business": 45, "loyalty": 55, "ambition": 60},
+      "tags": ["능글 무인", "실리파", "전 캐슬 10강"],
+      "relations": [
+        {"to": "ryujihak", "kind": "사제", "refs": ["p1:116/058-080"], "note": "'우리 막내' 형제 같은 후배"},
+        {"to": "kimyongseong", "kind": "상관", "refs": ["p1:116"], "note": "최측근"},
+        {"to": "kimtaehoon", "kind": "상관", "refs": ["095/054-063"], "note": "약속받은 몫을 챙기는 거래 관계"},
+        {"to": "kimshin", "kind": "원수", "refs": ["p1:116/058-080"], "note": "처형하려다 기습당함"},
+        {"to": "choemyeonghui", "kind": "은인", "refs": ["p1:119"], "note": "최명희가 육성한 셋 중 하나"}
+      ],
+      "why": "하성 넘버 2. 불리하면 미련 없이 물러서고 몫을 챙기는 실리형.",
+      "refs": ["082/037-047", "095/054-063"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "icheolmin",
+      "name": "이철민",
+      "stats": {"command": 15, "scheming": 50, "business": 35, "loyalty": 50, "ambition": 20},
+      "tags": ["정보통", "소심"],
+      "relations": [{"to": "chasumin", "kind": "상관", "refs": ["038"], "note": "차수민의 수하(자막)"}],
+      "why": "회암시 정보통이나 겁이 많은 조무래기.",
+      "refs": ["p1:007/013@2480-014@0", "038/034-035"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "ihuiseong",
+      "name": "이희성",
+      "stats": {"command": 55, "scheming": 72, "business": 60, "loyalty": 88, "ambition": 40},
+      "tags": ["비서실장", "계산형", "충성"],
+      "relations": [
+        {"to": "choeminuk", "kind": "상관", "refs": ["p1:107"], "note": "회장으로 모시며 진언 · 대리 응대"},
+        {"to": "immuyeol", "kind": "원수", "refs": ["p1:117"], "note": "막아서고 잡으라 명령"}
+      ],
+      "why": "최민욱 곁에서 위험을 계산하고 무릎 꿇는 충성을 보이는 비서실장. 현장 지휘력은 낮다.",
+      "refs": ["042/058-082", "p1:107/070-074"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "ihwan",
+      "name": "이환",
+      "stats": {"command": 65, "scheming": 60, "business": 25, "loyalty": 85, "ambition": 15},
+      "tags": ["엄한 스승", "옛 불휘 단장", "체념"],
+      "relations": [
+        {"to": "pyoyoung", "kind": "사제", "refs": ["p1:078"], "note": "영이를 아끼며 대련을 가르침"},
+        {"to": "gangminseong", "kind": "동료", "refs": ["p1:044"], "note": "불휘 시절 동료"},
+        {"to": "seojeongchi", "kind": "부하", "refs": ["p1:045"], "note": "단장님으로 불림"},
+        {"to": "kimshin", "kind": "동료", "refs": ["p1:053"], "note": "싫어하면서도 인정하는 애증"},
+        {"to": "odohwa", "kind": "원수", "refs": ["p1:047"], "note": "깊은 악연"}
+      ],
+      "why": "불휘 단장으로 후진을 지키고 키우는 노인. 공격 야망 없이 회한과 의리가 크다.",
+      "refs": ["p1:045/000-037", "p1:078/004@2569-007@1248"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "ilguk",
+      "name": "차일국",
+      "stats": {"command": 80, "scheming": 55, "business": 50, "loyalty": 55, "ambition": 45},
+      "tags": ["부진파 보스", "냉정", "강자"],
+      "relations": [
+        {"to": "chasumin", "kind": "가족", "refs": ["p1:010"], "note": "친부"},
+        {"to": "kimdaegeon", "kind": "부하", "refs": ["p1:010"], "note": "구명 청을 거절"},
+        {"to": "kimseongjun", "kind": "부하", "refs": ["p1:010"], "note": "책임지라며 버림"},
+        {"to": "woojin", "kind": "사제", "refs": ["p1:022"], "note": "강민성과 함께 키워낸 사람"},
+        {"to": "dojiung", "kind": "동료", "refs": ["p1:036"], "note": "'일국 형님'"}
+      ],
+      "why": "이 바닥 룰을 내세워 부하를 냉정히 버린 보스지만 대국 쪽 꺾는 무력도 있다.",
+      "refs": ["p1:010/018@0-018@1072", "131/024-029"],
+      "conf": "ai",
+      "provisional": true,
+      "flag": "1부 부하를 버린 냉정과 2부 동료 챙김이 엇갈림 — 131/024-029"
+    },
+    {
+      "id": "imjongtae",
+      "name": "임종태",
+      "stats": {"command": 20, "scheming": 40, "business": 65, "loyalty": 40, "ambition": 30},
+      "tags": ["밀항 브로커", "넉살"],
+      "relations": [
+        {"to": "kimshin", "kind": "동료", "refs": ["p1:090/000@3296-000@17362"], "note": "지형도 · 루트 제공"}
+      ],
+      "why": "돈 되는 건 뭐든 하는 바닷사람. 생계가 동기이고 겁이 많다.",
+      "refs": ["p1:090/000@3296-000@17362", "005/011-026"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "immuyeol",
+      "name": "임무열",
+      "stats": {"command": 80, "scheming": 80, "business": 75, "loyalty": 50, "ambition": 80},
+      "tags": ["수장", "계산형", "야심가"],
+      "relations": [
+        {"to": "odohwa", "kind": "상관", "refs": ["p1:059/034@0-048@0"], "note": "오야지로 불리는 윗사람"},
+        {"to": "kimhwang", "kind": "동료", "refs": ["p1:060/000@1418-017@0"], "note": "홀딩스 약화 계획을 공유하는 동맹"},
+        {"to": "kimyongseong", "kind": "원수", "refs": ["p1:060/000@1418-017@0"], "note": "영감탱이로 경계"},
+        {"to": "baekdochan", "kind": "맞수", "refs": ["p1:060"], "note": "선진 백대표의 움직임을 주시"}
+      ],
+      "why": "돈과 주먹을 저울질하는 냉혹한 계산가이자 호탕한 야심가.",
+      "refs": ["p1:060/017@1104-023@0", "p1:109/067-071"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "insu",
+      "name": "인수",
+      "stats": {"command": 62, "scheming": 68, "business": 35, "loyalty": 85, "ambition": 15},
+      "tags": ["2인자", "능청꾼", "관리형"],
+      "relations": [
+        {"to": "iseul", "kind": "상관", "refs": ["p1:021"], "note": "회장으로 부르며 보좌"},
+        {"to": "kimdaegeon", "kind": "동료", "refs": ["p1:087"], "note": "사람됨을 인정, 함께 밤거리를 걸음"}
+      ],
+      "why": "청년회 2인자로 판을 읽고 이슬에게 판단을 맡기는 보좌형. 농담 뒤에 의리가 단단하다.",
+      "refs": ["p1:021/028", "p1:112/040"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "ipildo",
+      "name": "이필도",
+      "stats": {"command": 55, "scheming": 60, "business": 30, "loyalty": 70, "ambition": 25},
+      "tags": ["능청", "겁 많은 척", "백의 간부"],
+      "relations": [{"to": "woojin", "kind": "동료", "refs": ["039/086-091"], "note": "피우진을 높이 침"}],
+      "why": "겉은 느긋하나 속으로 냉정히 분석하고 죽은 동료 앞에서 다시 일어서는 오기.",
+      "refs": ["011/092-093", "096/083-086"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "iriwon",
+      "name": "이리원",
+      "stats": {"command": 25, "scheming": 60, "business": 45, "loyalty": 70, "ambition": 10},
+      "tags": ["치료사", "손윗사람", "눈치꾼"],
+      "relations": [
+        {"to": "kimdaegeon", "kind": "동료", "refs": ["p1:014"], "note": "형제를 아는 누나뻘"},
+        {"to": "kimseongjun", "kind": "동료", "refs": ["p1:010"], "note": "치료해 주는 오랜 사이"},
+        {"to": "chasumin", "kind": "동료", "refs": ["p1:014"], "note": "수민이라 부르며 위로"}
+      ],
+      "why": "가게를 지키며 사람들을 치료하고 속내를 꿰는 눈치 빠른 손윗사람. 싸우는 조직은 아니다.",
+      "refs": ["p1:014/011@1406-013@1438", "p1:010/011@1096-015@2334"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "iseul",
+      "name": "이슬",
+      "stats": {"command": 75, "scheming": 55, "business": 45, "loyalty": 85, "ambition": 40},
+      "tags": ["형님", "의리파", "청년회장"],
+      "relations": [
+        {"to": "kimdaegeon", "kind": "동료", "refs": ["p1:039/001-074"], "note": "꾸짖되 감싸는 형님"},
+        {"to": "wonyong", "kind": "부하", "refs": ["p1:021/045-047"], "note": "형님으로 따름"},
+        {"to": "namyong", "kind": "부하", "refs": ["p1:066"], "note": "회장으로 따름"},
+        {"to": "ttolbae", "kind": "동료", "refs": ["p1:067"], "note": "싸워 이겨 품음"},
+        {"to": "kimshin", "kind": "동료", "refs": ["p1:022"], "note": "동맹 요청 수락"}
+      ],
+      "why": "아우들을 지키고 촉이 빠른 형님 기질. 거칠지만 정이 많다.",
+      "refs": ["p1:039/001-074", "p1:085/005@0-005@7842"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "ivanpushkin",
+      "name": "이반 푸쉬킨",
+      "stats": {"command": 45, "scheming": 70, "business": 75, "loyalty": 50, "ambition": 50},
+      "tags": ["원로", "정치통"],
+      "relations": [],
+      "why": "정치 · 안보 시각으로 조직을 보는 원로. 기록 적음.",
+      "refs": ["022/193-210"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "iwashiro",
+      "name": "이와시로 신스케",
+      "stats": {"command": 90, "scheming": 92, "business": 85, "loyalty": 60, "ambition": 72},
+      "tags": ["노회한 수장", "미식가", "관망형"],
+      "relations": [
+        {"to": "immuyeol", "kind": "동료", "refs": ["p1:097"], "note": "일인백살 호걸로 인정"},
+        {"to": "odohwa", "kind": "동료", "refs": ["p1:097"], "note": "일인백살 호걸로 인정"},
+        {"to": "shingen", "kind": "부하", "refs": ["101/028-031"], "note": "신겐을 상대로 완성하려 한 설계자"},
+        {"to": "risa", "kind": "맞수", "refs": ["070/051@0"], "note": "관리론에 정점이 앞에서 싸운다고 맞섬"}
+      ],
+      "why": "야마구치구미 회장으로 약속은 지키되 보험을 거는 이중 계산과 판 굴리기에 능한 노회한 수장.",
+      "refs": ["019/044-045", "070/051@0"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "jangho",
+      "name": "장호",
+      "stats": {"command": 40, "scheming": 55, "business": 25, "loyalty": 92, "ambition": 10},
+      "tags": ["의리파", "충직한 기사"],
+      "relations": [
+        {"to": "kimdaegeon", "kind": "은인", "refs": ["p1:080/004@7104-006@8633"], "note": "사는 법을 가르쳐 준 은인"},
+        {"to": "janghun", "kind": "가족", "refs": ["p1:079/006@0-009@3812"], "note": "친동생"}
+      ],
+      "why": "동생을 살려 보내고 은인에게 사과하며 죽음을 받아들인 의리파.",
+      "refs": ["p1:080/004@7104-006@8633", "p1:079/006@0-009@3812"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "jangibo",
+      "name": "장이보(张一博)",
+      "stats": {"command": 15, "scheming": 30, "business": 25, "loyalty": 30, "ambition": 30},
+      "tags": ["사고뭉치", "경박한 허세"],
+      "relations": [],
+      "why": "한국인을 깔보고 한몫 챙기려다 잡히자 아첨하는 경박한 사고뭉치. 기록 적음.",
+      "refs": ["047/043-063"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "jangpyeong",
+      "name": "장평",
+      "stats": {"command": 15, "scheming": 30, "business": 35, "loyalty": 45, "ambition": 20},
+      "tags": ["주민", "반발"],
+      "relations": [],
+      "why": "기록 적음. 돈 되는 일을 원하는 주민.",
+      "refs": ["034/009-010"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "jeongdan",
+      "name": "정단",
+      "stats": {"command": 72, "scheming": 68, "business": 35, "loyalty": 78, "ambition": 25},
+      "tags": ["규율형", "경호대 부대장", "사수"],
+      "relations": [{"to": "mahakyoung", "kind": "상관", "refs": ["081/000-017"], "note": "마학영 밑에서 그늘로 살아옴"}],
+      "why": "규칙 수호 · 냉정한 판단으로 부대를 지휘하는 부대장. 상관에 충실.",
+      "refs": ["076/007-017", "081/000-017"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "jeongseono",
+      "name": "정선오",
+      "stats": {"command": 25, "scheming": 35, "business": 20, "loyalty": 80, "ambition": 15},
+      "tags": ["의리파", "투덜이", "친구"],
+      "relations": [
+        {"to": "pyoyoung", "kind": "동료", "refs": ["p1:046"], "note": "그냥 친구라며 숨겨 주고 도움"},
+        {"to": "kimshin", "kind": "동료", "refs": ["p1:096"], "note": "감격하는 공손한 아우"},
+        {"to": "neopchi", "kind": "상관", "refs": ["p1:096"], "note": "정선오를 형님으로 부름"}
+      ],
+      "why": "투덜대지만 친구를 위해 대담하게 움직이는 의리파. 4패의 약한 쪽이고 지략은 낮다.",
+      "refs": ["p1:046/089-112", "094/052-055"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "jina",
+      "name": "서진아",
+      "stats": {"command": 15, "scheming": 58, "business": 30, "loyalty": 60, "ambition": 15},
+      "tags": ["민간인", "도망자"],
+      "relations": [{"to": "jintae", "kind": "가족", "refs": ["047/073-078"], "note": "오빠"}],
+      "why": "의심 많고 침착하며 오빠의 속을 꿰뚫는 민간인. 기록 적음.",
+      "refs": ["046/028-034", "047/073-078"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "jintae",
+      "name": "서진태",
+      "stats": {"command": 68, "scheming": 70, "business": 50, "loyalty": 85, "ambition": 30},
+      "tags": ["능청꾼", "오른팔", "실리형", "이스크라 출신"],
+      "relations": [
+        {"to": "kimshin", "kind": "상관", "refs": ["p1:003"], "note": "대장으로 부르는 오른팔"},
+        {"to": "akila", "kind": "동료", "refs": ["007/099"], "note": "같은 이스크라 팀(사용자 메모)"},
+        {"to": "pyoyoung", "kind": "동료", "refs": ["024/002-018"], "note": "진태형, 형 동생 사이"},
+        {"to": "hwangbomincheol", "kind": "맞수", "refs": ["p1:026"], "note": "완승한 칼싸움 상대"},
+        {"to": "yuwoosung", "kind": "원수", "refs": ["p1:076"], "note": "한국 위치를 파악하고도 놔둔 옛 사연의 상대"},
+        {"to": "gangminseong", "kind": "동료", "refs": ["p1:003"], "note": "민성 아저씨"}
+      ],
+      "why": "장난스럽지만 판을 읽고 막히면 뒷길로 트는 실리형. 김신의 오른팔로 의리는 높고 독립 야망은 낮다.",
+      "refs": ["p1:003/014-034", "024/159-187"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "joseokjung",
+      "name": "조석중",
+      "stats": {"command": 45, "scheming": 55, "business": 35, "loyalty": 55, "ambition": 50},
+      "tags": ["승부욕", "싸움 머리", "악바리"],
+      "relations": [{"to": "ryujihak", "kind": "맞수", "refs": ["008/088-131"], "note": "지기 싫어함"}],
+      "why": "싸움 머리와 체면 의식이 있는 출전자. 기록 적음.",
+      "refs": ["008/063-087", "008/088-131"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "juro",
+      "name": "주로",
+      "stats": {"command": 65, "scheming": 60, "business": 20, "loyalty": 88, "ambition": 35},
+      "tags": ["교관", "과묵한 충신", "독단"],
+      "relations": [
+        {"to": "cheonildo", "kind": "상관", "refs": ["p1:121"], "note": "어르신으로 모심"},
+        {"to": "mahakyoung", "kind": "맞수", "refs": ["096/021-033"], "note": "9는 내줘도 10은 안 내주는 놈이라 평함"}
+      ],
+      "why": "호텔 캐슬 이름을 걸고 회장 지시도 어기며 나서는 충성형 교관. 말이 적고 분석적이다.",
+      "refs": ["096/043-060", "p1:121/088-096"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "juwon",
+      "name": "주원",
+      "stats": {"command": 55, "scheming": 60, "business": 50, "loyalty": 55, "ambition": 40},
+      "tags": ["실리파", "손가락 조원", "투덜이"],
+      "relations": [{"to": "mahakyoung", "kind": "맞수", "refs": ["095/022-026"], "note": "맞붙기를 꺼림"}],
+      "why": "조직 이익을 먼저 따지고 전황을 읽는 실리파. 투덜대지만 싸운다.",
+      "refs": ["096/006-011", "063/017-019"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "keurisa",
+      "name": "크리사",
+      "stats": {"command": 40, "scheming": 75, "business": 25, "loyalty": 55, "ambition": 50},
+      "tags": ["냉정한 총잡이", "오만", "교활"],
+      "relations": [
+        {"to": "kimshin", "kind": "동료", "refs": ["p1:055"], "note": "티그로의 친우"},
+        {"to": "woojin", "kind": "맞수", "refs": ["p1:056/017@0-033@0"], "note": "시합 상대"},
+        {"to": "shamo", "kind": "동료", "refs": ["p1:055"], "note": "같은 킬러, 서로 얄밉게 봄"},
+        {"to": "medvedi", "kind": "상관", "refs": ["p1:056"], "note": "난입을 불청객으로 봄"}
+      ],
+      "why": "계산형 킬러로 오만하나 신세를 마음에 담고 정면 승부를 접는 판단도 한다.",
+      "refs": ["p1:056/017@0-033@0", "p1:097/109-183"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "kimdaegeon",
+      "name": "김대건",
+      "stats": {"command": 72, "scheming": 65, "business": 35, "loyalty": 88, "ambition": 30},
+      "tags": ["정면 돌파", "과묵한 충성", "DS 이사"],
+      "relations": [
+        {"to": "yundeoksu", "kind": "상관", "refs": ["p1:006"], "note": "대표님이라 부름"},
+        {"to": "kimseongjun", "kind": "가족", "refs": ["p1:010"], "note": "친형"},
+        {"to": "kimshin", "kind": "맞수", "refs": ["p1:007"], "note": "솜씨를 인정하고 최후통첩을 전함"},
+        {"to": "barista", "kind": "원수", "refs": ["p1:082"], "note": "장호를 잃은 분노로 맞붙음"}
+      ],
+      "why": "다친 몸으로 혼자 적진에 들어가는 정면 돌파와 계산을 겸하고 조직과 사람에 충직함.",
+      "refs": ["p1:021/029-045", "p1:082/000@2619-003@6918"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "kimhwang",
+      "name": "김황",
+      "stats": {"command": 75, "scheming": 85, "business": 85, "loyalty": 35, "ambition": 75},
+      "tags": ["노회한 계산가", "호쾌한 두목", "이익가"],
+      "relations": [
+        {"to": "choedalcheon", "kind": "부하", "refs": ["p1:059"], "note": "곁을 지키는 수행 주먹"},
+        {"to": "immuyeol", "kind": "동료", "refs": ["p1:060"], "note": "임형이라 부르며 계획을 공유"},
+        {"to": "choeminuk", "kind": "맞수", "refs": ["p1:060"], "note": "위기 때 지분을 뜯어낼 상대"},
+        {"to": "kimtaehoon", "kind": "원수", "refs": ["p1:089"], "note": "무혈입성한 꼬마로 보고 사라지길 바람"}
+      ],
+      "why": "절제된 이익가로 홀딩스 전력을 녹이려 임무열과 공조하는 계산가. 배신 모의가 있어 의리는 낮음.",
+      "refs": ["p1:060/001@1133-015@1206", "p1:089/000@0-001@2546"],
+      "conf": "ai",
+      "provisional": true,
+      "flag": "임무열이 지운 배신 누명(p1:117)과 실제 모의(p1:060) 어느 쪽인지 확인"
+    },
+    {
+      "id": "kimjaehoon",
+      "name": "김재훈",
+      "stats": {"command": 35, "scheming": 40, "business": 60, "loyalty": 25, "ambition": 65},
+      "tags": ["오만", "비굴", "선민의식"],
+      "relations": [
+        {"to": "kimtaehoon", "kind": "가족", "refs": ["p1:030"], "note": "이복형"},
+        {"to": "yundeoksu", "kind": "부하", "refs": ["p1:008"], "note": "스폰서로서 부리고 질책"},
+        {"to": "kimshin", "kind": "원수", "refs": ["p1:003"], "note": "고교 시절 괴롭힘"},
+        {"to": "gangchangseok", "kind": "부하", "refs": ["p1:009"], "note": "출소 공작으로 데려옴"}
+      ],
+      "why": "형의 권력에 기대는 오만한 가해자, 위기엔 비굴하게 애원. 사격 · 담력 없음.",
+      "refs": ["p1:027/009-138", "p1:057/061-066"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "kimjeon",
+      "name": "김전",
+      "stats": {"command": 20, "scheming": 30, "business": 35, "loyalty": 55, "ambition": 25},
+      "tags": ["후계", "소심"],
+      "relations": [{"to": "kimhwang", "kind": "가족", "refs": ["006"], "note": "김황의 장남(자막)"}],
+      "why": "기죽은 모습뿐인 기록. 기록 적음.",
+      "refs": ["006/085-087"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "kimseongjun",
+      "name": "김성준",
+      "stats": {"command": 62, "scheming": 55, "business": 20, "loyalty": 70, "ambition": 40},
+      "tags": ["광기", "싸움꾼", "동생 걱정"],
+      "relations": [
+        {"to": "kimdaegeon", "kind": "가족", "refs": ["p1:010"], "note": "우유부단하다 몰아붙이며 대신 처리에 나선 친동생"},
+        {"to": "kimshin", "kind": "맞수", "refs": ["p1:010"], "note": "완패 뒤 사죄를 받고 격려"},
+        {"to": "iriwon", "kind": "동료", "refs": ["p1:010"], "note": "치료받는 가까운 사이"}
+      ],
+      "why": "폐차장 습격조 우두머리로 싸움을 재미로 여기는 광기형. 동생을 위한 판단은 냉정하다.",
+      "refs": ["p1:007/025@2480-026@3683", "p1:081/000@1385-000@3840"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "kimseongyu",
+      "name": "김선규",
+      "stats": {"command": 45, "scheming": 70, "business": 80, "loyalty": 20, "ambition": 90},
+      "tags": ["위선 정치인", "거래꾼", "폭압형"],
+      "relations": [
+        {"to": "choeminuk", "kind": "부하", "refs": ["035/000-039"], "note": "개로 부린다고 여기나 제압당함"},
+        {"to": "kimjaehoon", "kind": "동료", "refs": ["p1:003"], "note": "하성건설 행사에서 악수"}
+      ],
+      "why": "겉은 청렴 후보, 속은 깡패를 경멸하며 거래하는 정치인. 계산이 끝나면 지장을 찍는 결단과 대권 야망이 크다.",
+      "refs": ["059/040-054", "064/000-022"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "kimshin",
+      "name": "김신",
+      "stats": {"command": 95, "scheming": 92, "business": 58, "loyalty": 88, "ambition": 60},
+      "tags": ["맹수", "복수자", "아무르 티그로", "과묵한 수장"],
+      "relations": [
+        {"to": "jintae", "kind": "부하", "refs": ["p1:003"], "note": "오른팔, 사전 조사를 맡김"},
+        {"to": "risa", "kind": "동료", "refs": ["p1:002"], "note": "청부를 중개받던 사이, 돌아오라 권함"},
+        {"to": "gustav", "kind": "맞수", "refs": ["p1:069"], "note": "모의전 상대로 점찍음"},
+        {"to": "kimjaehoon", "kind": "원수", "refs": ["p1:003"], "note": "고교 동창 가해자"},
+        {"to": "kimtaeha", "kind": "가족", "refs": ["p1:001"], "note": "아버지 위패"},
+        {"to": "kimhyeokju", "kind": "원수", "refs": ["p1:003"], "note": "회암시 리스트의 표적"}
+      ],
+      "why": "2부 최강으로 백의를 이끄는 수장이며 판과 시기를 재는 계산에 능함. 복수라는 목적 앞에 의리와 야망을 같이 쥔다.",
+      "refs": ["p1:068/006", "p1:023/050-053"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "kimtaehoon",
+      "name": "김태훈",
+      "stats": {"command": 70, "scheming": 85, "business": 85, "loyalty": 40, "ambition": 90},
+      "tags": ["하성 회장", "집요한 야심", "냉혹"],
+      "relations": [
+        {"to": "kimjaehoon", "kind": "가족", "refs": ["p1:030"], "note": "이복동생"},
+        {"to": "kimyongseong", "kind": "상관", "refs": ["p1:030"], "note": "회장님으로 받들며 명을 받음"},
+        {"to": "ojiin", "kind": "부하", "refs": ["082/027-028"], "note": "오 실장으로 챙기는 측근"},
+        {"to": "sintaejin", "kind": "부하", "refs": ["p1:031"], "note": "김신 제거에 투입"},
+        {"to": "hyeonseok", "kind": "동료", "refs": ["095/054-063"], "note": "몫을 약속한 거래"}
+      ],
+      "why": "캐슬 내력을 꿰뚫고 계산 끝에 위험한 수를 택하는 야심가. 최민욱에게 열등감이 있다.",
+      "refs": ["p1:068/001", "045/073-077"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "kimyongseong",
+      "name": "김용성",
+      "stats": {"command": 75, "scheming": 90, "business": 85, "loyalty": 40, "ambition": 70},
+      "tags": ["노회한 협상가", "명예회장", "체면 중시"],
+      "relations": [
+        {"to": "kimtaehoon", "kind": "가족", "refs": ["p1:030"], "note": "장남에게 보복을 명령"},
+        {"to": "kimjaehoon", "kind": "가족", "refs": ["p1:030"], "note": "감싸는 둘째 아들"},
+        {"to": "baekdochan", "kind": "동료", "refs": ["p1:057"], "note": "통화로 야심을 부추김"},
+        {"to": "choeminuk", "kind": "부하", "refs": ["p1:058"], "note": "젊은 그를 회장 자리에 앉힌 사람"},
+        {"to": "cheonildo", "kind": "동료", "refs": ["p1:060"], "note": "원로 두 영감"}
+      ],
+      "why": "조건을 구체적으로 내미는 노회한 협상가이자 아들 제거까지 포장하는 냉혹한 설계자. 가문 체면은 중시하나 사람은 도구로 쓴다.",
+      "refs": ["p1:058/017@0-024@0", "p1:116/053"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "kkuldanji",
+      "name": "꿀단지",
+      "stats": {"command": 10, "scheming": 55, "business": 65, "loyalty": 15, "ambition": 30},
+      "tags": ["사기꾼", "정보통", "비굴"],
+      "relations": [{"to": "jintae", "kind": "맞수", "refs": ["027/191-197"], "note": "두려워하면서 동업을 꿈꿈"}],
+      "why": "정보 장사꾼이지만 위기에 동료를 버리고 혼자 도망치는 겁쟁이.",
+      "refs": ["027/135-169", "025/008-013"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "komodo",
+      "name": "코모도",
+      "stats": {"command": 55, "scheming": 60, "business": 40, "loyalty": 30, "ambition": 80},
+      "tags": ["야심가", "잔인한 실리", "나이프 파이터"],
+      "relations": [
+        {"to": "baekdochan", "kind": "상관", "refs": ["p1:058"], "note": "사냥감에서 받들 신으로"},
+        {"to": "snapper", "kind": "맞수", "refs": ["p1:035"], "note": "판돈 경쟁자이자 의리 없는 동료"},
+        {"to": "risa", "kind": "상관", "refs": ["p1:034"], "note": "눈치가 지긋지긋한 윗선"},
+        {"to": "kimshin", "kind": "맞수", "refs": ["p1:058"], "note": "과거 김신에게 진 상대"}
+      ],
+      "why": "이스크라 아래를 불만으로 보고 강한 쪽에 붙으려는 야심형. 의리는 낮다.",
+      "refs": ["p1:034/128-152", "p1:085/000@0-002@11835"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "krot",
+      "name": "크로트",
+      "stats": {"command": 50, "scheming": 80, "business": 75, "loyalty": 55, "ambition": 40},
+      "tags": ["정보 브로커", "신중", "능글"],
+      "relations": [
+        {
+          "to": "baekdochan",
+          "kind": "상관",
+          "refs": ["p1:012/011@2281-016@2262"],
+          "note": "'그 사람' — 파이톤의 물건이라 밝힘"
+        },
+        {"to": "kimshin", "kind": "동료", "refs": ["p1:013"], "note": "티그로 · 형제로 따름"},
+        {"to": "shire", "kind": "부하", "refs": ["p1:040"], "note": "수행 부하"},
+        {"to": "keurisa", "kind": "동료", "refs": ["p1:013"], "note": "부르면 달려올 동료"}
+      ],
+      "why": "가장 조심스러워 오래 살아남은 정보통. 이스크라 선은 지킨다.",
+      "refs": ["028/200-210", "p1:040/093-177"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "lingling",
+      "name": "링링",
+      "stats": {"command": 55, "scheming": 40, "business": 25, "loyalty": 70, "ambition": 35},
+      "tags": ["특수경호원", "냉소", "광기"],
+      "relations": [{"to": "yuwoosung", "kind": "상관", "refs": ["p1:033"], "note": "유우성의 특수경호원"}],
+      "why": "유우성의 경호와 처형을 맡는 실행자로 상대를 깔보는 공격형. 지략 기록은 적음.",
+      "refs": ["p1:033/127-139", "046/018-023"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "mahakyoung",
+      "name": "마학영",
+      "stats": {"command": 92, "scheming": 65, "business": 35, "loyalty": 93, "ambition": 25},
+      "tags": ["경호대장", "충신", "무력형"],
+      "relations": [
+        {"to": "choeminuk", "kind": "상관", "refs": ["p1:045"], "note": "오직 회장님에게 충성"},
+        {"to": "majunyeong", "kind": "가족", "refs": ["p1:121"], "note": "쌍둥이 동생"},
+        {"to": "baekdochan", "kind": "맞수", "refs": ["p1:045"], "note": "신뢰하지 않음"}
+      ],
+      "why": "경호대 지휘자. 최민욱에게 충직하나 부패를 알고도 담담해 차츰 동화.",
+      "refs": ["p1:045/100-136", "121/023-025"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "majunyeong",
+      "name": "마준영",
+      "stats": {"command": 68, "scheming": 60, "business": 20, "loyalty": 78, "ambition": 40},
+      "tags": ["싸움광", "거친 입", "경호 부대장"],
+      "relations": [
+        {"to": "mahakyoung", "kind": "가족", "refs": ["p1:121"], "note": "쌍둥이 형"},
+        {"to": "choeminuk", "kind": "상관", "refs": ["087/020-021"], "note": "회장 안위에 민감"}
+      ],
+      "why": "싸움을 즐기는 부대장이나 약점을 읽고 참는 계산도 있고 형과 회장에게 충성.",
+      "refs": ["092/035-036", "087/020-021"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "marina",
+      "name": "마리나",
+      "stats": {"command": 15, "scheming": 78, "business": 55, "loyalty": 55, "ambition": 25},
+      "tags": ["정보원", "이중 얼굴", "정 많음"],
+      "relations": [
+        {"to": "jintae", "kind": "동료", "refs": ["p1:076/011@3925-013@4470"], "note": "정보를 주며 걱정"},
+        {"to": "risa", "kind": "상관", "refs": ["p1:077/005@10690-007@3712"], "note": "월간 보고 대상"},
+        {"to": "sintaejin", "kind": "동료", "refs": ["p1:062/122-128"], "note": "신원 보증"}
+      ],
+      "why": "정보에 밝은 이스크라 정보원. 조직 선을 지키면서도 진태를 걱정하는 이중성.",
+      "refs": ["p1:077/005@10690-007@3712", "024/084-119"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "mark",
+      "name": "마크",
+      "stats": {"command": 40, "scheming": 25, "business": 25, "loyalty": 40, "ambition": 40},
+      "tags": ["고용 선수", "잔혹한 힘", "막무가내"],
+      "relations": [],
+      "why": "교류회 선수로 고용돼 맞으면서 밀고 들어가는 힘꾼. 기록 적음.",
+      "refs": ["009/005-007", "010/000-002"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "masa",
+      "name": "마사",
+      "stats": {"command": 50, "scheming": 55, "business": 35, "loyalty": 80, "ambition": 40},
+      "tags": ["최측근", "명예 중시", "현장 지휘"],
+      "relations": [
+        {"to": "odohwa", "kind": "상관", "refs": ["p1:050"], "note": "부대표님으로 복종"},
+        {"to": "hide", "kind": "동료", "refs": ["p1:093"], "note": "함께 제거 명령을 받음"},
+        {"to": "shamo", "kind": "맞수", "refs": ["p1:096"], "note": "빠박이로 찍혀 맞붙음"}
+      ],
+      "why": "오도화에게 복종하며 현장 셋팅을 지휘하는 최측근. 형세가 기울면 몸을 빼는 현실감도 있다.",
+      "refs": ["p1:051/000@0", "p1:096/008-009"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "medvedi",
+      "name": "메드베디",
+      "stats": {"command": 78, "scheming": 70, "business": 45, "loyalty": 70, "ambition": 30},
+      "tags": ["수장", "스승", "신중"],
+      "relations": [
+        {"to": "woojin", "kind": "사제", "refs": ["p1:041"], "note": "시험 합격 후 스승 역할"},
+        {"to": "kimshin", "kind": "동료", "refs": ["p1:039/129-175"], "note": "맹세 메달을 받은 사이"},
+        {"to": "risa", "kind": "동료", "refs": ["p1:039/129-175"], "note": "친분 있는 잦은 방문객"},
+        {"to": "keurisa", "kind": "동료", "refs": ["p1:056"], "note": "난입해 시합을 중단"}
+      ],
+      "why": "클럽 수장이자 신중한 스승. 맹세를 무겁게 여기고 현장을 냉정히 읽는다.",
+      "refs": ["p1:039/129-175", "p1:075/004@6989-004@11309"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "missbarbara",
+      "name": "미스 바바라",
+      "stats": {"command": 40, "scheming": 75, "business": 88, "loyalty": 45, "ambition": 55},
+      "tags": ["원로", "로비스트", "노회"],
+      "relations": [{"to": "risa", "kind": "은인", "refs": ["023/004"], "note": "리사를 받아 줌"}],
+      "why": "시장 · 커미션 논리로 설득하는 CIS 로비스트. 기록 적음.",
+      "refs": ["022/196"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "monica",
+      "name": "모니카",
+      "stats": {"command": 75, "scheming": 85, "business": 55, "loyalty": 70, "ambition": 40},
+      "tags": ["원로", "전대 리사", "위엄"],
+      "relations": [{"to": "akila", "kind": "상관", "refs": ["022/191-192"], "note": "원로원 결론을 통보하고 압박"}],
+      "why": "원로원의 결론을 위엄 있게 전하고 과거 실패를 근거로 압박하는 전대 리사. 기록 적음.",
+      "refs": ["022/191-192", "022/217-218"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "moseunggyu",
+      "name": "모승규",
+      "stats": {"command": 55, "scheming": 55, "business": 45, "loyalty": 25, "ambition": 85},
+      "tags": ["야심가", "비굴", "배신자"],
+      "relations": [
+        {"to": "odohwa", "kind": "상관", "refs": ["p1:045/035"], "note": "부대표님으로 모시며 기용을 청함"},
+        {"to": "pyoyoung", "kind": "원수", "refs": ["p1:049/100-119"], "note": "회유 거절당해 벌주려 함"},
+        {"to": "gwakjungheon", "kind": "원수", "refs": ["p1:040"], "note": "옛 수하 곽중헌을 배신"},
+        {"to": "seojeongchi", "kind": "원수", "refs": ["p1:045"], "note": "서정치가 배신자로 부름"}
+      ],
+      "why": "서울 · 전국을 노리나 궁지에 몰리면 애걸하는 야심가. 옛 보스를 배신한 전력.",
+      "refs": ["p1:047/000-018", "p1:052/048-078"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "namgunghyuk",
+      "name": "남궁혁",
+      "stats": {"command": 78, "scheming": 78, "business": 65, "loyalty": 75, "ambition": 45},
+      "tags": ["오른팔", "냉혹한 관찰자", "선진 이사"],
+      "relations": [
+        {"to": "baekdochan", "kind": "상관", "refs": ["p1:023"], "note": "백도찬의 오른팔"},
+        {"to": "barista", "kind": "동료", "refs": ["p1:052"], "note": "형제로 부르는 옛 동료"},
+        {"to": "kimjaehoon", "kind": "동료", "refs": ["p1:023"], "note": "주요 거래처, 신변 보호만"},
+        {"to": "sintaejin", "kind": "동료", "refs": ["p1:023"], "note": "신선배로 부르는 선후배"},
+        {"to": "kimshin", "kind": "맞수", "refs": ["p1:087"], "note": "심계 깊다며 높이 평가"},
+        {"to": "woojin", "kind": "원수", "refs": ["p1:028"], "note": "성장할 후환으로 보고 제거하려 함"}
+      ],
+      "why": "격을 따지고 상대를 관찰하며 판을 짜는 이사급 간부. 백도찬 곁이라 의리는 높은 편.",
+      "refs": ["p1:084/011-031", "p1:087/001@8795-001@14536"],
+      "conf": "ai",
+      "provisional": true,
+      "flag": "1부 111 피우진에게 죽음(사용자 메모)"
+    },
+    {
+      "id": "namilho",
+      "name": "남일호",
+      "stats": {"command": 50, "scheming": 55, "business": 10, "loyalty": 85, "ambition": 10},
+      "tags": ["과묵 칼잡이", "의리파"],
+      "relations": [
+        {"to": "pyoyoung", "kind": "사제", "refs": ["p1:078/006@5256-007@0"], "note": "일호 삼촌으로 대련"},
+        {"to": "ihwan", "kind": "부하", "refs": ["p1:047/067-087"], "note": "단장 곁을 지킴"},
+        {"to": "jintae", "kind": "원수", "refs": ["p1:044/001-047"], "note": "갚아줄 빚"}
+      ],
+      "why": "말없이 단장을 지키는 칼잡이. 피를 멀리하려는 다짐이 있다.",
+      "refs": ["p1:057/085-099", "p1:078/006@5256-007@0"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "namyong",
+      "name": "남용",
+      "stats": {"command": 25, "scheming": 20, "business": 15, "loyalty": 78, "ambition": 15},
+      "tags": ["우직", "청년회원"],
+      "relations": [
+        {"to": "iseul", "kind": "상관", "refs": ["062/044"], "note": "회장 · 형님"},
+        {"to": "wonyong", "kind": "동료", "refs": ["p1:066/003-019"], "note": "함께 발끈"}
+      ],
+      "why": "우직하게 달려드는 행동파 회원.",
+      "refs": ["062/002-019", "062/094-095"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "neopchi",
+      "name": "넙치",
+      "stats": {"command": 25, "scheming": 45, "business": 50, "loyalty": 70, "ambition": 15},
+      "tags": ["대외담당", "현실파", "공손"],
+      "relations": [
+        {"to": "pyoyoung", "kind": "상관", "refs": ["p1:078"], "note": "표영에게 존댓말로 보고"},
+        {"to": "seojeongchi", "kind": "상관", "refs": ["p1:078"], "note": "서정치의 대리인"},
+        {"to": "jeongseono", "kind": "동료", "refs": ["p1:096"], "note": "정선오가 형님으로 부름"}
+      ],
+      "why": "일본 라인 연락과 보고를 맡는 대외담당으로 수적 열세를 걱정하는 현실파.",
+      "refs": ["p1:078/002@12516-002@15396", "003/001-021"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "odohwa",
+      "name": "오도화",
+      "stats": {"command": 82, "scheming": 85, "business": 55, "loyalty": 50, "ambition": 65},
+      "tags": ["해결사", "냉혹", "노련"],
+      "relations": [
+        {"to": "immuyeol", "kind": "상관", "refs": ["p1:059/034@0-048@0"], "note": "오야지로 모심"},
+        {"to": "hide", "kind": "부하", "refs": ["p1:098/003@13274-003@16154"], "note": "스파이임을 알고도 거둠"},
+        {"to": "baekdochan", "kind": "맞수", "refs": ["p1:044"], "note": "북에는 파이톤 동에는 오도화"},
+        {"to": "moseunggyu", "kind": "부하", "refs": ["p1:045"], "note": "기용을 청한 아랫사람"}
+      ],
+      "why": "야나가와구미 출신 해결사. 수하를 미끼로 쓰는 냉혹함과 판 읽기, 배신한 부하에겐 정을 보이는 면.",
+      "refs": ["p1:051/000@0-033", "p1:098/003@13274-003@16154"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "ojiin",
+      "name": "오지인",
+      "stats": {"command": 50, "scheming": 72, "business": 60, "loyalty": 85, "ambition": 25},
+      "tags": ["참모", "보좌역", "무인의 눈"],
+      "relations": [
+        {"to": "kimtaehoon", "kind": "상관", "refs": ["076/021-035"], "note": "측근으로 충성"},
+        {"to": "kimjaehoon", "kind": "상관", "refs": ["p1:024"], "note": "비서로 보좌"},
+        {"to": "namgunghyuk", "kind": "동료", "refs": ["p1:026"], "note": "남궁혁이 믿는 전력"},
+        {"to": "sintaejin", "kind": "동료", "refs": ["p1:029"], "note": "연락 상대"}
+      ],
+      "why": "냉정한 참모이자 진검을 쥘 줄 아는 보좌역. 상관에게 충직.",
+      "refs": ["p1:087/005@1358-006@5904", "074/030@1306"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "pantera",
+      "name": "판테라",
+      "stats": {"command": 40, "scheming": 35, "business": 15, "loyalty": 55, "ambition": 40},
+      "tags": ["킬러", "웃으며 덤비는 무례"],
+      "relations": [],
+      "why": "웃으며 뛰어들고 상대를 깔보는 이스크라 소속 킬러. 기록 적음.",
+      "refs": ["020/004-006", "076/000-007"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "peurikit",
+      "name": "프리깃",
+      "stats": {"command": 45, "scheming": 60, "business": 25, "loyalty": 70, "ambition": 30},
+      "tags": ["속사", "실무파", "빈정"],
+      "relations": [
+        {"to": "akila", "kind": "상관", "refs": ["p1:056/043@0-045@0"], "note": "대장으로 부름"},
+        {"to": "shamo", "kind": "동료", "refs": ["p1:096/001-002"], "note": "함께 온 동료"},
+        {"to": "gustav", "kind": "맞수", "refs": ["p1:056/043@0-045@0"], "note": "티격 · 조롱"},
+        {"to": "jeongseono", "kind": "은인", "refs": ["p1:105"], "note": "목에 칼이 들어온 그를 구함"}
+      ],
+      "why": "냉정한 상황 판단과 속사 실력의 실무파. 동료를 엄호한다.",
+      "refs": ["p1:110/009-010", "072/032-034"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "pyoyoung",
+      "name": "표영",
+      "stats": {"command": 65, "scheming": 60, "business": 35, "loyalty": 78, "ambition": 45},
+      "tags": ["독고다이", "의리", "칼잡이"],
+      "relations": [
+        {"to": "jintae", "kind": "동료", "refs": ["024/002-018"], "note": "진태형이라 저장한 형 동생 사이"},
+        {"to": "jeongseono", "kind": "동료", "refs": ["p1:046"], "note": "숨겨 주는 친구"},
+        {"to": "ihwan", "kind": "사제", "refs": ["p1:078"], "note": "영이라 부르며 가르침"},
+        {"to": "hide", "kind": "사제", "refs": ["p1:079"], "note": "불씨를 보고 칼을 줌"},
+        {"to": "moseunggyu", "kind": "원수", "refs": ["p1:042"], "note": "오락실 습격으로 적대"}
+      ],
+      "why": "배신자도 다시 받아들이는 의리와 대장 기질이 있고 부산 지부장까지 오르는 칼잡이. 계산은 평균 이상.",
+      "refs": ["p1:060/025@983-034@0", "107/013-014"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "ratel",
+      "name": "라텔",
+      "stats": {"command": 55, "scheming": 45, "business": 20, "loyalty": 75, "ambition": 40},
+      "tags": ["다혈질", "팀 리더", "동료애"],
+      "relations": [
+        {"to": "medvedi", "kind": "동료", "refs": ["p1:094"], "note": "동료를 위해 무모하게 뛰어듦"},
+        {"to": "kimshin", "kind": "동료", "refs": ["p1:089"], "note": "티그로와 함께해 영광이라 함"},
+        {"to": "baekdochan", "kind": "원수", "refs": ["p1:095"], "note": "덤볐다가 바다에 떨어짐"}
+      ],
+      "why": "팀 리더로 침착하게 지시하고 동료를 위해 몸을 던지는 다혈질. 3패의 약한 쪽이다.",
+      "refs": ["029/012-042", "112/007-019"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "reperi",
+      "name": "레퍼리",
+      "stats": {"command": 40, "scheming": 45, "business": 30, "loyalty": 50, "ambition": 40},
+      "tags": ["시니컬", "킬러"],
+      "relations": [],
+      "why": "메드베디 말로 시니컬한 놈이라는 한 줄뿐이라 기록 적음.",
+      "refs": ["022/022"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "richeon",
+      "name": "리천",
+      "stats": {"command": 40, "scheming": 80, "business": 55, "loyalty": 40, "ambition": 45},
+      "tags": ["중국 최고 살수", "거만", "냉정한 분석"],
+      "relations": [
+        {"to": "yuwoosung", "kind": "동료", "refs": ["024/044-071"], "note": "거래를 맺은 고용 관계"},
+        {"to": "kimshin", "kind": "맞수", "refs": ["040/016-035"], "note": "김리전에서 맞붙어 패사(사용자 메모)"}
+      ],
+      "why": "절대적 자신감으로 상대를 분석하며 근접전까지 바꾸는 냉정한 살수. 고용된 몸이라 조직력과 의리는 낮다.",
+      "refs": ["028/130-169", "029/043-059"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "risa",
+      "name": "리사",
+      "stats": {"command": 78, "scheming": 92, "business": 90, "loyalty": 45, "ambition": 88},
+      "tags": ["마담", "청부 브로커", "판 짜는 여우", "카르텔 야망"],
+      "relations": [
+        {"to": "kimshin", "kind": "동료", "refs": ["p1:002"], "note": "청부를 중개하고 돌아오라 권함"},
+        {"to": "baekdochan", "kind": "맞수", "refs": ["p1:031"], "note": "킬러 소집 요구를 받음"},
+        {"to": "komodo", "kind": "부하", "refs": ["p1:034"], "note": "눈치 보는 윗선"},
+        {"to": "gustav", "kind": "부하", "refs": ["069/007-034"], "note": "강자 제공을 약속하며 설교"},
+        {"to": "medvedi", "kind": "동료", "refs": ["p1:039"], "note": "자주 찾아가는 사이"},
+        {"to": "iwashiro", "kind": "맞수", "refs": ["070/051@0"], "note": "관리론으로 영업하다 맞섬"}
+      ],
+      "why": "청부 중개와 영업, 판 읽기에 능하고 오랜 야망(카르텔)이 기록에 있다. 이득을 쫓아 의리는 중간 아래.",
+      "refs": ["070/000-002", "p1:057/000-055"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "ryujihak",
+      "name": "류지학",
+      "stats": {"command": 70, "scheming": 70, "business": 25, "loyalty": 88, "ambition": 25},
+      "tags": ["하성 제일 실력자", "충성", "냉소"],
+      "relations": [
+        {"to": "kimtaehoon", "kind": "상관", "refs": ["p1:033"], "note": "하성 제일의 수하"},
+        {"to": "ojiin", "kind": "맞수", "refs": ["p1:056"], "note": "제안을 망상으로 일축"},
+        {"to": "sintaejin", "kind": "동료", "refs": ["p1:056"], "note": "유일하게 가깝게 지낸 사이"},
+        {"to": "choemyeonghui", "kind": "사제", "refs": ["p1:119"], "note": "여사님이 길러 낸 킬러"}
+      ],
+      "why": "회장에게 충성하고 판의 배후를 추리하는 냉소적 킬러. 타이틀과 권력에는 관심이 없다.",
+      "refs": ["p1:116/010-049", "081/018-033"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "ryuwangsaeng",
+      "name": "류왕생",
+      "stats": {"command": 55, "scheming": 55, "business": 70, "loyalty": 50, "ambition": 50},
+      "tags": ["금룡 우두머리", "냉혹"],
+      "relations": [{"to": "yuwoosung", "kind": "가족", "refs": ["050/020-021"], "note": "친부로 보이는 사이, 내쫓음"}],
+      "why": "한 장면에서 자기 아들일 수 있는 아이를 내쫓는 냉혹한 우두머리. 기록 적음.",
+      "refs": ["050/020-021"],
+      "conf": "ai",
+      "provisional": true,
+      "flag": "유우성과의 부자 관계는 추정 — 050/020-021 확인"
+    },
+    {
+      "id": "sainjin",
+      "name": "사인진",
+      "stats": {"command": 50, "scheming": 65, "business": 30, "loyalty": 45, "ambition": 45},
+      "tags": ["능글", "가학", "경호 부대장"],
+      "relations": [
+        {"to": "immuyeol", "kind": "원수", "refs": ["p1:117/067-068"], "note": "처형으로 봄"},
+        {"to": "choeminuk", "kind": "상관", "refs": ["p1:117"], "note": "목소리에 멈춤"}
+      ],
+      "why": "조롱하며 추리와 작전 간파를 하는 가학적 파견 부대장. 상관을 깔보기도.",
+      "refs": ["111/054-058", "103/037-039"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "seojeongchi",
+      "name": "서정치",
+      "stats": {"command": 65, "scheming": 65, "business": 30, "loyalty": 85, "ambition": 20},
+      "tags": ["보호자", "의리파", "현실파"],
+      "relations": [
+        {"to": "pyoyoung", "kind": "상관", "refs": ["p1:048/038-041"], "note": "보스로 부르며 보호"},
+        {"to": "ihwan", "kind": "은인", "refs": ["p1:045/021"], "note": "거두어 준 단장"},
+        {"to": "kimshin", "kind": "동료", "refs": ["p1:045/021"], "note": "은혜를 갚으려 편을 듦"},
+        {"to": "gwakjungheon", "kind": "상관", "refs": ["p1:045"], "note": "모시던 반도파 보스"}
+      ],
+      "why": "현실적 판단으로 표영을 지키는 지휘격. 은혜는 목숨으로 갚는다.",
+      "refs": ["p1:048/038-041", "p1:078/004@2569-006@5256"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "seungyeong",
+      "name": "정승영",
+      "stats": {"command": 20, "scheming": 25, "business": 25, "loyalty": 50, "ambition": 25},
+      "tags": ["배신 후 복귀", "동네 건달"],
+      "relations": [
+        {"to": "pyoyoung", "kind": "동료", "refs": ["p1:060/024@0-031@1401"], "note": "배신했다가 사과, 밑으로 복귀"},
+        {"to": "moseunggyu", "kind": "부하", "refs": ["p1:046/006"], "note": "돈에 팔려 붙음"},
+        {"to": "jeongseono", "kind": "동료", "refs": ["p1:060/024@0-031@1401"], "note": "마주치기 싫어함"}
+      ],
+      "why": "돈에 팔려 한번 배신했으나 사과하고 돌아와 덤비는 근성이 있다.",
+      "refs": ["p1:046/006", "098/000-003"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "shamo",
+      "name": "샤모",
+      "stats": {"command": 35, "scheming": 50, "business": 15, "loyalty": 55, "ambition": 35},
+      "tags": ["광기", "승부광", "킬러"],
+      "relations": [
+        {"to": "keurisa", "kind": "동료", "refs": ["p1:055/068-081"], "note": "얄미워하는 같은 킬러"},
+        {"to": "medvedi", "kind": "맞수", "refs": ["p1:055"], "note": "곰 아저씨로 부름"},
+        {"to": "peurikit", "kind": "동료", "refs": ["p1:096"], "note": "함께 온 동료"},
+        {"to": "akila", "kind": "상관", "refs": ["p1:073"], "note": "아킬라 곁에 섬"}
+      ],
+      "why": "잔혹하고 가볍게 웃는 승부광. 상대 기술을 읽는 눈은 있으나 강자엔 바로 꼬리를 내린다.",
+      "refs": ["p1:055/068-081", "008/044-049"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "shingen",
+      "name": "사사키 신겐",
+      "stats": {"command": 78, "scheming": 65, "business": 35, "loyalty": 40, "ambition": 75},
+      "tags": ["무인", "후계 후보", "실리", "힘의 논리"],
+      "relations": [
+        {"to": "iwashiro", "kind": "상관", "refs": ["082/001-017"], "note": "존대로 보고"},
+        {"to": "hayabusa", "kind": "부하", "refs": ["017/150-158"], "note": "제1 부하"},
+        {"to": "hide", "kind": "원수", "refs": ["095/042-063"], "note": "본명으로 부르며 깔봄"},
+        {"to": "woojin", "kind": "맞수", "refs": ["099/045-065"], "note": "싸우며 분석하고 감탄"}
+      ],
+      "why": "강자의 논리를 믿는 무인이나 위기에는 부하를 방패로 쓰는 실리가 있다. 후계 야망도 크다.",
+      "refs": ["058/046-052", "095/042-063"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "shire",
+      "name": "샤이어",
+      "stats": {"command": 30, "scheming": 50, "business": 20, "loyalty": 88, "ambition": 10},
+      "tags": ["충직한 수행", "과묵"],
+      "relations": [
+        {"to": "krot", "kind": "상관", "refs": ["070/044-048"], "note": "끝까지 따르며 속으로 사과"},
+        {"to": "kimshin", "kind": "동료", "refs": ["p1:050"], "note": "동경하며 함께 싸움"}
+      ],
+      "why": "과묵하고 신중하며 크로트에게 충직한 수행 부하.",
+      "refs": ["070/044-048", "p1:049/003-007"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "sintaejin",
+      "name": "신태진",
+      "stats": {"command": 68, "scheming": 78, "business": 35, "loyalty": 55, "ambition": 25},
+      "tags": ["청소부", "냉소", "죽음 소망"],
+      "relations": [
+        {"to": "kimtaehoon", "kind": "상관", "refs": ["p1:031"], "note": "하성의 칼로 제거 명령을 받음"},
+        {"to": "kimjaehoon", "kind": "상관", "refs": ["p1:023/028"], "note": "지시로 김신을 쫓은 청소부"},
+        {"to": "kimshin", "kind": "맞수", "refs": ["p1:032/001-144"], "note": "맹수로 인정하고 빈틈을 열어줌"},
+        {"to": "ojiin", "kind": "동료", "refs": ["p1:029"], "note": "연락하던 사이"},
+        {"to": "baekdochan", "kind": "원수", "refs": ["p1:034"], "note": "합류 시험에서 졌음"}
+      ],
+      "why": "청소 칼솜씨와 함정 간파가 뛰어난 프로. 하성을 이탈해 신세는 갚는 냉소가.",
+      "refs": ["p1:023/028", "p1:037/064-132"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "songikcheon",
+      "name": "송익천",
+      "stats": {"command": 45, "scheming": 40, "business": 20, "loyalty": 75, "ambition": 30},
+      "tags": ["과묵한 간부", "의리"],
+      "relations": [
+        {"to": "seojeongchi", "kind": "동료", "refs": ["p1:045"], "note": "반도파 간부 동료"},
+        {"to": "pyoyoung", "kind": "맞수", "refs": ["p1:078"], "note": "대련 상대"},
+        {"to": "gwakjungheon", "kind": "동료", "refs": ["p1:096"], "note": "중헌 형님의 원수를 갚으려 함"}
+      ],
+      "why": "말수가 적고 곁을 지키며 원수 갚기에 의미를 두는 간부. 기록 적음.",
+      "refs": ["p1:096/068-069", "p1:078/004@2569-006@5256"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "toishi",
+      "name": "토이시",
+      "stats": {"command": 55, "scheming": 55, "business": 30, "loyalty": 85, "ambition": 20},
+      "tags": ["충직", "통역 호위"],
+      "relations": [
+        {"to": "iwashiro", "kind": "부하", "refs": ["018/049"], "note": "통역 · 호위"},
+        {"to": "hide", "kind": "맞수", "refs": ["088/023-025"], "note": "히데 놈이라 부르는 경쟁심"}
+      ],
+      "why": "오야붕에 충성하고 짧은 명령으로 지휘하며 관찰 보고도 정확하다.",
+      "refs": ["019/068-071", "094/063-068"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "ttolbae",
+      "name": "똘배",
+      "stats": {"command": 40, "scheming": 30, "business": 20, "loyalty": 78, "ambition": 65},
+      "tags": ["행동파", "형님 모시기", "성급"],
+      "relations": [
+        {"to": "kimdaegeon", "kind": "동료", "refs": ["p1:068/088-089"], "note": "김대건 형님으로 부름"},
+        {"to": "iseul", "kind": "동료", "refs": ["p1:067"], "note": "싸워 져서 이슬이 품음"},
+        {"to": "kimshin", "kind": "동료", "refs": ["p1:068/088-089"], "note": "경외"}
+      ],
+      "why": "성질 급한 실전파. 형님은 깍듯이 모시고 위를 꿈꾼다.",
+      "refs": ["p1:066/008-020", "038/045-058"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "vasily",
+      "name": "바실리",
+      "stats": {"command": 30, "scheming": 30, "business": 45, "loyalty": 45, "ambition": 40},
+      "tags": ["가학적 파이터", "돈 집착"],
+      "relations": [
+        {"to": "medvedi", "kind": "부하", "refs": ["p1:040"], "note": "클럽 간판 투사"},
+        {"to": "woojin", "kind": "맞수", "refs": ["p1:041"], "note": "시험 경기에서 패배"}
+      ],
+      "why": "링 위 폭력을 즐기고 돈에 집착하는 클럽 파이터. 총 앞에선 겁먹는다.",
+      "refs": ["p1:040/013-089", "020/124-154"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "wangdokpil",
+      "name": "왕독필",
+      "stats": {"command": 70, "scheming": 55, "business": 60, "loyalty": 60, "ambition": 60},
+      "tags": ["대전 대보스", "옛 거물"],
+      "relations": [{"to": "guilhwa", "kind": "부하", "refs": ["p1:038"], "note": "아버지처럼 키워 준 큰형님"}],
+      "why": "직접 장면 기록이 없고 부하 구일화의 말로만 나오는 대보스. 기록 적음.",
+      "refs": ["p1:038", "p1:039"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "wanghaoming",
+      "name": "왕하오밍",
+      "stats": {"command": 35, "scheming": 40, "business": 92, "loyalty": 45, "ambition": 55},
+      "tags": ["재벌 3세", "도박광", "쇼맨십"],
+      "relations": [
+        {"to": "yuwoosung", "kind": "동료", "refs": ["025/010-012"], "note": "가장 큰 후원자"},
+        {"to": "eunbo", "kind": "맞수", "refs": ["027/079-085"], "note": "망나니라 불리며 협박 대상"}
+      ],
+      "why": "돈과 후원으로 판을 벌이는 재벌 3세. 싸움은 구경하는 도박꾼이라 지휘와 계략은 낮다.",
+      "refs": ["025/114-117", "026/135-142"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "wonil",
+      "name": "신원일",
+      "stats": {"command": 40, "scheming": 50, "business": 50, "loyalty": 55, "ambition": 15},
+      "tags": ["현실주의", "정비소 주인"],
+      "relations": [{"to": "chasumin", "kind": "동료", "refs": ["088/002-015"], "note": "끝까지 수민아로 타이름"}],
+      "why": "생존을 우선하는 현실주의자로 부상자를 챙긴다. 기록 적음.",
+      "refs": ["088/002-015", "063/026@0"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "wonyong",
+      "name": "원용",
+      "stats": {"command": 25, "scheming": 25, "business": 15, "loyalty": 80, "ambition": 15},
+      "tags": ["다혈질", "의리파", "청년회원"],
+      "relations": [
+        {"to": "iseul", "kind": "상관", "refs": ["p1:021/045-047"], "note": "회장 · 형님으로 따름"},
+        {"to": "kimdaegeon", "kind": "원수", "refs": ["p1:021"], "note": "2년을 벼름"},
+        {"to": "namyong", "kind": "동료", "refs": ["p1:066/002-019"], "note": "함께 움직임"}
+      ],
+      "why": "회장을 지키려 끼어드는 다혈질 의리파.",
+      "refs": ["057/012-015", "062/008-022"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "woojin",
+      "name": "피우진",
+      "stats": {"command": 55, "scheming": 40, "business": 20, "loyalty": 70, "ambition": 40},
+      "tags": ["무력형", "강민성 제자", "열등감"],
+      "relations": [
+        {"to": "gangminseong", "kind": "사제", "refs": ["p1:003/059-068"], "note": "첫 번째 제자, 틀어졌으나 부모 자식 같은 사이"},
+        {"to": "medvedi", "kind": "사제", "refs": ["p1:054"], "note": "둘째 스승"},
+        {"to": "kimshin", "kind": "동료", "refs": ["103/000@1289"], "note": "열등감이 있으나 지키려 함"},
+        {"to": "keurisa", "kind": "맞수", "refs": ["p1:056"], "note": "마지막 경기 상대"},
+        {"to": "jintae", "kind": "동료", "refs": ["p1:003"], "note": "처음엔 적대"}
+      ],
+      "why": "해외 지부장급 대장. 무력과 몰입이 강점이고 계산 · 수완은 낮다.",
+      "refs": ["042/049-056", "092/034-038"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "yeominsu",
+      "name": "여민수",
+      "stats": {"command": 72, "scheming": 65, "business": 50, "loyalty": 80, "ambition": 30},
+      "tags": ["지역 대표", "냉정", "충직"],
+      "relations": [
+        {"to": "kimshin", "kind": "부하", "refs": ["p1:088/005@2792"], "note": "꿇고 따르기로 함"},
+        {"to": "choedalcheon", "kind": "원수", "refs": ["p1:076"], "note": "한쪽 눈을 잃은 악연"},
+        {"to": "jintae", "kind": "맞수", "refs": ["p1:076"], "note": "침입자와 맞섬"},
+        {"to": "eogwangdeuk", "kind": "동료", "refs": ["p1:088"], "note": "함께 따름"}
+      ],
+      "why": "순천 세력 대표. 냉정하게 싸움을 읽고 부하를 아끼며 굴복한 이를 받아들인다.",
+      "refs": ["p1:101/014-017", "126/046-050"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "yundeoksu",
+      "name": "윤덕수",
+      "stats": {"command": 75, "scheming": 55, "business": 60, "loyalty": 30, "ambition": 78},
+      "tags": ["우두머리", "윗선엔 비굴", "출세욕"],
+      "relations": [
+        {"to": "kimjaehoon", "kind": "부하", "refs": ["p1:008/016@2580-021@1322"], "note": "스폰서에게 굽실"},
+        {
+          "to": "kimdaegeon",
+          "kind": "상관",
+          "refs": ["p1:006/021@1240-028@2400"],
+          "note": "이사에게 책임을 묻고 부진파를 맡김"
+        },
+        {"to": "gangchangseok", "kind": "원수", "refs": ["p1:015/052-054@1360"], "note": "훗날 배신당해 죽음"},
+        {"to": "chasumin", "kind": "원수", "refs": ["p1:006"], "note": "부진파를 적으로 봄"},
+        {"to": "woojin", "kind": "맞수", "refs": ["p1:011/011@1240-011@2389"], "note": "꺼지라며 보내줌"}
+      ],
+      "why": "DS 우두머리. 부하는 잔혹하게 다루고 윗선엔 굽실하며 위로 올라가려는 출세욕.",
+      "refs": ["p1:006/021@1240-028@2400", "p1:013/017@2404-022@2470"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "yusehui",
+      "name": "유세희",
+      "stats": {"command": 15, "scheming": 40, "business": 20, "loyalty": 55, "ambition": 25},
+      "tags": ["고교생", "성실한 학생"],
+      "relations": [{"to": "kimshin", "kind": "동료", "refs": ["p1:025"], "note": "공부를 부탁하는 반 친구"}],
+      "why": "밝고 성실한 학생이라 전략 능력은 낮다. 기록 적음.",
+      "refs": ["p1:025/147-158", "p1:027/007-034"],
+      "conf": "ai",
+      "provisional": true
+    },
+    {
+      "id": "yuwoosung",
+      "name": "유우성",
+      "stats": {"command": 78, "scheming": 80, "business": 78, "loyalty": 45, "ambition": 75},
+      "tags": ["능글맞은 야심가", "냉혹한 처형자", "삼합회 출신"],
+      "relations": [
+        {"to": "kimtaehoon", "kind": "동료", "refs": ["p1:033"], "note": "김형이라 놀리며 일을 제안"},
+        {"to": "lingling", "kind": "부하", "refs": ["p1:077"], "note": "처형을 맡김"},
+        {"to": "ryukai", "kind": "상관", "refs": ["p1:077"], "note": "형님으로 부름"},
+        {"to": "jintae", "kind": "원수", "refs": ["p1:076"], "note": "불명예를 갚으려 놔둔 타겟"},
+        {"to": "richeon", "kind": "사제", "refs": ["024/020-039"], "note": "스승에게 포권하며 존대"},
+        {"to": "douchen", "kind": "상관", "refs": ["p1:117"], "note": "롱터우로 불리는 윗선"}
+      ],
+      "why": "능글맞게 판을 읽고 서슴없이 처형하는 야심가. 후원자와 윗선을 이용해 올라가는 사업 줄이 크다.",
+      "refs": ["p1:033/124-158", "048/000-037"],
+      "conf": "ai",
+      "provisional": true
+    }
+  ]
+}

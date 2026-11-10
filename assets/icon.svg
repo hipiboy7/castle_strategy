@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <!-- 캐슬 제패 아이콘 — 직접 그림(밤 바탕 · 흰 성벽 · 붉은 점). assets/ASSETS.md 와 같은 원칙: 직접 · 원작 그림 아님 -->
+  <rect width="128" height="128" rx="20" fill="#0e1016"/>
+  <path d="M24 104V52h12v-14h12v14h8V38h16v14h8V38h12v14h12v52z" fill="#ecebe6"/>
+  <rect x="56" y="76" width="16" height="28" fill="#0e1016"/>
+  <circle cx="64" cy="26" r="7" fill="#b3201f"/>
+</svg>
