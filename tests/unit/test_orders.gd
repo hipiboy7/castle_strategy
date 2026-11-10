@@ -42,7 +42,7 @@ func _ctx(phase: String = "manage") -> Dictionary:
 func test_registry_kinds_and_phases() -> void:
 	var kinds := Orders.KINDS.keys()
 	kinds.sort()
-	eq(kinds, ["expand", "move", "open", "recruit", "rest"], "C1 명령 종류")
+	eq(kinds, ["defend", "expand", "move", "open", "raid", "recruit", "rest"], "C1 명령 종류 + C3 습격 · 지키기")
 	eq(Orders.KINDS["move"]["phase"], "move", "이동은 이동 단계")
 	for k in ["open", "expand", "recruit", "rest"]:
 		eq(Orders.KINDS[k]["phase"], "manage", "%s 는 경영 단계" % k)

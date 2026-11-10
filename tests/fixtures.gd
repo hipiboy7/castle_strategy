@@ -42,8 +42,15 @@ static func files() -> Dictionary:
 				"troops": {"건달급": 10.0, "조장급": 2.0, "네임드": 0.0, "경호대급": 0.0}},
 			"zone_default": {"flow": 10000.0, "people": 3.0, "police": 1000.0, "slots": 3.0, "owned_slots": 1.0},
 			"scenarios": {"A": {"orgs": {"org_a": {"cash": 500.0}}, "zones": {"z2": {"slots": 2.0, "people": 4.0}}}}},
+		"game/combat.json": combat(),
 		"game/map.json": {"zones": {"z1": {"x": 100.0, "y": 100.0}, "z2": {"x": 300.0, "y": 100.0}}, "links": [["z1", "z2"]]},
 	}
+
+
+## 습격 · 일기토 3층 값 — data/game/combat.json 그대로(값을 바꾸는 시험은 사본을 고친다)
+static func combat() -> Dictionary:
+	var v = JSON.parse_string(FileAccess.get_file_as_string("res://data/game/combat.json"))
+	return v if v is Dictionary else {}
 
 
 ## 08 14-1 시작값 + 이 판이 정한 값(개업 · 확장 · 모집) — data/game/economy.json 과 같은 꼴

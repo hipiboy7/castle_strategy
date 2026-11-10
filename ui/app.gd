@@ -22,6 +22,7 @@ const ZoneCard = preload("res://ui/zone_card.gd")
 const OfficerStrip = preload("res://ui/officer_strip.gd")
 const OrderPicker = preload("res://ui/order_picker.gd")
 const ReportView = preload("res://ui/report_view.gd")
+const BattleView = preload("res://ui/battle_view.gd")
 const Pages = preload("res://ui/tab_pages.gd")
 
 const SAVE := "user://save_auto.json"
@@ -45,7 +46,7 @@ var _note := ""
 var _tab := "map"
 var _zone := ""
 var _officer := ""
-var _sheet := ""                       # "" · pick · report
+var _sheet := ""                       # "" · pick · report · battle
 var _pick := ["", ""]                  # 고르기 창의 [간부, 구역]
 var _report_i := -1
 var _ephemeral := false
@@ -65,6 +66,7 @@ var _card
 var _strip
 var _picker
 var _report
+var _battle
 var _actions: HBoxContainer
 var _hint: Label
 var _auto: Button
@@ -132,6 +134,8 @@ func _setup_shot() -> void:
 	var weeks := int(args.get("week", 1)) - 1
 	if v == "report":
 		weeks = maxi(1, weeks)
+	if v == "battle":
+		weeks = 1
 	for i in weeks:
 		if not _over():
 			Game.step_player(_g, _t, Draft.auto(_g["state"], _t))
@@ -151,6 +155,10 @@ func _setup_shot() -> void:
 		_open_pick(s["orgs"][me]["boss"], z)
 	elif v == "report":
 		_open_report(_g["reports"].size() - 1)
+	elif v == "battle":
+		_open_report(0)
+		_open_battle(0)
+		_battle.hold_at_first_duel()
 
 
 func _build() -> void:
@@ -232,7 +240,11 @@ func _build() -> void:
 	add_child(_picker)
 	_report = ReportView.new()
 	_report.closed.connect(_close_sheet)
+	_report.battle.connect(_open_battle)
 	add_child(_report)
+	_battle = BattleView.new()
+	_battle.closed.connect(_close_battle)
+	add_child(_battle)
 
 	_tabbar = HBoxContainer.new()
 	_tabbar.add_theme_constant_override("separation", 8)
@@ -298,6 +310,8 @@ func _relayout() -> void:
 	_place(_picker, f["sheet"])
 	_report.visible = _sheet == "report"
 	_place(_report, f["body"])
+	_battle.visible = _sheet == "battle"
+	_place(_battle, f["body"])
 	for k in _tab_btn:
 		_tab_btn[k].set_pressed_no_signal(k == _tab)
 	_print_ui.call_deferred()
@@ -484,8 +498,29 @@ func _open_report(i: int) -> void:
 	_report.show_report("%d주 보고" % int(e["report"]["turn"]), View.report_cards(e, _t, me),
 		"닫기 — %d주로" % int(_g["state"]["turn"]) if last and not _over() else "닫기")
 	print("REPORT %d" % int(e["report"]["turn"]))
+	for ev in e["report"]["events"]:
+		if ev.get("kind") == "outcome":
+			print("OUTCOME %s %s turn=%d" % [ev["result"], ev["why"], int(e["report"]["turn"])])
 	_relayout()
 	_refresh()
+
+
+## 전투 화면 — 지금 연 보고의 i 번째 습격
+func _open_battle(i: int) -> void:
+	if _report_i < 0 or _report_i >= _g.get("reports", []).size():
+		return
+	var battles: Array = _g["reports"][_report_i]["report"].get("battles", [])
+	if i < 0 or i >= battles.size():
+		return
+	_sheet = "battle"
+	_battle.show_battle(battles[i], _t, _g["state"]["player"], _sprites)
+	print("BATTLE %d" % i)
+	_relayout()
+
+
+func _close_battle() -> void:
+	_sheet = "report"
+	_relayout()
 
 
 func _close_sheet() -> void:
@@ -522,6 +557,8 @@ func _back() -> void:
 		_confirm.hide()
 		_confirm_end.hide()
 		_confirm_new.hide()
+	elif _sheet == "battle":
+		_close_battle()
 	elif _sheet != "":
 		_close_sheet()
 	elif _tab == "map" and _zone != "" and not _wide:
@@ -550,7 +587,9 @@ func _notification(what: int) -> void:
 func _print_ui() -> void:
 	await get_tree().process_frame
 	var xf := get_viewport().get_final_transform()
-	var at := {"auto": _auto, "end": _end, "close": _report.close_button}
+	var at := {"auto": _auto, "end": _end, "close": _report.close_button, "battle_close": _battle.close_button}
+	for i in _report.battle_buttons.size():
+		at["battle_%d" % i] = _report.battle_buttons[i]
 	for k in _tab_btn:
 		at["tab_" + k] = _tab_btn[k]
 	for i in _picker.buttons.size():

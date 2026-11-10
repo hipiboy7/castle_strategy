@@ -8,9 +8,9 @@
 ## 빠른 시작 (작업 서버 — 화면 없는 검증만)
 - 엔진 받기: `python3 -B scripts/get_godot.py` — Godot 4.7.2 를 `.tools/` 에 받는다(멱등)
 - 전체 검증: `python3 -B scripts/verify.py` — 마지막 줄이 `verify: N/M 통과 · X초 — OK` 이고 종료 코드가 0 이면 통과다
-- 시나리오 A 자동 진행(화면 없음 · 모든 조직 AI): `.tools/godot/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64 --headless --path . -- --autoplay --turns 26 --seed 1` — `RESULT {…"hash":"d2b2a6faa864f932"…}` 한 줄(기준값은 `tests/integration/golden_a.json`)
+- 시나리오 A 자동 진행(화면 없음 · 모든 조직 AI): `.tools/godot/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64 --headless --path . -- --autoplay --turns 26 --seed 1` — `RESULT {…"hash":"b9259bb7a56b5bc3"…}` 한 줄(기준값은 `tests/integration/golden_a.json` — C3 에서 AI 습격이 들어가 바뀜)
 - castle_common 다시 받기: `cd ../castle_common && python3 -B tools/sync.py castle_strategy` → 이 폴더에서 `python3 -B scripts/verify.py` → `CHANGELOG.md` 의 [깨짐] 확인 → "castle_common <커밋> 받음" 커밋
-- 화면 한 장 찍기(가상 화면): `tools/xvfb_shot.sh` — 사용법은 파일 머리에 있다. 장면을 고르려면 뒤에 게임 인자(예 `--view report --week 3` · `--view card --zone namgu` — `src/launch.gd` 머리)
+- 화면 한 장 찍기(가상 화면): `tools/xvfb_shot.sh` — 사용법은 파일 머리에 있다. 장면을 고르려면 뒤에 게임 인자(예 `--view report --week 3` · `--view card --zone namgu` · `--view battle` — `src/launch.gd` 머리)
 - 인물 도트 다시 받기(취호전 시트 내보내기 · 멱등): `CASTLE_RPG=<취호전 폴더> python3 -B scripts/import_chars.py` — pygame 이 든 python 은 작업 서버의 가상환경(만들기 `python3.11 -m venv .tools/artvenv` 뒤 pygame 설치 — 파일 머리). 점검만: `python3 -B scripts/import_chars.py --check`
 - 폰에서 하기: 휴대폰 GitHub 앱 → `castle_strategy` → Releases → 맨 위 릴리스의 APK(`docs/폰확인.md`)
 
@@ -26,8 +26,11 @@
 | `docs/C2_요구사항정의서_화면과명령.md` | C2(지도 · 명령 · 턴 끝 보고 화면) 요구사항 · 완료 기준 · 위험 · 비용 |
 | `docs/C2_설계서_화면과명령.md` | 화면 구조 · 보기 · 명령 제출(대기 명령 · 미리 보기) · 저장 pending · 도트 받기 · 스크린샷 인자 |
 | `docs/C2_테스트결과서_화면과명령.md` | C2 실행 증거(검증 출력 · 커버리지 · CI · 에뮬레이터 · 스크린샷 · 자체 점검 · 폰 결과) |
+| `docs/C3_요구사항정의서_습격과일기토.md` | C3(습격 · 작전 카드 · 일기토 · 전투 화면 · A 완주) 요구사항 · 완료 기준 · 위험 · 비용 |
+| `docs/C3_설계서_습격과일기토.md` | 습격 · 일기토 · 승패 모듈 · 명령 묶기 · 틱 규칙 · 차지 뒤 · 화면 · 저장 · 해시 |
+| `docs/C3_테스트결과서_습격과일기토.md` | C3 실행 증거(검증 출력 · 커버리지 · CI · 에뮬레이터 · 스크린샷 · 자체 점검 · 폰 결과) |
 | `docs/성능.md` | 성능 예산(fps · 켜기 · 주 처리 · APK)과 서버 · CI · 폰 실측 |
-| `docs/폰확인.md` | 릴리스 본문 — 폰에서 할 일(설치 · 1분 경로 · 볼 것 — 지금 C2) |
+| `docs/폰확인.md` | 릴리스 본문 — 폰에서 할 일(설치 · 1분 경로 · 볼 것 — 지금 C3) |
 | `assets/ASSETS.md` | 자산 출처(verify 가 검사) |
 | `docs/트러블슈팅.md` | 겪은 문제(T-n — 증상 · 원인 · 조치) |
 | `docs/크레딧_기록.md` | 비용 기록 — `tools/credit.py` 가 쓴다 |

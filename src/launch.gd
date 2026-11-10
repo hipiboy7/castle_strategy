@@ -6,13 +6,13 @@ extends RefCounted
 ##   --seed S          시드(정수 · 기본 1)
 ##   --shot PATH       화면을 --shot-frame 번째 프레임에 PNG 로 찍고 끝낸다(작업 서버 xvfb · CI 스크린샷)
 ##   --shot-frame N    (1 이상 · 기본 30)
-##   --view NAME       화면 장면(C2 FR-217): map(기본) · card · pick · orders · report · org · log · diplo — --shot 과 함께 쓴다
+##   --view NAME       화면 장면(C2 FR-217): map(기본) · card · pick · orders · report · org · log · diplo · battle(C3 — 1주 보고의 첫 전투 · 첫 일기토 장면) — --shot 과 함께 쓴다
 ##   --week N          (1 이상 · 기본 1) 맡기기로 N−1주를 둔 뒤의 화면
 ##   --zone ID         card · pick 에서 고를 구역(기본 = 내 본거지)
 
 const INT_KEYS := {"--turns": "turns", "--seed": "seed", "--shot-frame": "shot_frame", "--week": "week"}
 const MIN_ONE := ["turns", "shot_frame", "week"]
-const VIEWS := ["map", "card", "pick", "orders", "report", "org", "log", "diplo"]
+const VIEWS := ["map", "card", "pick", "orders", "report", "org", "log", "diplo", "battle"]
 
 
 static func defaults() -> Dictionary:

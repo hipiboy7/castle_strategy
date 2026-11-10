@@ -41,6 +41,9 @@ func test_five_player_weeks_preview_matches() -> void:
 		eq(rep["violations"], [], "주 %d 불변식" % (week + 1))
 		var mine_applied: Array = rep["applied"].filter(func(o): return o["org"] == s["player"])
 		eq(mine_applied, p["applied"], "주 %d 받은 명령 = 미리 보기" % (week + 1))
+		var me: String = s["player"]
+		if rep["battles"].any(func(b): return b["att"] == me or b["def"] == me):
+			continue                    # 싸움이 있던 주는 구역 · 조직원 · 간부 자리가 충돌 단계에서 바뀐다(미리 보기는 명령 단계까지 — C3 설계서 6절)
 		var want := _mine(p["state"])
 		var got := _mine(g["state"])
 		eq(got["zones"], want["zones"], "주 %d 내 사업장 = 미리 보기" % (week + 1))
@@ -67,7 +70,7 @@ func test_hand_orders_move_and_open() -> void:
 	var me: String = s["player"]
 	var boss: String = s["orgs"][me]["boss"]
 	var opts: Array = Draft.options(s, t, [], boss, "namgu")
-	eq(opts.map(func(x): return x["kind"]), ["move"], "이웃 구역은 이동")
+	eq(opts.map(func(x): return x["kind"]).slice(0, 1), ["move"], "이웃 구역은 이동 먼저(주인 없는 구역이라 습격 줄도 있다)")
 	var d: Array = Draft.add(s, t, [], opts[0]["order"])["draft"]
 	var there: Array = Draft.options(s, t, d, boss, "namgu")
 	var open: Dictionary = there.filter(func(x): return x["kind"] == "open")[0]

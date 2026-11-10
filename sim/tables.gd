@@ -16,9 +16,9 @@ const NEEDS := [
 	"common/canon/characters.json", "common/canon/factions.json", "common/canon/locations.json",
 	"common/packs/strategy/factions.json", "common/packs/strategy/districts.json",
 	"common/packs/strategy/scenarios.json", "common/packs/strategy/characters.json",
-	"game/game.json", "game/economy.json", "game/setup.json", "game/map.json",
+	"game/game.json", "game/economy.json", "game/setup.json", "game/map.json", "game/combat.json",
 ]
-const GAME := ["game", "economy", "setup", "map"]     # data/game/<이름>.json → t[이름] (정수로)
+const GAME := ["game", "economy", "setup", "map", "combat"]     # data/game/<이름>.json → t[이름] (정수로)
 
 
 static func build(files: Dictionary) -> Dictionary:
@@ -178,6 +178,14 @@ static func _check_game(t: Dictionary, errors: Array) -> void:
 	for kind in sorted_keys(t["economy"].get("base", {})):
 		if not t["trades"].has(kind):
 			errors.append("game/economy.json:base/%s — 모르는 업종" % kind)
+	var cards: Dictionary = t["combat"].get("cards", {})
+	for key in ["attack_cards", "defend_cards"]:
+		for c in t["combat"].get(key, []):
+			if not cards.has(c):
+				errors.append("game/combat.json:%s/%s — 모르는 작전 카드" % [key, c])
+	for sid in sorted_keys(t["game"].get("goals", {})):
+		if not t["scenarios"].has(sid):
+			errors.append("game/game.json:goals/%s — 모르는 시나리오" % sid)
 	var sc: Dictionary = t["setup"].get("scenarios", {})
 	for sid in sorted_keys(sc):
 		if not t["scenarios"].has(sid):

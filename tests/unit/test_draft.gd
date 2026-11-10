@@ -81,7 +81,7 @@ func test_options_here_and_there() -> void:
 	var t := _t()
 	var s := _s(t)
 	var here: Array = Draft.options(s, t, [], "boss_a", "z1")
-	eq(here.map(func(x): return x["kind"]), ["open", "expand", "recruit", "rest"], "지금 구역 — 등록부 순")
+	eq(here.map(func(x): return x["kind"]), ["open", "expand", "recruit", "rest", "defend", "defend"], "지금 구역 — 등록부 순(C3 지키기 카드 둘)")
 	var open: Dictionary = here[0]
 	check(open["ok"], "개업 됨")
 	eq(open["cost"], Economy.open_cost(t["economy"], "상권"), "개업 비용")
@@ -91,7 +91,8 @@ func test_options_here_and_there() -> void:
 	eq(here[2]["cost"], Economy.recruit_cost(t["economy"], here[2]["gain"]), "모집 비용 = 머릿수 × 값")
 	check(here[3]["ok"] and here[3]["cost"] == 0, "쉼은 공짜")
 	var there: Array = Draft.options(s, t, [], "boss_a", "z2")
-	eq(there.map(func(x): return x["kind"]), ["move"], "다른 구역 — 이동")
+	eq(there.map(func(x): return x["kind"]).slice(0, 1), ["move"], "다른 구역 — 이동 먼저")
+	eq(there.slice(1).map(func(x): return x["kind"]), ["raid", "raid", "raid", "raid", "raid", "raid"], "우리 구역이 아니면 습격(작전 카드 꼴 6)")
 	check(there[0]["ok"], "이웃으로 이동 됨")
 	var nowhere: Array = Draft.options(s, t, [], "boss_a", "nope")
 	check(not nowhere[0]["ok"] and nowhere[0]["why"] != "", "판에 없는 구역 — 까닭")

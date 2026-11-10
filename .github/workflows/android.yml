@@ -148,8 +148,8 @@ jobs:
           sudo apt-get update -q && sudo apt-get install -y -q xvfb libgl1 libgl1-mesa-dri libglx-mesa0 libegl1 \
             libx11-6 libxcursor1 libxinerama1 libxrandr2 libxi6 libxext6 libxrender1 libxkbcommon0 > /dev/null
           mkdir -p shots
-          # 해상도:이름:장면(C2 FR-217 --view) — 맡기기로 2주 둔 뒤(--week 3)
-          for s in 1080x2340:phone_card:card 1080x2340:phone_report:report 1812x2176:fold_inner_card:card; do
+          # 해상도:이름:장면(C2 FR-217 --view) — 맡기기로 2주 둔 뒤(--week 3) · battle(C3)은 1주 보고의 첫 전투
+          for s in 1080x2340:phone_card:card 1080x2340:phone_report:report 1080x2340:phone_battle:battle 1812x2176:fold_inner_card:card; do
             R=${s%%:*}; rest=${s#*:}; N=${rest%%:*}; V=${rest##*:}
             timeout 240 xvfb-run -a -s "-screen 0 ${R}x24" "$GODOT" --path . --rendering-driver opengl3 --audio-driver Dummy \
               --resolution "$R" -- --shot "$PWD/shots/$N.png" --shot-frame 30 --view "$V" --week 3 2>&1 \
