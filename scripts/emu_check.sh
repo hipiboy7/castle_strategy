@@ -33,7 +33,7 @@ sleep 6
 adb exec-out screencap -p > emu/emu_1_home.png
 adb logcat -d > emu/logcat.txt
 GOT=$(grep -oE "SELFHASH [0-9a-f]{16}" emu/logcat.txt | tail -1 | cut -d' ' -f2)
-echo "자가 해시: 에뮬레이터 ${GOT:-없음} · 기준 구현 $WANT"
+echo "자가 해시: 에뮬레이터 ${GOT:-없음} · 기준값(golden_a seed 1) $WANT"
 if [ "$GOT" != "$WANT" ]; then
   echo "자가 해시가 다르다 — 판정이 기기마다 다르다(또는 앱이 뜨지 않았다)"
   grep -iE "godot|AndroidRuntime" emu/logcat.txt | tail -40
