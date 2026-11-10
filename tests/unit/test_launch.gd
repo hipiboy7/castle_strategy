@@ -40,3 +40,19 @@ func test_errors() -> void:
 	eq(_p(["--shot"])["errors"].size(), 1, "경로 없는 --shot")
 	eq(_p(["--shot-frame", "0"])["errors"].size(), 1, "--shot-frame 은 1 이상")
 	eq(_p(["--seed", "x", "--autoplay"])["autoplay"], true, "오류 뒤 인자도 계속 읽는다")
+
+
+## FR-217 — 스크린샷 장면 인자: --view(장면) · --week(맡기기로 N−1주 둔 뒤) · --zone(고를 구역)
+func test_view_week_zone() -> void:
+	var d := _p([])
+	eq([d["view"], d["week"], d["zone"]], ["map", 1, ""], "기본 지도 · 1주 · 구역 없음")
+	var a := _p(["--view", "report", "--week", "5", "--zone", "namgu"])
+	eq([a["view"], a["week"], a["zone"]], ["report", 5, "namgu"], "값")
+	eq(a["errors"], [], "오류 없음")
+	for v in Launch.VIEWS:
+		eq(_p(["--view", v])["errors"], [], "장면 %s" % v)
+	eq(_p(["--view", "nope"])["errors"].size(), 1, "모르는 장면")
+	eq(_p(["--view"])["errors"].size(), 1, "값 없는 --view")
+	eq(_p(["--week", "0"])["errors"].size(), 1, "--week 는 1 이상")
+	eq(_p(["--zone", "--autoplay"])["errors"].size(), 1, "값 없는 --zone")
+	eq(_p(["--zone", "--autoplay"])["autoplay"], true, "다음 인자는 그대로 읽는다")

@@ -27,19 +27,28 @@ static func chief_business(s: Dictionary, t: Dictionary, zone: String, org: Stri
 
 
 static func income_of(s: Dictionary, t: Dictionary, org: String) -> int:
-	var e: Dictionary = t["economy"]
-	var o: Dictionary = s["orgs"][org]
-	var trade = t["factions"].get(org, {}).get("trade")
 	var total := 0
 	for zid in State.sorted_keys(s["zones"]):
-		var z: Dictionary = s["zones"][zid]
-		var biz := -1
-		for sl in z["slots"]:
-			if sl["org"] != org:
-				continue
-			if biz < 0:
-				biz = chief_business(s, t, zid, org)
-			total += slot_income(e, sl["kind"], sl["lv"], z["flow"], biz, o["heat"], sl["kind"] == trade)
+		total += zone_income(s, t, zid, org)
+	return total
+
+
+## 구역 하나에서 그 조직이 버는 주 수입(구역 카드 — C2 FR-203). 구역마다 더하면 income_of
+static func zone_income(s: Dictionary, t: Dictionary, zid: String, org: String) -> int:
+	var z: Dictionary = s["zones"].get(zid, {})
+	if z.is_empty() or not s["orgs"].has(org):
+		return 0
+	var e: Dictionary = t["economy"]
+	var heat: int = s["orgs"][org]["heat"]
+	var trade = t["factions"].get(org, {}).get("trade")
+	var total := 0
+	var biz := -1
+	for sl in z["slots"]:
+		if sl["org"] != org:
+			continue
+		if biz < 0:
+			biz = chief_business(s, t, zid, org)
+		total += slot_income(e, sl["kind"], sl["lv"], z["flow"], biz, heat, sl["kind"] == trade)
 	return total
 
 

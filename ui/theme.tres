@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=6 format=3]
+[gd_resource type="Theme" load_steps=12 format=3]
 
 [ext_resource type="FontFile" path="res://assets/fonts/Galmuri11-Bold.ttf" id="1_font"]
 
@@ -37,6 +37,87 @@ corner_radius_top_right = 12
 corner_radius_bottom_right = 12
 corner_radius_bottom_left = 12
 
+[sub_resource type="StyleBoxFlat" id="sheet"]
+content_margin_left = 28.0
+content_margin_top = 24.0
+content_margin_right = 28.0
+content_margin_bottom = 24.0
+bg_color = Color(0.15, 0.16, 0.21, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.42, 0.44, 0.52, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+
+[sub_resource type="StyleBoxFlat" id="tab_normal"]
+content_margin_left = 8.0
+content_margin_top = 16.0
+content_margin_right = 8.0
+content_margin_bottom = 16.0
+bg_color = Color(0.11, 0.12, 0.16, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="tab_on"]
+content_margin_left = 8.0
+content_margin_top = 16.0
+content_margin_right = 8.0
+content_margin_bottom = 16.0
+bg_color = Color(0.925, 0.92, 0.9, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="card_normal"]
+content_margin_left = 12.0
+content_margin_top = 10.0
+content_margin_right = 12.0
+content_margin_bottom = 10.0
+bg_color = Color(0.17, 0.18, 0.24, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.3, 0.32, 0.4, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="card_on"]
+content_margin_left = 12.0
+content_margin_top = 10.0
+content_margin_right = 12.0
+content_margin_bottom = 10.0
+bg_color = Color(0.24, 0.22, 0.17, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.95, 0.8, 0.3, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="row"]
+content_margin_left = 16.0
+content_margin_top = 12.0
+content_margin_right = 16.0
+content_margin_bottom = 12.0
+bg_color = Color(0.2, 0.21, 0.27, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
 [resource]
 BigLabel/base_type = &"Label"
 BigLabel/font_sizes/font_size = 88
@@ -64,3 +145,80 @@ SmallLabel/font_sizes/font_size = 33
 TitleLabel/base_type = &"Label"
 TitleLabel/font_sizes/font_size = 77
 VBoxContainer/constants/separation = 28
+CardButton/base_type = &"Button"
+CardButton/colors/font_color = Color(0.925, 0.92, 0.9, 1)
+CardButton/colors/font_pressed_color = Color(0.925, 0.92, 0.9, 1)
+CardButton/colors/font_hover_color = Color(0.925, 0.92, 0.9, 1)
+CardButton/colors/font_focus_color = Color(0.925, 0.92, 0.9, 1)
+CardButton/font_sizes/font_size = 30
+CardButton/styles/normal = SubResource("card_normal")
+CardButton/styles/hover = SubResource("card_normal")
+CardButton/styles/pressed = SubResource("card_on")
+CardButton/styles/focus = SubResource("btn_focus")
+CardTitle/base_type = &"Label"
+CardTitle/font_sizes/font_size = 52
+Faction/colors/none = Color(0.36, 0.38, 0.44, 1)
+Faction/colors/default = Color(0.62, 0.62, 0.68, 1)
+Faction/colors/bujinpa = Color(0.86, 0.53, 0.26, 1)
+Faction/colors/dssecurity = Color(0.74, 0.3, 0.44, 1)
+Faction/colors/haseong = Color(0.5, 0.62, 0.74, 1)
+Faction/colors/iskra = Color(0.55, 0.56, 0.32, 1)
+Faction/colors/baekui = Color(0.94, 0.94, 0.91, 1)
+Faction/colors/hwajin = Color(0.87, 0.73, 0.3, 1)
+Faction/colors/castle_hotel = Color(0.77, 0.78, 0.76, 1)
+Faction/colors/castle_holdings = Color(0.62, 0.5, 0.78, 1)
+Faction/colors/iwashirogumi = Color(0.36, 0.45, 0.72, 1)
+Faction/colors/gold = Color(0.95, 0.84, 0.45, 1)
+Faction/colors/mori = Color(0.45, 0.72, 0.62, 1)
+Faction/colors/sunjin = Color(0.35, 0.66, 0.85, 1)
+Faction/colors/pacheon = Color(0.82, 0.42, 0.32, 1)
+Faction/colors/daeguk = Color(0.8, 0.35, 0.3, 1)
+Faction/colors/samhaphoe = Color(0.72, 0.6, 0.35, 1)
+Faction/colors/sombrakareutel = Color(0.6, 0.45, 0.35, 1)
+Frame/constants/margin = 24
+Frame/constants/gap = 12
+Frame/constants/top_h = 132
+Frame/constants/strip_h = 236
+Frame/constants/actions_h = 150
+Frame/constants/tabs_h = 140
+Frame/constants/side_pct = 40
+Frame/constants/side_min = 560
+Frame/constants/sheet_pct = 58
+Map/colors/bg = Color(0.07, 0.08, 0.12, 1)
+Map/colors/link = Color(0.36, 0.38, 0.47, 1)
+Map/colors/front = Color(0.8, 0.17, 0.15, 1)
+Map/colors/select = Color(0.96, 0.93, 0.86, 1)
+Map/colors/drop = Color(0.96, 0.8, 0.3, 1)
+Map/colors/text = Color(0.92, 0.92, 0.9, 1)
+Map/colors/mark = Color(0.06, 0.06, 0.09, 1)
+Map/colors/police_on = Color(0.45, 0.62, 0.98, 1)
+Map/colors/police_off = Color(0.24, 0.26, 0.33, 1)
+Map/constants/node_r_min = 52
+Map/constants/node_r_max = 118
+Map/constants/pad = 150
+Map/constants/line_w = 6
+Map/constants/front_w = 14
+Map/constants/ring_w = 6
+Map/constants/fig_scale = 3
+Map/font_sizes/name = 36
+Map/font_sizes/mark = 68
+Map/font_sizes/small = 28
+RowPanel/base_type = &"PanelContainer"
+RowPanel/styles/panel = SubResource("row")
+SheetPanel/base_type = &"PanelContainer"
+SheetPanel/styles/panel = SubResource("sheet")
+TabButton/base_type = &"Button"
+TabButton/colors/font_color = Color(0.925, 0.92, 0.9, 1)
+TabButton/colors/font_hover_color = Color(0.925, 0.92, 0.9, 1)
+TabButton/colors/font_pressed_color = Color(0.055, 0.06, 0.085, 1)
+TabButton/colors/font_hover_pressed_color = Color(0.055, 0.06, 0.085, 1)
+TabButton/colors/font_focus_color = Color(0.925, 0.92, 0.9, 1)
+TabButton/font_sizes/font_size = 36
+TabButton/styles/normal = SubResource("tab_normal")
+TabButton/styles/hover = SubResource("tab_normal")
+TabButton/styles/pressed = SubResource("tab_on")
+TabButton/styles/hover_pressed = SubResource("tab_on")
+TabButton/styles/focus = SubResource("btn_focus")
+TinyLabel/base_type = &"Label"
+TinyLabel/colors/font_color = Color(0.66, 0.67, 0.7, 1)
+TinyLabel/font_sizes/font_size = 28

@@ -110,3 +110,17 @@ func test_dead_org_is_skipped() -> void:
 	Economy.settle(s, {"t": _t(), "report": report})
 	eq(s["orgs"]["org_a"]["cash"], 7, "무너진 조직은 결산하지 않는다")
 	check(not report["money"].has("org_a"), "보고에도 없다")
+
+
+## C2 FR-203 — 구역 하나의 내 주 수입(구역 카드) · 구역마다 더하면 income_of 와 같다
+func test_zone_income_sums_to_income_of() -> void:
+	var t := _t()
+	var s := _s()
+	s["zones"]["z2"]["slots"] = [{"kind": "유흥", "org": "org_a", "lv": 1, "dmg": 0}]
+	var sum := 0
+	for z in State.sorted_keys(s["zones"]):
+		sum += Economy.zone_income(s, t, z, "org_a")
+	eq(sum, Economy.income_of(s, t, "org_a"), "구역 합 = 조직 수입")
+	check(Economy.zone_income(s, t, "z2", "org_a") > 0, "z2 수입")
+	eq(Economy.zone_income(s, t, "nope", "org_a"), 0, "판에 없는 구역")
+
