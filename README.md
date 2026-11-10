@@ -11,7 +11,7 @@
 - 시나리오 A 자동 진행(화면 없음 · 모든 조직 AI): `.tools/godot/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64 --headless --path . -- --autoplay --turns 26 --seed 1` — `RESULT {…"hash":"d2b2a6faa864f932"…}` 한 줄(기준값은 `tests/integration/golden_a.json`)
 - castle_common 다시 받기: `cd ../castle_common && python3 -B tools/sync.py castle_strategy` → 이 폴더에서 `python3 -B scripts/verify.py` → `CHANGELOG.md` 의 [깨짐] 확인 → "castle_common <커밋> 받음" 커밋
 - 화면 한 장 찍기(가상 화면): `tools/xvfb_shot.sh` — 사용법은 파일 머리에 있다
-- 인물 도트 다시 받기(취호전 시트 내보내기 · 멱등): `CASTLE_RPG=<취호전 폴더> python3 -B scripts/import_chars.py` — pygame 이 든 python 은 `.tools/artvenv/`(만드는 명령은 파일 머리). 점검만: `python3 -B scripts/import_chars.py --check`
+- 인물 도트 다시 받기(취호전 시트 내보내기 · 멱등): `CASTLE_RPG=<취호전 폴더> python3 -B scripts/import_chars.py` — pygame 이 든 python 은 작업 서버의 가상환경(만들기 `python3.11 -m venv .tools/artvenv` 뒤 pygame 설치 — 파일 머리). 점검만: `python3 -B scripts/import_chars.py --check`
 - 폰에서 하기: 휴대폰 GitHub 앱 → `castle_strategy` → Releases → 맨 위 릴리스의 APK(`docs/폰확인.md`)
 
 ## 문서 (이 목록이 유일하다)
