@@ -4,7 +4,8 @@
 #  계정 한도에 들지 않지만, 비공개로 되돌릴 때를 위해 그대로 둔다(CLAUDE.md 0절 외부 서비스).
 #  push(main · impl-* · 경로 필터): 검증(scripts/verify.py) → APK 내보내기 → APK 안 파일 점검 → 세로 스크린샷(실패해도 계속 · 1일)
 #  수동 실행(emulator=true) · 태그: 위에 더해 에뮬레이터 점검(scripts/emu_check.sh — API 34 x86_64 · 세로 · 자가 해시 대조)
-#  태그(v*): 위에 더해 GitHub Releases 에 APK 를 붙인다. 이름에 -rc 가 들면 프리릴리스. 본문 = docs/폰확인.md + sha256
+#  태그(v*): 위에 더해 GitHub Releases 에 APK 를 붙이고 **Latest** 로 둔다(-rc 도 프리릴리스로 두지 않는다 — 폰 GitHub 앱 → Releases
+#             → 맨 위에서 바로 받게 · castle_M3D 와 같게 · 사용자 2026-11-10 · docs/트러블슈팅.md T-2). 본문 = 바로 받기 링크 + docs/폰확인.md + sha256
 #  서명: android/debug.keystore(castle_M3D 와 같은 고정 디버그 키 — 패키지 이름이 달라 서로 덮어쓰지 않는다 · CLAUDE.md 7절)
 name: android
 
@@ -220,12 +221,13 @@ jobs:
           F="$APK-$T.apk"
           cp "build/$APK.apk" "$F"
           sha256sum "$F" | tee "$F.sha256"
-          case "$T" in *-rc*) KIND="--prerelease" ;; *) KIND="--latest" ;; esac
           {
             echo "커밋 \`${GITHUB_SHA::7}\` · run #$GITHUB_RUN_NUMBER · \`$F\` · 고정 디버그 키 서명(덮어 설치 · 저장 유지) · 이 저장소 Releases 의 APK 만 까세요"
+            echo ""
+            echo "**바로 받기**: [$F](https://github.com/$GITHUB_REPOSITORY/releases/download/$T/$F) — 눌러서 받은 뒤 열어 설치"
             echo ""
             cat docs/폰확인.md
             echo ""
             echo "sha256 \`$(cut -d' ' -f1 "$F.sha256")\`"
           } > notes.md
-          gh release create "$T" "$F" "$F.sha256" --repo "$GITHUB_REPOSITORY" --title "캐슬 제패 $T" $KIND --notes-file notes.md
+          gh release create "$T" "$F" "$F.sha256" --repo "$GITHUB_REPOSITORY" --title "캐슬 제패 $T" --latest --notes-file notes.md
