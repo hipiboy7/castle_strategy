@@ -1,0 +1,27 @@
+# Godot
+.godot/
+*.import.tmp
+export_credentials.cfg
+
+# 도구 · 가상환경 (작업 서버에만 — scripts/get_godot.py 가 받는다)
+.tools/
+.venv/
+__pycache__/
+*.pyc
+
+# 빌드 산출물 — 커밋하지 않고 릴리스에 붙인다
+build/
+*.apk
+*.aab
+*.idsig
+shots/
+emu/
+
+# 남겨 둘 조사 · 초안(커밋하지 않음)
+.work/
+
+# 크레딧 원장 잠금
+docs/*.lock
+
+# 비밀
+.env
