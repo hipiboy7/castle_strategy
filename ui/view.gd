@@ -165,3 +165,128 @@ static func officer_cards(s: Dictionary, t: Dictionary, me: String, used: Dictio
 			"prov": p["rank_prov"], "post": POST.get(p["post"], p["post"]), "boss": boss,
 			"total": total, "left": maxi(0, total - int(used.get(id, 0)))})
 	return out
+
+
+## 명령 글 — "김신 · 이동 → 회암시 남구" · "김신 · 개업 — 회암시 부진" · "김신 · 쉼"
+static func order_text(t: Dictionary, o: Dictionary) -> String:
+	var head := "%s · %s" % [person(t, o["by"]), KIND.get(o["kind"], o["kind"])]
+	if o["kind"] == "rest" or o["to"] == "":
+		return head
+	return head + (" → " if o["kind"] == "move" else " — ") + zone_name(t, o["to"])
+
+
+## 명령 고르기 줄 — Draft.options 한 줄 → "개업 — 140만 원" · "모집 +7명 — 21만 원" · "확장 — 안 됨: 까닭"
+static func option_text(opt: Dictionary) -> String:
+	var name: String = KIND.get(opt["kind"], opt["kind"])
+	if not opt["ok"]:
+		return "%s — 안 됨: %s" % [name, opt["why"]]
+	if int(opt["gain"]) > 0:
+		name += " +%d명" % int(opt["gain"])
+	return name if int(opt["cost"]) == 0 else "%s — %s" % [name, money(int(opt["cost"]))]
+
+
+## 턴 끝 보고 카드 — entry = {report, before, after}(sim/game.gd g.reports 한 줄) → [{kind, title, lines}]: 돈 · 내 명령 · 다른 조직 · 전투
+static func report_cards(entry: Dictionary, t: Dictionary, me: String) -> Array:
+	var rep: Dictionary = entry["report"]
+	var b: Dictionary = entry["before"]
+	var a: Dictionary = entry["after"]
+	var m: Dictionary = rep["money"].get(me, {"income": 0, "upkeep": 0})
+	var cash_b := int(b["orgs"][me]["cash"])
+	var cash_a := int(a["orgs"][me]["cash"])
+	var money_lines := ["수입 %s · 지출 %s" % [delta(int(m["income"])), money(-int(m["upkeep"]))]]
+	var spent := cash_b + int(m["income"]) - int(m["upkeep"]) - cash_a
+	if spent != 0:
+		money_lines.append("명령에 쓴 돈 %s" % money(spent))
+	money_lines.append("남은 돈 %s (이번 주 %s)" % [money(cash_a), delta(cash_a - cash_b)])
+	var intel := []
+	for ev in rep["events"]:
+		if ev.get("kind") == "leave":
+			var lost: Array = State.TROOP_GRADES.filter(func(g): return int(ev["lost"].get(g, 0)) > 0) \
+				.map(func(g): return "%s %d" % [g, int(ev["lost"][g])])
+			if ev["org"] == me:
+				money_lines.append("돈이 0 밑 — 조직원이 떠났다(%s)" % " · ".join(lost))
+			else:
+				intel.append("[%s] %s · 조직원이 떠났다(%s)" % [mark(t, ev["org"]), org_name(t, ev["org"]), " · ".join(lost)])
+	var mine_ok: Array = rep["applied"].filter(func(o): return o["org"] == me)
+	var mine_no: Array = rep["rejected"].filter(func(r): return r["order"] is Dictionary and r["order"].get("org") == me)
+	var order_lines := []
+	for o in mine_ok:
+		order_lines.append("○ " + order_text(t, o))
+		for ev in rep["events"]:
+			if ev.get("kind") == "recruit" and ev.get("by") == o["by"] and o["kind"] == "recruit":
+				order_lines.append("   모집 +%d명" % int(ev["n"]))
+	for r in mine_no:
+		order_lines.append("× %s — %s" % [order_text(t, r["order"]), r["why"]])
+	if order_lines.is_empty():
+		order_lines.append("낸 명령 없음")
+	intel = _moves(t, b, a, me) + intel
+	if intel.is_empty():
+		intel.append("눈에 띄는 움직임 없음")
+	return [
+		{"kind": "money", "title": "돈", "lines": money_lines},
+		{"kind": "orders", "title": "내 명령 — 받음 %d · 거절 %d" % [mine_ok.size(), mine_no.size()], "lines": order_lines},
+		{"kind": "intel", "title": "다른 조직", "lines": intel},
+		{"kind": "battle", "title": "전투", "lines": ["이번 주 습격 · 전투 없음(습격은 C3)"]},
+	]
+
+
+## 다른 조직 움직임(전 · 뒤 상태 비교) — 개업 · 확장 · 구역 주인 바뀜 · 간부 이동
+static func _moves(t: Dictionary, b: Dictionary, a: Dictionary, me: String) -> Array:
+	var out := []
+	for zid in State.sorted_keys(a["zones"]):
+		var za: Dictionary = a["zones"][zid]
+		var zb: Dictionary = b["zones"].get(zid, za)
+		for i in za["slots"].size():
+			var sa: Dictionary = za["slots"][i]
+			var sb: Dictionary = zb["slots"][i] if i < zb["slots"].size() else {"org": "", "lv": 0}
+			if sa["org"] == "" or sa["org"] == me:
+				continue
+			if sb["org"] != sa["org"]:
+				out.append("[%s] %s · 개업 — %s(%s)" % [mark(t, sa["org"]), org_name(t, sa["org"]), zone_name(t, zid), sa["kind"]])
+			elif int(sa["lv"]) > int(sb["lv"]):
+				out.append("[%s] %s · 확장 — %s(%s lv%d)" % [mark(t, sa["org"]), org_name(t, sa["org"]), zone_name(t, zid), sa["kind"], int(sa["lv"])])
+		if za["owner"] != zb["owner"]:
+			out.append("%s 주인 바뀜 — %s → %s" % [zone_name(t, zid), org_name(t, zb["owner"]), org_name(t, za["owner"])])
+	for id in State.sorted_keys(a["officers"]):
+		var pa: Dictionary = a["officers"][id]
+		var pb: Dictionary = b["officers"].get(id, pa)
+		if pa["org"] != me and pa["zone"] != pb["zone"] and SHOWN.has(pa["status"]):
+			out.append("[%s] %s 이동 — %s → %s" % [mark(t, pa["org"]), person(t, id), zone_name(t, pb["zone"]), zone_name(t, pa["zone"])])
+	return out
+
+
+## 기록 탭 한 줄 — "3주 — 돈 -110만 원 · 받음 1 · 거절 1"
+static func report_title(entry: Dictionary, me: String) -> String:
+	var rep: Dictionary = entry["report"]
+	var d := int(entry["after"]["orgs"][me]["cash"]) - int(entry["before"]["orgs"][me]["cash"])
+	var ok: int = rep["applied"].filter(func(o): return o["org"] == me).size()
+	var no: int = rep["rejected"].filter(func(r): return r["order"] is Dictionary and r["order"].get("org") == me).size()
+	return "%d주 — 돈 %s · 받음 %d · 거절 %d" % [int(rep["turn"]), delta(d), ok, no]
+
+
+## 조직 탭 — 내 조직 돈 · 수입 · 지출 · 열기 · 명성 · 결속 · 조직원 · 간부 · 다른 조직 요약(구역 · 사업장 수)
+static func org_panel(s: Dictionary, t: Dictionary, me: String) -> Dictionary:
+	var o: Dictionary = s["orgs"][me]
+	var inc := Economy.income_of(s, t, me)
+	var up := Economy.upkeep_of(s, t, me)
+	var officers := []
+	for id in State.officers_of(s, me, false):
+		var p: Dictionary = s["officers"][id]
+		officers.append({"id": id, "name": person(t, id), "rank": p["rank"] + ("(잠정)" if p["rank_prov"] else ""),
+			"post": "두목" if o["boss"] == id else POST.get(p["post"], p["post"]), "loyalty": _pct(int(p["loyalty"])),
+			"status": STATUS.get(p["status"], p["status"]), "zone_name": zone_name(t, p["zone"]) if p["zone"] != "" else "—"})
+	var others := []
+	for org in State.sorted_keys(s["orgs"]):
+		if org == me or not s["orgs"][org]["alive"]:
+			continue
+		var zones := 0
+		var slots := 0
+		for zid in State.sorted_keys(s["zones"]):
+			var z: Dictionary = s["zones"][zid]
+			zones += 1 if z["owner"] == org else 0
+			slots += z["slots"].filter(func(x): return x["org"] == org).size()
+		others.append({"org": org, "name": org_name(t, org), "mark": mark(t, org), "zones": zones, "slots": slots})
+	return {"name": org_name(t, me), "mark": mark(t, me), "cash": money(int(o["cash"])), "income": money(inc), "upkeep": money(up),
+		"net": delta(inc - up), "heat": _pct(int(o["heat"])), "fame": _pct(int(o["fame"])), "cohesion": _pct(int(o["cohesion"])),
+		"troops": " · ".join(State.TROOP_GRADES.map(func(g): return "%s %d" % [g, int(o["troops"][g])])),
+		"officers": officers, "others": others}

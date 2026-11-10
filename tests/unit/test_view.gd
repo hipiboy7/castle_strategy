@@ -162,3 +162,83 @@ func test_officer_cards_and_top() -> void:
 	var end: Dictionary = View.top(s, t, "org_a", 0, 0)
 	check(end["over"], "26주 뒤")
 	eq(end["week"], "끝 — 26주", "끝 글")
+
+
+const Orders = preload("res://sim/orders.gd")
+
+
+## 한 주 보고 고정물 — 나: z1 빈칸 개업(돈 −140) · 모집 거절 · 남: org_b 가 z2 lv1 → 2 확장 · new_c 가 z2 → z1 이동 · 구역 z2 주인 바뀜 없음
+func _entry() -> Dictionary:
+	var before := _s()
+	var after := State.to_dict(before)
+	after["turn"] = 4
+	after["zones"]["z1"]["slots"][2]["org"] = "org_a"
+	after["zones"]["z1"]["slots"][2]["lv"] = 1
+	after["zones"]["z2"]["slots"][0]["lv"] = 2
+	after["zones"]["z2"]["slots"][1]["org"] = "org_b"
+	after["zones"]["z2"]["slots"][1]["lv"] = 1
+	after["officers"]["new_c"]["zone"] = "z1"
+	after["orgs"]["org_a"]["cash"] = 1200 - 140 + 50 - 20
+	var open := Orders.make("org_a", "boss_a", "open", "z1", {}, "player")
+	var rec := Orders.make("org_a", "man_b", "recruit", "z2", {}, "player")
+	var report := {"turn": 3, "applied": [open, Orders.make("org_b", "new_c", "move", "z1")], "rejected": [{"order": rec, "why": "남의 구역"}],
+		"events": [{"kind": "leave", "org": "org_a", "lost": {"건달급": 2, "조장급": 0, "네임드": 0, "경호대급": 0}}],
+		"money": {"org_a": {"income": 50, "upkeep": 20, "cash": 1090}}}
+	return {"report": report, "before": before, "after": after}
+
+
+func test_order_and_option_text() -> void:
+	var t := _t()
+	eq(View.order_text(t, Orders.make("org_a", "boss_a", "move", "z2")), "보스 · 이동 → 둘째 구역", "이동 글")
+	eq(View.order_text(t, Orders.make("org_a", "boss_a", "open", "z1")), "보스 · 개업 — 첫 구역", "개업 글")
+	eq(View.order_text(t, Orders.make("org_a", "boss_a", "rest", "z1")), "보스 · 쉼", "쉼 글")
+	eq(View.option_text({"kind": "open", "ok": true, "cost": 140, "gain": 0, "why": ""}), "개업 — 140만 원", "고르기 줄")
+	eq(View.option_text({"kind": "recruit", "ok": true, "cost": 21, "gain": 7, "why": ""}), "모집 +7명 — 21만 원", "모집 줄")
+	eq(View.option_text({"kind": "rest", "ok": true, "cost": 0, "gain": 0, "why": ""}), "쉼", "공짜 줄")
+	eq(View.option_text({"kind": "expand", "ok": false, "cost": 0, "gain": 0, "why": "돈이 모자라다"}), "확장 — 안 됨: 돈이 모자라다", "안 되는 줄")
+
+
+func test_report_cards() -> void:
+	var t := _t()
+	var cards: Array = View.report_cards(_entry(), t, "org_a")
+	eq(cards.map(func(c): return c["kind"]), ["money", "orders", "intel", "battle"], "카드 넷")
+	var money: Array = cards[0]["lines"]
+	eq(money[0], "수입 +50만 원 · 지출 -20만 원", "수입 · 지출")
+	eq(money[1], "명령에 쓴 돈 140만 원", "명령에 쓴 돈 = 전 + 수입 − 지출 − 뒤")
+	eq(money[2], "남은 돈 1,090만 원 (이번 주 -110만 원)", "남은 돈 · 증감")
+	check(money[3].contains("조직원이 떠났다") and money[3].contains("건달급 2"), "떠남")
+	eq(cards[1]["title"], "내 명령 — 받음 1 · 거절 1", "명령 카드 제목")
+	eq(cards[1]["lines"], ["○ 보스 · 개업 — 첫 구역", "× 맨 · 모집 — 둘째 구역 — 남의 구역"], "받음 · 거절 까닭")
+	var intel: Array = cards[2]["lines"]
+	check(intel.has("[B] Bee 회 · 개업 — 둘째 구역(상권)"), "남의 개업 %s" % [intel])
+	check(intel.has("[B] Bee 회 · 확장 — 둘째 구역(유흥 lv2)"), "남의 확장")
+	check(intel.has("[B] new_c 이동 — 둘째 구역 → 첫 구역"), "남의 이동")
+	check(not intel.any(func(l): return l.contains("가람파")), "내 조직은 다른 조직 카드에 없다")
+	eq(cards[3]["lines"].size(), 1, "전투 자리 한 줄")
+	eq(View.report_title(_entry(), "org_a"), "3주 — 돈 -110만 원 · 받음 1 · 거절 1", "기록 탭 한 줄")
+
+
+func test_report_quiet_week() -> void:
+	var t := _t()
+	var s := _s()
+	var e := {"report": {"turn": 1, "applied": [], "rejected": [], "events": [], "money": {}}, "before": s, "after": s}
+	var cards: Array = View.report_cards(e, t, "org_a")
+	eq(cards[1]["lines"], ["낸 명령 없음"], "명령 없음")
+	eq(cards[2]["lines"], ["눈에 띄는 움직임 없음"], "조용한 주")
+
+
+func test_org_panel() -> void:
+	var t := _t()
+	var s := _s()
+	var o: Dictionary = View.org_panel(s, t, "org_a")
+	eq(o["name"], "가람파", "이름")
+	eq(o["cash"], "1,200만 원", "돈")
+	eq(o["income"], View.money(Economy.income_of(s, t, "org_a")), "주 수입")
+	eq(o["upkeep"], View.money(Economy.upkeep_of(s, t, "org_a")), "주 지출")
+	eq(o["heat"], "0%", "열기")
+	eq(o["officers"].map(func(p): return p["id"]), ["boss_a", "man_b"], "간부 id 순")
+	eq(o["officers"][1]["rank"], "조장급(잠정)", "자리값 등급 표시")
+	eq([o["officers"][0]["post"], o["officers"][1]["post"]], ["두목", "간부"], "두목 · 자리 없음")
+	eq(o["officers"][0]["loyalty"], "50%", "충성")
+	eq(o["others"].map(func(x): return x["org"]), ["org_b"], "다른 조직")
+	eq([o["others"][0]["zones"], o["others"][0]["slots"]], [1, 1], "다른 조직 구역 · 사업장 수")

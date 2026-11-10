@@ -101,3 +101,25 @@ func test_replaced_ids_are_renamed() -> void:
 	eq(r["save"]["player"], "org_a", "저장의 player")
 	eq(r["save"]["orders"][0]["orders"][0], Orders.make("org_a", "new_c", "move", "z1"), "명령 기록")
 	check(r["notes"].any(func(n): return String(n).contains("old_c")), "옮긴 id 기록")
+
+
+## C2 FR-213 — 대기 명령 선택 칸 pending: 쓰고 읽으면 그대로 · 없는 옛 저장은 빈 목록 · 꼴이 틀린 명령은 버리고 알림 · id 옮기기
+func test_pending_round_trip_and_old_saves() -> void:
+	var t := _t()
+	var pend := [Orders.make("org_a", "boss_a", "open", "z1", {}, "player")]
+	var sv := Save.make(_meta(), _state(), _log(), pend)
+	eq(sv["format_version"], 1, "형식 버전은 그대로")
+	var r: Dictionary = Save.from_text(Save.to_text(sv), _t())
+	eq(r["errors"], [], "읽기")
+	eq(r["save"]["pending"], pend, "대기 명령 그대로")
+	var old := Save.make(_meta(), _state(), _log())
+	old.erase("pending")
+	eq(Save.from_text(Save.to_text(old), t)["save"]["pending"], [], "pending 없는 C1 저장 = 빈 목록")
+	var bad := Save.make(_meta(), _state(), _log(), [pend[0], {"org": "org_a"}, "x"])
+	var rb: Dictionary = Save.from_text(Save.to_text(bad), t)
+	eq(rb["errors"], [], "틀린 대기 명령은 오류가 아니다")
+	eq(rb["save"]["pending"], pend, "맞는 것만 남김")
+	check(rb["notes"].any(func(n): return n.contains("대기 명령 2개 버림")), "버린 수 알림")
+	var mv := Save.make(_meta(), _state(), _log(), [Orders.make("org_a", "old_c", "rest", "old_place", {}, "player")])
+	var rm: Dictionary = Save.from_text(Save.to_text(mv), t)
+	eq([rm["save"]["pending"][0]["by"], rm["save"]["pending"][0]["to"]], ["new_c", "z1"], "대기 명령도 id 옮김")

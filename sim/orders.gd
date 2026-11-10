@@ -4,12 +4,13 @@ extends RefCounted
 ## 처리 순서: 조직 id → 간부 id → 한 간부 안에서는 낸 순서(08 13절 1). 행동 수는 간부 1 · 두목 2(data/game/game.json actions).
 ## 틀린 명령은 적용하지 않고 까닭을 보고(rejected)에 남긴다 — 같은 입력이면 같은 거절. 설계: docs/C1_설계서_상태와턴.md 3-4 · 시험: tests/unit/test_orders.gd
 
+## at: 화면이 그 명령을 어디에 놓을 때 고르게 하나(C2 sim/draft.gd options) — "here" = 간부가 서 있는 구역 · "other" = 다른 구역
 const KINDS := {
-	"move": {"phase": "move", "mod": preload("res://sim/kinds/move.gd")},
-	"open": {"phase": "manage", "mod": preload("res://sim/kinds/open.gd")},
-	"expand": {"phase": "manage", "mod": preload("res://sim/kinds/expand.gd")},
-	"recruit": {"phase": "manage", "mod": preload("res://sim/kinds/recruit.gd")},
-	"rest": {"phase": "manage", "mod": preload("res://sim/kinds/rest.gd")},
+	"move": {"phase": "move", "at": "other", "mod": preload("res://sim/kinds/move.gd")},
+	"open": {"phase": "manage", "at": "here", "mod": preload("res://sim/kinds/open.gd")},
+	"expand": {"phase": "manage", "at": "here", "mod": preload("res://sim/kinds/expand.gd")},
+	"recruit": {"phase": "manage", "at": "here", "mod": preload("res://sim/kinds/recruit.gd")},
+	"rest": {"phase": "manage", "at": "here", "mod": preload("res://sim/kinds/rest.gd")},
 }
 const FIELDS := {"org": TYPE_STRING, "by": TYPE_STRING, "kind": TYPE_STRING, "to": TYPE_STRING, "args": TYPE_DICTIONARY, "src": TYPE_STRING}
 const SOURCES := ["player", "ai"]
