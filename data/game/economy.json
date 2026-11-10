@@ -1,0 +1,18 @@
+{
+  "_about": "08 14-1 경제 시작값(3층) — sim/economy.gd · 대조 시험 tests/unit/test_economy_table.gd. 수입 = BASE × lv × 유동 × (biz_base_milli + biz_per_point_milli × 수완) × (heat_div − 열기) × (돈줄 맞으면 match_milli) ÷ (10000 × 1000 × heat_div × 1000) — 열기는 ×100 · 유동은 10000 = 1.00배(C1 설계서 3-6). neg_cash 의 leave_bp · loyalty_drop 과 open · expand · recruit 는 08 에 없는 값이라 이 판이 정했다(docs/기획_차이.md (나)12). tribute · loan · castle_fee 는 C4 · C5 에서 쓴다.",
+  "base": {"유흥": 60, "대부": 50, "건설": 70, "물류": 80, "숙박": 55, "상권": 35},
+  "match_milli": 1250,
+  "biz_base_milli": 800,
+  "biz_per_point_milli": 4,
+  "heat_div": 20000,
+  "wage": {"건달급": 1, "조장급": 2, "네임드": 4, "경호대급": 8},
+  "officer_pay_per_rank": 3,
+  "tribute_bp": 1500,
+  "tribute_forced_bp": 3000,
+  "loan": {"interest_bp": 300, "default_turns": 4},
+  "castle_fee_bp": 500,
+  "neg_cash": {"turns": 2, "leave_bp": 1000, "loyalty_drop": 500},
+  "open_cost_k": 4,
+  "expand_cost_k": 4,
+  "recruit": {"cost": 3, "per_people": 2, "rand": 3}
+}

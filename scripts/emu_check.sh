@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # 에뮬레이터 점검 — CI android 잡이 부른다(수동 실행 emulator=true · 태그). castle_M3D scripts/emu_check.sh 를 옮겼다(세로).
-#   APK 설치 → 실행 → APP ready 기다림 → 첫 화면 스크린샷 → 자가 해시(SELFHASH)가 기준 구현 값과 같은지(다르면 실패)
+#   APK 설치 → 실행 → APP ready 기다림 → 첫 화면 스크린샷 → 자가 해시(SELFHASH)가 시나리오 A 기준값(tests/integration/golden_a.json seed 1)과 같은지(다르면 실패)
 #   → '다음 주' 자리 누름(기록만) → logcat 에 우리 앱 충돌 · 스크립트 오류가 없는지 → 화면 끄고 켜기(기록만)
 # 입력: build/castle_strategy.apk · tests/unit/rng_vectors.json(시드 1 · 26주 기대 해시)   출력: emu/*.png · emu/logcat*.txt
 set -u
 PKG=com.hipiboy7.castlestrategy
 APK=build/castle_strategy.apk
-WANT=$(python3 -c 'import json; print([c["hash"] for c in json.load(open("tests/unit/rng_vectors.json"))["stub"] if c["seed"] == 1][0])')
+WANT=$(python3 -c 'import json; print(json.load(open("tests/integration/golden_a.json"))["hash"]["1"])')
 mkdir -p emu
 adb install -r "$APK" || { echo "설치 실패"; exit 1; }
 adb shell settings put secure immersive_mode_confirmations confirmed   # 전체 화면 안내 창이 스크린샷을 가린다

@@ -16,7 +16,9 @@ const NEEDS := [
 	"common/canon/characters.json", "common/canon/factions.json", "common/canon/locations.json",
 	"common/packs/strategy/factions.json", "common/packs/strategy/districts.json",
 	"common/packs/strategy/scenarios.json", "common/packs/strategy/characters.json",
+	"game/game.json", "game/economy.json", "game/setup.json", "game/map.json",
 ]
+const GAME := ["game", "economy", "setup", "map"]     # data/game/<이름>.json → t[이름] (정수로)
 
 
 static func build(files: Dictionary) -> Dictionary:
@@ -77,7 +79,23 @@ static func build(files: Dictionary) -> Dictionary:
 			errors.append("%s:%s — canon 인물에 없다" % [spath, c["id"]])
 	t["strat"] = strat
 	t["tags"] = tags
+	for name in GAME:
+		var g = files.get("game/%s.json" % name)
+		if not (g is Dictionary):
+			errors.append("game/%s.json:- — 파일이 없거나 사전이 아니다" % name)
+			g = {}
+		t[name] = _ints(g)
+	var nb := {}
+	for pair in t["map"].get("links", []):
+		for i in 2:
+			if not nb.has(pair[i]):
+				nb[pair[i]] = []
+			nb[pair[i]].append(pair[1 - i])
+	for k in nb:
+		nb[k].sort()
+	t["neighbors"] = nb
 	_check_pack(t, errors)
+	_check_game(t, errors)
 	_freeze(t)
 	return t
 
@@ -141,6 +159,36 @@ static func _check_pack(t: Dictionary, errors: Array) -> void:
 		for v in (p.values() if p is Dictionary else [p]):
 			if not is_org.call(v):
 				errors.append("%s:%s — 부모 %s 모름" % [fp, uid, v])
+
+
+## 3층 표 검사 — 지도 구역 · 길 끝 · 경제 업종 · 시작값의 조직 · 구역이 표에 있다
+static func _check_game(t: Dictionary, errors: Array) -> void:
+	var mz: Dictionary = t["map"].get("zones", {})
+	for z in sorted_keys(mz):
+		if not t["districts"].has(z):
+			errors.append("game/map.json:%s — 모르는 구역" % z)
+	for pair in t["map"].get("links", []):
+		for z in pair:
+			if not mz.has(z):
+				errors.append("game/map.json:%s — 길 끝이 지도 구역에 없다" % z)
+	for kind in sorted_keys(t["economy"].get("base", {})):
+		if not t["trades"].has(kind):
+			errors.append("game/economy.json:base/%s — 모르는 업종" % kind)
+	var sc: Dictionary = t["setup"].get("scenarios", {})
+	for sid in sorted_keys(sc):
+		if not t["scenarios"].has(sid):
+			errors.append("game/setup.json:%s — 모르는 시나리오" % sid)
+		for org in sorted_keys(sc[sid].get("orgs", {})):
+			if not t["factions"].has(org):
+				errors.append("game/setup.json:%s/orgs/%s — 모르는 조직" % [sid, org])
+		for z in sorted_keys(sc[sid].get("zones", {})):
+			if not t["districts"].has(z):
+				errors.append("game/setup.json:%s/zones/%s — 모르는 구역" % [sid, z])
+
+
+## 땅길 이웃(id 순 — data/game/map.json links)
+static func neighbors(t: Dictionary, zone: String) -> Array:
+	return t["neighbors"].get(zone, [])
 
 
 ## replaced_by 를 끝까지 따라간 id(고리면 MAX_HOPS 에서 멈춘다)

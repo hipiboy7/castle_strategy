@@ -202,28 +202,5 @@
    "target": "가나",
    "turn": 26
   }
- ],
- "stub": [
-  {
-   "acc": 1825805455,
-   "hash": "ae1ca669e2a06f7a",
-   "last": 2385619981,
-   "seed": 1,
-   "turns": 26
-  },
-  {
-   "acc": 471279287,
-   "hash": "7d3f13ef6abe8f56",
-   "last": 1485591929,
-   "seed": 2,
-   "turns": 26
-  },
-  {
-   "acc": 1547085078,
-   "hash": "c3980c6ac83dc6ac",
-   "last": 3037645528,
-   "seed": 3,
-   "turns": 26
-  }
  ]
 }

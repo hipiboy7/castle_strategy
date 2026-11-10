@@ -1,11 +1,11 @@
-"""기준 구현(Python 정수) — PCG32 · 갈래 스트림 · 정규형 JSON 해시 · C1-0 빈 시뮬. GDScript 쪽이 이것과 같아야 한다.
+"""기준 구현(Python 정수) — PCG32 · 갈래 스트림 · 정규형 JSON 해시. GDScript 쪽이 이것과 같아야 한다.
+(C1-0 빈 시뮬 기준 구현은 C1 본체에서 sim/turn.gd 가 들어와 지웠다 — 시나리오 A 기준 해시는 tests/integration/golden_a.json)
 
     python3 -B tools/rng_ref.py --write   # tests/unit/rng_vectors.json 을 다시 쓴다
     python3 -B tools/rng_ref.py --check   # 다시 만들어 파일과 같은지 + 공개 PCG32 데모 수열과 같은지(scripts/verify.py 가 부른다)
-    python3 -B tools/rng_ref.py --stub 1 26   # 빈 시뮬 시드 1 · 26턴의 해시(폰 자가 해시 기대값)
 
-설계: docs/C1_설계서_상태와턴.md 3-1(RNG) · 3-2(해시) · 요구: FR-103 · FR-104 · FR-106
-GDScript: sim/rng.gd · sim/hash.gd · sim/stub_turn.gd · 시험: tests/unit/test_rng.gd · test_hash.gd · test_stub_turn.gd
+설계: docs/C1_설계서_상태와턴.md 3-1(RNG) · 3-2(해시) · 요구: FR-103 · FR-104
+GDScript: sim/rng.gd · sim/hash.gd · 시험: tests/unit/test_rng.gd · test_hash.gd
 """
 import hashlib
 import json
@@ -70,14 +70,6 @@ def sha16(v):
     return hashlib.sha256(canonical(v).encode("utf-8")).hexdigest()[:16]
 
 
-def stub_run(seed, turns):
-    s = {"v": 1, "seed": seed, "turn": 1, "acc": 0, "last": 0}
-    for _ in range(turns):
-        x = stream(s["seed"], s["turn"], "stub", "acc").next_u32()
-        s = dict(s, acc=(s["acc"] * 31 + x) & M32, last=x, turn=s["turn"] + 1)
-    return s
-
-
 # 정규형 시험 값 — tests/unit/test_hash.gd 가 같은 이름으로 같은 값을 만든다
 HASH_VALUES = {
     "empty": {},
@@ -104,13 +96,9 @@ def build():
     for bound in (1, 2, 7, 10000, 0x80000001):
         r = stream(1, 1, "below", str(bound))
         below.append({"bound": bound, "target": str(bound), "out": [r.below(bound) for _ in range(6)]})
-    stub = []
-    for seed in (1, 2, 3):
-        s = stub_run(seed, 26)
-        stub.append({"seed": seed, "turns": 26, "acc": s["acc"], "last": s["last"], "hash": sha16(s)})
     hashes = {k: {"text": canonical(v), "hash": sha16(v)} for k, v in HASH_VALUES.items()}
     return {"_about": "tools/rng_ref.py --write 가 만든다 — 손으로 고치지 않는다. 64비트 값은 [hi, lo] 32비트 두 쪽(JSON 수는 Godot 에서 실수라 2^53 을 넘으면 틀어진다)",
-            "seeded": seeded, "streams": streams, "below": below, "stub": stub, "hash": hashes}
+            "seeded": seeded, "streams": streams, "below": below, "hash": hashes}
 
 
 def _text(data):
@@ -123,12 +111,6 @@ def main(argv):
     if demo != DEMO[2]:
         print(f"[FAIL] PCG32 공개 데모 수열과 다르다: {[hex(x) for x in demo]}")
         return 1
-    if "--stub" in argv:
-        i = argv.index("--stub")
-        seed, turns = int(argv[i + 1]), int(argv[i + 2])
-        s = stub_run(seed, turns)
-        print(json.dumps({"seed": seed, "turns": turns, "acc": s["acc"], "hash": sha16(s)}))
-        return 0
     text = _text(build())
     if "--write" in argv:
         with open(VECTORS, "w", encoding="utf-8", newline="\n") as f:

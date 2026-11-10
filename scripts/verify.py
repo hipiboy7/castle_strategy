@@ -12,8 +12,9 @@
   가져오기      godot --headless --path . --import (스크립트 문법 · 자원)
   시험          godot --headless --path . -s res://tests/run_tests.gd (tests/unit = A · tests/integration = B)
   커버리지      함수 단위 — .tools/cov/ 사본의 A · B 파일 함수 머리마다 표시 줄을 넣고 시험을 다시 돌린다. A ≥ 90% · B ≥ 70%
-  자동 진행     -- --autoplay --turns 26 --seed S (시드 1 · 2 · 3, 두 번씩) — RESULT 해시가 두 번 같고 기준 구현 값과 같다
-  화면 띄우기   --quit-after 120 (창 없이 화면 장면을 120 프레임) — APP ready · SELFHASH 가 시드 1 기대값
+  자동 진행     -- --autoplay --turns 26 --seed S (시나리오 A · 시드 1 · 2 · 3, 두 번씩) — RESULT 해시가 두 번 같고
+                tests/integration/golden_a.json 기준값과 같다 · 불변식 위반 0
+  화면 띄우기   --quit-after 120 (창 없이 화면 장면을 120 프레임) — APP ready · SELFHASH 가 시드 1 기준값
   잘못된 인자   -- --turns 0 — ARGS 줄 · 종료 코드 2
   문서 명령     README · 테스트결과서 · 폰확인의 `python3 -B <파일>` 과 저장소 경로가 실제로 있다
 출력에 SCRIPT ERROR · ERROR: · WARNING: · Leaked · Parse Error 가 하나라도 있으면 그 단계는 실패다.
@@ -38,12 +39,14 @@ COMMON_DIR = os.path.join(ROOT, "data", "common")
 COMMON_SRC = os.environ.get("CASTLE_COMMON") or os.path.join(os.path.dirname(ROOT), "castle_common")
 RECEIVES = ("data/*.json", "cases/*.json", "canon/*.json", "packs/strategy/*.json", "docs/개발규격/*.md")  # docs/castle_common_요청.md #14
 ASSETS = os.path.join(ROOT, "assets")
-VECTORS = os.path.join(ROOT, "tests", "unit", "rng_vectors.json")
+GOLDEN = os.path.join(ROOT, "tests", "integration", "golden_a.json")   # 시나리오 A 26턴 기준 해시(seed → hash)
 # CLAUDE.md 3절 TDD 등급 — 함수 단위 커버리지를 재는 파일(화면 장면 ui/home.gd · 진입 src/main.gd 는 C · 화면 단계가 본다)
 COV_FILES = {
-    "A": ["sim/rng.gd", "sim/hash.gd", "sim/stub_turn.gd", "src/launch.gd", "ui/layout.gd",
-          "sim/rules_common.gd", "sim/tables.gd", "sim/state.gd"],
-    "B": ["src/storage.gd", "src/data_files.gd"],
+    "A": ["sim/rng.gd", "sim/hash.gd", "src/launch.gd", "ui/layout.gd",
+          "sim/rules_common.gd", "sim/tables.gd", "sim/state.gd", "sim/fixed.gd", "sim/economy.gd", "sim/setup.gd",
+          "sim/orders.gd", "sim/kinds/move.gd", "sim/kinds/open.gd", "sim/kinds/expand.gd", "sim/kinds/recruit.gd",
+          "sim/kinds/rest.gd", "sim/save.gd"],
+    "B": ["src/storage.gd", "src/data_files.gd", "sim/turn.gd", "sim/ai.gd", "sim/game.gd"],
 }
 COV_DIRS = ("sim", "src", "ui", "tests", "data")
 COV_MIN = {"A": 0.90, "B": 0.70}
@@ -243,13 +246,14 @@ def step_autoplay(g, want):
             def chk(out, got=got):
                 r = _result(out)
                 got.append(r)
-                return r is not None, ""
+                ok = r is not None and r.get("violations") == 0
+                return ok, ("" if ok else "RESULT 줄 없음 또는 불변식 위반")
             ok_all &= run(f"자동 진행 seed {seed} · 26주", [g, "--headless", "--path", ".", "--", "--autoplay", "--turns", "26",
                                                        "--seed", str(seed)], chk, timeout=120)
         hashes = [r["hash"] if r else None for r in got]
         same = len(set(hashes)) == 1 and hashes[0] == want.get(seed)
         ok_all &= same
-        print(f"[{'ok' if same else 'FAIL'}] 결정성 seed {seed} — 두 번 {hashes} · 기준 구현 {want.get(seed)}")
+        print(f"[{'ok' if same else 'FAIL'}] 결정성 seed {seed} — 두 번 {hashes} · 기준값 {want.get(seed)}")
     return ok_all
 
 
@@ -285,8 +289,8 @@ def main():
     results = [r for r in (step_common(strict),) if r is not None]
     results.append(step_assets())
     results.append(run("기준 구현", [sys.executable, "-B", os.path.join("tools", "rng_ref.py"), "--check"]))
-    with open(VECTORS, encoding="utf-8") as f:
-        want = {c["seed"]: c["hash"] for c in json.load(f)["stub"]}
+    with open(GOLDEN, encoding="utf-8") as f:
+        want = {int(k): v for k, v in json.load(f)["hash"].items()}
     if not os.path.isdir(os.path.join(ROOT, ".godot", "imported")):
         # 새로 받은 저장소(CI): 첫 가져오기는 테마 글꼴을 가져오기 전에 읽으려 해 ERROR 를 낸다 — 한 번 돌리고 다시 본다
         p = subprocess.run([g, "--headless", "--path", ".", "--import"], cwd=ROOT, stdout=subprocess.DEVNULL,

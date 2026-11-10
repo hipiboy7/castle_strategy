@@ -12,7 +12,7 @@ func test_build_fake_has_no_errors() -> void:
 	eq(t["errors"], [], "가짜 표는 오류 없음")
 	eq(t["ranks"], ["건달급", "조장급", "네임드"], "사다리")
 	eq(t["rank_no"]["네임드"], 2, "등급 번호")
-	eq(t["trades"], ["상권", "유흥"], "업종")
+	eq(t["trades"], ["유흥", "대부", "건설", "물류", "숙박", "상권"], "업종 여섯")
 	check(t["factions"].has("org_b") and t["districts"].has("z2") and t["scenarios"].has("A"), "id 로 찾는 표")
 	eq(t["strat"]["boss_a"]["business"], 60, "전략 능력치는 정수로")
 	check(t["rules"] != null and t["rules"].rank_index("조장급") == 1, "규칙 함수(rules_common)가 같은 사다리를 쓴다")
@@ -101,3 +101,22 @@ func test_received_copy_builds_clean() -> void:
 	eq(Tables.resolve(t, "namgucheongnyeonhoe", "A"), "", "A 의 남구희망청년회는 무소속")
 	eq(Tables.resolve(t, "namgucheongnyeonhoe", "B"), "bujinpa", "B 에서는 부진파")
 	eq(Tables.current_id(t, "gimdaegeon"), "kimdaegeon", "canon replaced_by")
+
+
+## 3층 표(data/game) — 정수로 · 지도 이웃 · id 검사(지도 구역 · 길 · 업종 · 시작값의 조직 · 구역)
+func test_game_tables() -> void:
+	var t: Dictionary = Tables.build(Fixtures.files())
+	eq(t["economy"]["base"]["상권"], 35, "경제 값은 정수")
+	eq(t["game"]["actions"]["boss"], 2, "두목 행동 수")
+	eq(Tables.neighbors(t, "z1"), ["z2"], "길 이웃")
+	eq(Tables.neighbors(t, "z2"), ["z1"], "길은 양쪽")
+	eq(Tables.neighbors(t, "없는곳"), [], "모르는 구역")
+	var f := Fixtures.files()
+	f["game/map.json"]["zones"]["ghost_zone"] = {"x": 1, "y": 1}
+	f["game/map.json"]["links"].append(["z1", "ghost_link"])
+	f["game/economy.json"]["base"]["우주업"] = 9
+	f["game/setup.json"]["scenarios"]["A"]["orgs"]["ghost_org"] = {}
+	f["game/setup.json"]["scenarios"]["A"]["zones"]["ghost_z"] = {}
+	var errs: Array = Tables.build(f)["errors"]
+	for w in ["ghost_zone", "ghost_link", "우주업", "ghost_org", "ghost_z"]:
+		check(errs.any(func(e): return String(e).contains(w)), "오류 목록에 %s: %s" % [w, errs])

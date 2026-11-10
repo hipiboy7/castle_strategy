@@ -3,6 +3,7 @@ extends RefCounted
 ## sim/ 은 파일을 읽지 않는다(CLAUDE.md 2절 DIP) — 이 결과의 "files" 를 sim/tables.gd build 에 넘긴다.
 ## 받은 사본: data/common/(castle_common 이 원본 · 손대지 않음) · 3층 표: data/game/. 설계: docs/C1_설계서_상태와턴.md 1절 · 요구: FR-113
 
+const Tables = preload("res://sim/tables.gd")
 const ROOT := "res://data/"
 const SOURCE := "common/SOURCE.json"
 
@@ -28,3 +29,8 @@ static func source_sha(root: String = ROOT) -> String:
 	var r := read([SOURCE], root)
 	var d = r["files"].get(SOURCE)
 	return String(d.get("castle_common", "")) if d is Dictionary else ""
+
+
+## 정적 표 — sim/tables.gd NEEDS 를 읽어 build(없는 파일도 t["errors"] 에 든다)
+static func load_tables(root: String = ROOT) -> Dictionary:
+	return Tables.build(read(Tables.NEEDS, root)["files"])

@@ -1,0 +1,6 @@
+{
+  "_about": "시나리오 A headless 26턴 기준 해시(seed → hash) — tests/integration/test_scenario_a.gd · scripts/verify.py 자동 진행 · 화면 자가 해시(seed 1) · scripts/emu_check.sh 가 읽는다. 시뮬 · AI · 3층 값을 일부러 바꿨을 때만 고치고 까닭(옛 값 → 새 값)을 테스트결과서에 적는다.",
+  "scenario": "A",
+  "turns": 26,
+  "hash": {"1": "d2b2a6faa864f932", "2": "c85ab24cbc4ec4c1", "3": "188861c5fd8c69f5"}
+}

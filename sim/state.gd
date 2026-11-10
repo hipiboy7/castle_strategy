@@ -53,7 +53,7 @@ static func from_dict(d) -> Dictionary:
 	if not (d is Dictionary):
 		return {"state": {}, "errors": ["상태가 사전이 아니다"]}
 	var errs := []
-	var s = _ints(d, errs, "state")
+	var s = ints(d, errs, "state")
 	if s.get("v") != VERSION:
 		errs.append("state.v — 모르는 형식 %s (이 판은 %d)" % [s.get("v"), VERSION])
 	_need(s, TOP_KEYS, "state", errs)
@@ -178,7 +178,7 @@ static func _need(d: Dictionary, keys: Array, at: String, errs: Array) -> void:
 
 
 ## JSON 실수 → 정수(깊이). 정수 꼴이 아니면 오류에 적고 그대로 둔다
-static func _ints(v, errs: Array, at: String):
+static func ints(v, errs: Array, at: String):
 	if v is float:
 		if v == floorf(v) and absf(v) < 9.0e15:
 			return int(v)
@@ -187,11 +187,11 @@ static func _ints(v, errs: Array, at: String):
 	if v is Array:
 		var out := []
 		for i in v.size():
-			out.append(_ints(v[i], errs, "%s[%d]" % [at, i]))
+			out.append(ints(v[i], errs, "%s[%d]" % [at, i]))
 		return out
 	if v is Dictionary:
 		var out := {}
 		for k in v:
-			out[k] = _ints(v[k], errs, "%s.%s" % [at, k])
+			out[k] = ints(v[k], errs, "%s.%s" % [at, k])
 		return out
 	return v

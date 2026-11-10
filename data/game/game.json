@@ -1,0 +1,6 @@
+{
+  "_about": "3층(이 판 소유) 게임 규칙 값 — sim/orders.gd(행동 수) · sim/setup.gd(등급 자리값). 행동 수는 08 2절 · 18절 (다), 판 길이는 08 8절, 자리값은 docs/기획_차이.md (나)9.",
+  "actions": {"officer": 1, "boss": 2},
+  "lengths": [26, 52, 0],
+  "rank_placeholder": "조장급"
+}

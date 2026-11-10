@@ -1,0 +1,10 @@
+{
+  "_about": "3층(이 판 소유) 지도 — 구역 좌표(0~1000 격자)와 땅길(장르 팩에 선 · 좌표가 없다 — 08 3-4 · docs/기획_차이.md (가)). C1 본체는 시나리오 A 의 회암시 4구역만 둔다. 전체 32구역 · 바닷길은 C2.",
+  "zones": {
+    "bujindong": {"x": 250, "y": 650},
+    "namgu": {"x": 300, "y": 300},
+    "bukgu": {"x": 700, "y": 250},
+    "hoeamsijang": {"x": 650, "y": 650}
+  },
+  "links": [["bujindong", "namgu"], ["bujindong", "hoeamsijang"], ["namgu", "hoeamsijang"], ["namgu", "bukgu"], ["bukgu", "hoeamsijang"]]
+}

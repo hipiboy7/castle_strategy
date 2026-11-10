@@ -131,10 +131,12 @@ jobs:
         run: |
           set -e
           unzip -l "build/$APK.apk" > build/apk_list.txt
-          for f in sim/rng.gd sim/hash.gd sim/stub_turn.gd src/main.gd ui/home.gd; do
+          for f in sim/rng.gd sim/hash.gd sim/turn.gd sim/rules_common.gd sim/tables.gd src/main.gd ui/home.gd \
+                   data/game/economy.json data/common/packs/strategy/scenarios.json data/common/canon/characters.json; do
             grep -qE "assets/${f}c?$" build/apk_list.txt || { echo "::error::APK 에 $f 가 없다"; exit 1; }
           done
           if grep -q "assets/tests/" build/apk_list.txt; then echo "::error::시험(tests/)이 APK 에 들었다"; exit 1; fi
+          if grep -q "assets/data/common/cases/" build/apk_list.txt; then echo "::error::cases 가 APK 에 들었다"; exit 1; fi
           echo "APK 에 판정 · 화면 코드 있음 · 시험 없음 · 크기 $(stat -c %s "build/$APK.apk") 바이트"
 
       - name: 화면 찍기 (가상 화면 · 폰 세로 1080x2340 · 폴드 안쪽 1812x2176)

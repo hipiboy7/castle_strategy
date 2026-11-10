@@ -1,15 +1,17 @@
 extends Control
 ## 진입점(main.tscn) — 실행 인자(src/launch.gd)에 따라:
-##   --autoplay  화면 없이 자동 진행(C1-0 은 빈 시뮬)을 돌려 RESULT 한 줄을 찍고 끝낸다(scripts/verify.py 가 읽는다)
+##   --autoplay  화면 없이 시나리오 A 를 --turns 턴 자동 진행(모든 조직 AI)하고 RESULT 한 줄을 찍고 끝낸다(scripts/verify.py 가 읽는다).
+##               불변식 위반이 있으면 VIOLATION 줄 · 종료 코드 1, 데이터 오류면 DATA 줄 · 종료 코드 3
 ##   (없음)      화면(ui/home.gd)을 띄운다. --shot PATH 면 --shot-frame 번째 프레임을 PNG 로 찍고 끝낸다(xvfb · CI)
-## 인자가 틀리면 ARGS 줄을 찍고 종료 코드 2. 요구: FR-106 · FR-107 · 설계: docs/C1_설계서_상태와턴.md 1절
+## 인자가 틀리면 ARGS 줄을 찍고 종료 코드 2. 요구: FR-106 · FR-107 · FR-119 · 설계: docs/C1_설계서_상태와턴.md 1절
 
 const Launch = preload("res://src/launch.gd")
-const Stub = preload("res://sim/stub_turn.gd")
-const StateHash = preload("res://sim/hash.gd")
+const DataFiles = preload("res://src/data_files.gd")
+const Game = preload("res://sim/game.gd")
+const State = preload("res://sim/state.gd")
 const Home = preload("res://ui/home.gd")
 const GAME_VERSION := "0.1.0"
-const SOURCE := "res://data/common/SOURCE.json"
+const SCENARIO := "A"
 
 var _args: Dictionary = {}
 var _frames := 0
@@ -23,13 +25,11 @@ func _ready() -> void:
 		get_tree().quit(2)
 		return
 	if _args["autoplay"]:
-		var s: Dictionary = Stub.run(_args["seed"], _args["turns"])
-		print("RESULT " + JSON.stringify({"turns": _args["turns"], "seed": _args["seed"], "acc": s["acc"], "hash": StateHash.of(s)}))
-		get_tree().quit(0)
+		get_tree().quit(_autoplay())
 		return
 	var home = Home.new()
 	home.version = GAME_VERSION
-	home.common_sha = _common_sha()
+	home.common_sha = DataFiles.source_sha().substr(0, 7)
 	add_child(home)
 	set_process(_args["shot"] != "")
 
@@ -44,9 +44,18 @@ func _process(_dt: float) -> void:
 	get_tree().quit(0 if err == OK else 1)
 
 
-## 받은 castle_common 판(SOURCE.json — 받기 전이면 "")
-func _common_sha() -> String:
-	if not FileAccess.file_exists(SOURCE):
-		return ""
-	var d = JSON.parse_string(FileAccess.get_file_as_string(SOURCE))
-	return String(d.get("castle_common", "")).substr(0, 7) if d is Dictionary else ""
+func _autoplay() -> int:
+	var t: Dictionary = DataFiles.load_tables()
+	if not t["errors"].is_empty():
+		for e in t["errors"]:
+			print("DATA " + e)
+		return 3
+	var a: Dictionary = Game.autoplay(t, SCENARIO, _args["seed"], _args["turns"])
+	var cash := {}
+	for org in State.sorted_keys(a["state"]["orgs"]):
+		cash[org] = a["state"]["orgs"][org]["cash"]
+	print("RESULT " + JSON.stringify({"turns": _args["turns"], "seed": _args["seed"], "scenario": SCENARIO, "hash": a["hash"],
+		"violations": a["violations"].size(), "cash": cash}))
+	for v in a["violations"]:
+		print("VIOLATION " + v)
+	return 0 if a["violations"].is_empty() else 1
