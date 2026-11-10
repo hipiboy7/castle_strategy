@@ -39,6 +39,7 @@ static func build(files: Dictionary) -> Dictionary:
 
 	# canon — 있는 id 와 replaced_by
 	var people := {}
+	var names := {}                       # canon 인물 id → 이름(화면이 id 로 찾는다 — C2 FR-215)
 	var replaced := {}
 	var replaced_src := {}
 	for f in [["characters.json", "characters"], ["factions.json", "factions"], ["locations.json", "locations"]]:
@@ -46,10 +47,12 @@ static func build(files: Dictionary) -> Dictionary:
 		for e in _list(files, errors, path, f[1]):
 			if f[1] == "characters":
 				people[e["id"]] = true
+				names[e["id"]] = String(e.get("name", e["id"]))
 			if e.get("replaced_by") is String and e["replaced_by"] != "":
 				replaced[e["id"]] = e["replaced_by"]
 				replaced_src[e["id"]] = path
 	t["people"] = people
+	t["names"] = names
 	t["replaced"] = replaced
 	for k in replaced:
 		var seen := {k: true}
@@ -167,10 +170,11 @@ static func _check_game(t: Dictionary, errors: Array) -> void:
 	for z in sorted_keys(mz):
 		if not t["districts"].has(z):
 			errors.append("game/map.json:%s — 모르는 구역" % z)
-	for pair in t["map"].get("links", []):
-		for z in pair:
-			if not mz.has(z):
-				errors.append("game/map.json:%s — 길 끝이 지도 구역에 없다" % z)
+	for key in ["links", "sea"]:
+		for pair in t["map"].get(key, []):
+			for z in pair:
+				if not mz.has(z):
+					errors.append("game/map.json:%s/%s — 길 끝이 지도 구역에 없다" % [key, z])
 	for kind in sorted_keys(t["economy"].get("base", {})):
 		if not t["trades"].has(kind):
 			errors.append("game/economy.json:base/%s — 모르는 업종" % kind)

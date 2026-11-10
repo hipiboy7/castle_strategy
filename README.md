@@ -11,6 +11,7 @@
 - 시나리오 A 자동 진행(화면 없음 · 모든 조직 AI): `.tools/godot/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64 --headless --path . -- --autoplay --turns 26 --seed 1` — `RESULT {…"hash":"d2b2a6faa864f932"…}` 한 줄(기준값은 `tests/integration/golden_a.json`)
 - castle_common 다시 받기: `cd ../castle_common && python3 -B tools/sync.py castle_strategy` → 이 폴더에서 `python3 -B scripts/verify.py` → `CHANGELOG.md` 의 [깨짐] 확인 → "castle_common <커밋> 받음" 커밋
 - 화면 한 장 찍기(가상 화면): `tools/xvfb_shot.sh` — 사용법은 파일 머리에 있다
+- 인물 도트 다시 받기(취호전 시트 내보내기 · 멱등): `CASTLE_RPG=<취호전 폴더> python3 -B scripts/import_chars.py` — pygame 이 든 python 은 `.tools/artvenv/`(만드는 명령은 파일 머리). 점검만: `python3 -B scripts/import_chars.py --check`
 - 폰에서 하기: 휴대폰 GitHub 앱 → `castle_strategy` → Releases → 맨 위 릴리스의 APK(`docs/폰확인.md`)
 
 ## 문서 (이 목록이 유일하다)
@@ -22,6 +23,8 @@
 | `docs/C1_요구사항정의서_시뮬코어.md` | C1(C1-0 기술 검증 + 시뮬 코어) 요구사항 · 완료 기준 · 위험 · 비용 |
 | `docs/C1_설계서_상태와턴.md` | 상태 · 명령 · 턴 · 결정성(RNG · 해시 · 정수화) · 저장 v1 |
 | `docs/C1_테스트결과서_시뮬코어.md` | C1 실행 증거(검증 출력 · CI · APK 지문 · 폰 결과) |
+| `docs/C2_요구사항정의서_화면과명령.md` | C2(지도 · 명령 · 턴 끝 보고 화면) 요구사항 · 완료 기준 · 위험 · 비용 |
+| `docs/C2_설계서_화면과명령.md` | 화면 구조 · 보기 · 명령 제출(대기 명령 · 미리 보기) · 저장 pending · 도트 받기 · 스크린샷 인자 |
 | `docs/폰확인.md` | 릴리스 본문 — 폰에서 할 일(설치 · 1분 경로 · 볼 것) |
 | `assets/ASSETS.md` | 자산 출처(verify 가 검사) |
 | `docs/트러블슈팅.md` | 겪은 문제(T-n — 증상 · 원인 · 조치) |
@@ -31,6 +34,6 @@
 ## 폴더
 - 코드: `sim/`(판정 — 순수 · 노드 없음 · 명령 처리기 `sim/kinds/`) · `ui/`(화면 · 테마) · `src/`(진입 · 실행 인자 · 데이터 · 저장소 입출력)
 - 데이터: `data/common/`(castle_common 받은 사본 — 손대지 않음 · `SOURCE.json` 도장) · `data/game/`(3층 표 — 경제 · 시작값 · 지도 · 규칙 값)
-- 시험 · 검증: `tests/`(unit = A · integration = B · 시나리오 A 기준 해시 `tests/integration/golden_a.json`) · `scripts/`(get_godot · verify · emu_check) · `tools/`(rng_ref 기준 구현 · credit · xvfb_shot)
+- 시험 · 검증: `tests/`(unit = A · integration = B · 시나리오 A 기준 해시 `tests/integration/golden_a.json`) · `scripts/`(get_godot · verify · emu_check · import_chars) · `tools/`(rng_ref 기준 구현 · credit · xvfb_shot)
 - 빌드 · 자산: `android/`(고정 디버그 키) · `.github/workflows/` · `assets/`
 - 문서 · 기록: `docs/` · `history/`
