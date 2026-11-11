@@ -36,6 +36,7 @@ var skip_button: Button
 var end_button: Button
 var _max := [1, 1]
 var _sprites = null
+const DUEL_PIC := 150.0             # 일기토 초상 한 변(px · 기준 1080 폭)
 var _pic := [null, null]          # 일기토 초상 칸 [a(아래), b(위)]
 var _pic_id := ["", ""]
 
@@ -212,7 +213,7 @@ func _duel_row(name: Label, bar: ProgressBar, k: int, pic_right: bool) -> HBoxCo
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 18)
 	var pic := HBoxContainer.new()
-	pic.custom_minimum_size = Vector2(96, 96)
+	pic.custom_minimum_size = Vector2(DUEL_PIC, DUEL_PIC)
 	_pic[k] = pic
 	var v := VBoxContainer.new()
 	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -235,7 +236,7 @@ func _set_pic(k: int, id: String, who: String) -> void:
 	_pic_id[k] = id
 	for ch in _pic[k].get_children():
 		ch.queue_free()
-	var b: Control = _sprites.box(id, who, 96)
+	var b: Control = _sprites.box(id, who, DUEL_PIC, k == 1)   # 위 사람(초상 왼쪽)은 뒤집어 아래 사람과 마주 보게
 	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_pic[k].add_child(b)
 

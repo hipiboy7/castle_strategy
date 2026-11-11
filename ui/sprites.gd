@@ -4,8 +4,8 @@ extends RefCounted
 ## 도트(취호전 시트)는 2026-11-11 에 그만 썼다(사용자 지시 · docs/기획_차이.md (라)12). 요구: FR-212 · 출처: assets/ASSETS.md
 
 const DIR := "res://assets/chars/svg/"
-## 얼굴 둘레(그림 384px 안) — 지도 위 동그란 패에 머리만 넣을 때 쓴다(머리 공간 → 화면: scripts/draw_portraits.py HEAD)
-const HEAD_REGION := Rect2(84, 24, 216, 216)
+## 얼굴 둘레(그림 384px 안) — 지도 위 동그란 패에 머리만 넣을 때 쓴다(그림 256 좌표 x 48~208 · y 24~184 × 1.5 — scripts/draw_portraits.py 얼굴 자리)
+const HEAD_REGION := Rect2(72, 36, 240, 240)
 
 var _cache := {}
 
@@ -18,7 +18,8 @@ func portrait(id: String) -> Texture2D:
 
 
 ## 초상 한 칸 — 테마 판(PortraitPanel) 위에 그림(없으면 이름 첫 글자). 누름은 통과시킨다.
-func box(id: String, name: String, side: float) -> Control:
+## 그림은 모두 화면 왼쪽을 본다(3/4) — flip = 좌우를 뒤집어 오른쪽을 보게(전투 일기토에서 마주 보게).
+func box(id: String, name: String, side: float, flip := false) -> Control:
 	var p := PanelContainer.new()
 	p.theme_type_variation = "PortraitPanel"
 	p.custom_minimum_size = Vector2(side, side)
@@ -31,6 +32,7 @@ func box(id: String, name: String, side: float) -> Control:
 		r.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		r.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		r.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		r.flip_h = flip
 		p.add_child(r)
 	else:
 		var l := Label.new()
