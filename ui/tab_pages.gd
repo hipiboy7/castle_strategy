@@ -50,14 +50,9 @@ class OrgPage extends PanelContainer:
 			row.theme_type_variation = "RowPanel"
 			var h := HBoxContainer.new()
 			row.add_child(h)
-			var tex: Texture2D = sprites.portrait(p["id"]) if sprites != null else null
-			if tex != null:
-				var r := TextureRect.new()
-				r.texture = tex
-				r.custom_minimum_size = Vector2(96, 96)
-				r.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-				r.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-				h.add_child(r)
+			h.add_theme_constant_override("separation", 20)
+			if sprites != null:
+				h.add_child(sprites.box(p["id"], p["name"], 128))
 			var l: Label = T._line(h, "%s · %s · %s\n충성 %s · %s · %s" % [p["name"], p["post"], p["rank"], p["loyalty"], p["status"], p["zone_name"]])
 			l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			_v.add_child(row)
@@ -109,12 +104,13 @@ class LogPage extends PanelContainer:
 	signal open_report(i: int)
 	signal new_game
 	var _v: VBoxContainer
+	var _perf: Label
 
 	func _ready() -> void:
 		_v = load("res://ui/tab_pages.gd")._scroll(self)
 
-	## titles = 보고 한 줄(오래된 것부터) · info = 판 · 해시 · 성능 글
-	func show_log(titles: Array, info: String) -> void:
+	## titles = 보고 한 줄(오래된 것부터) · info = 판 · 해시 글 · perf = 성능 줄(1초마다 set_perf 로 글만 바꾼다 — 끌어 둔 자리를 지키려고)
+	func show_log(titles: Array, info: String, perf: String) -> void:
 		var T = load("res://ui/tab_pages.gd")
 		T._clear(_v)
 		T._line(_v, "지난 보고 %d" % titles.size(), "CardTitle")
@@ -134,5 +130,10 @@ class LogPage extends PanelContainer:
 		n.custom_minimum_size = Vector2(0, 130)
 		n.pressed.connect(func() -> void: new_game.emit())
 		_v.add_child(n)
+		_perf = T._line(_v, perf, "Label")
 		T._line(_v, "판 정보", "Label")
 		T._line(_v, info, "TinyLabel")
+
+	func set_perf(text: String) -> void:
+		if is_instance_valid(_perf):
+			_perf.text = text

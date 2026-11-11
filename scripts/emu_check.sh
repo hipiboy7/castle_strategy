@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # 에뮬레이터 점검 — CI android 잡이 부른다(수동 실행 emulator=true · 태그). castle_M3D scripts/emu_check.sh 를 옮겼다(세로).
 #   APK 설치 → 실행 → APP ready 기다림 → 첫 화면(지도) 스크린샷 → 자가 해시(SELFHASH)가 시나리오 A 기준값(tests/integration/golden_a.json seed 1)과 같은지
-#   → C2 1분 경로 일부(FR-218): 앱이 찍은 버튼 자리(UI <이름> x y)를 눌러 맡기기 → 주 끝내기 → 보고(REPORT n) → 닫기를 5번 → TURN 6(아니면 실패)
+#   → C2 1분 경로 일부(FR-218): 앱이 찍은 버튼 자리(UI <이름> x y)를 눌러 맡기기 → 주 끝내기 → 보고(REPORT n) → 닫기를 5번 → TURN 6(아니면 실패) · C3: 맡기기에 AI 습격이 들어가 4주 안팎에 OUTCOME win 줄이 찍힌다(보기만 — 판정은 TURN 6)
 #   → logcat 에 우리 앱 충돌 · 스크립트 오류가 없는지 → 화면 끄고 켜기(기록만)
 # 입력: build/castle_strategy.apk · tests/integration/golden_a.json   출력: emu/*.png(지도 · 보고 · 5주 뒤 · 다시 켬) · emu/logcat*.txt
 set -u
@@ -57,7 +57,7 @@ for week in 1 2 3 4 5; do
 done
 adb exec-out screencap -p > emu/emu_3_week6.png
 adb logcat -d > emu/logcat.txt
-grep -oE "TURN [0-9]+|REPORT [0-9]+|PERF [a-z_=0-9 ]+" emu/logcat.txt | tail -12
+grep -oE "TURN [0-9]+|REPORT [0-9]+|OUTCOME [a-z_]+ [a-z_]+ turn=[0-9]+|PERF [a-z_=0-9 ]+" emu/logcat.txt | tail -16
 if ! grep -q "TURN 6" emu/logcat.txt; then
   echo "5주를 두지 못했다(TURN 6 없음) — 누른 자리:"
   grep -oE "UI (auto|end|close) [0-9]+ [0-9]+" emu/logcat.txt | tail -6

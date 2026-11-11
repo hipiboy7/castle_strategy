@@ -1,0 +1,365 @@
+{
+ "_about": "원작 공식 인물 카드 초상(개인 빌드 전용) — scripts/cut_portraits.py 가 만든다. head = 지도 얼굴 패에 쓸 자리(384 그림 좌표 x · y · w · h).",
+ "heads": {
+  "baekdochan": {
+   "head": [
+    108,
+    10,
+    173,
+    173
+   ],
+   "src": "sources/character_profile/선진_백도찬.jpg",
+   "src_sha256": "3d7eef5df13b13f6ef6496cbe88c0667611171cc013c58e1be8f36eb0850061f"
+  },
+  "chasumin": {
+   "head": [
+    75,
+    18,
+    186,
+    186
+   ],
+   "src": "sources/character_profile/차수민.jpg",
+   "src_sha256": "f58e5f7d92b207f0d1e928f8ebef3db5ad847bf1ebb47e1a4fd48d83f7d368f6"
+  },
+  "cheonildo": {
+   "head": [
+    89,
+    9,
+    204,
+    204
+   ],
+   "src": "sources/character_profile/호텔캐슬_천일도.jpg",
+   "src_sha256": "fe0f06b3117877b0d0e9f311cadecea42e8210bffa1d4714bf01e02227ef0443"
+  },
+  "choeminuk": {
+   "head": [
+    78,
+    9,
+    204,
+    204
+   ],
+   "src": "sources/character_profile/캐슬홀딩스_최민욱.jpg",
+   "src_sha256": "c81a57419212553021c1669ac73c8f9c298abe142866c3a8ca42e1d53ba1696d"
+  },
+  "dojiung": {
+   "head": [
+    209,
+    22,
+    136,
+    136
+   ],
+   "src": "sources/character_profile/도지웅.jpg",
+   "src_sha256": "63216b762c0b81f54d2a48dd96db89cba3daaa7a4efac3532f542e4d09580461"
+  },
+  "gangchangseok": {
+   "head": [
+    103,
+    23,
+    198,
+    198
+   ],
+   "src": "sources/character_profile/DS씨큐리티_강창석.jpg",
+   "src_sha256": "071862dcbf941ef2fbdcef934ce9a927238c0fc8dfa044c7bda1512b147bc96d"
+  },
+  "gangminseong": {
+   "head": [
+    89,
+    9,
+    204,
+    204
+   ],
+   "src": "sources/character_profile/강민성.jpg",
+   "src_sha256": "cf46c5edf750c05a5b9fb4130f971a60613d41d441cb660130b6f4f2b91fe92e"
+  },
+  "hwangbomincheol": {
+   "head": [
+    113,
+    1,
+    148,
+    148
+   ],
+   "src": "sources/character_profile/하성_황보민철.jpg",
+   "src_sha256": "5e6cdfbe01d6c784e91556d7a61060bef4577e5c88a064a7478d5ac1848deb51"
+  },
+  "hyeonseok": {
+   "head": [
+    89,
+    0,
+    204,
+    204
+   ],
+   "src": "sources/character_profile/하성_현석.jpg",
+   "src_sha256": "2280dcb62f1ee66d3c3177140e48448185d2e7ccb8c137d95e0997e775326edc"
+  },
+  "icheolmin": {
+   "head": [
+    100,
+    3,
+    136,
+    136
+   ],
+   "src": "sources/character_profile/이철민.jpg",
+   "src_sha256": "490ffd79465acbfb50814d96e16032850741abf565a76e679a4872f2cb7c1bd9"
+  },
+  "ihwan": {
+   "head": [
+    54,
+    0,
+    204,
+    204
+   ],
+   "src": "sources/character_profile/이환.jpg",
+   "src_sha256": "90d8b87cffb38c7cbe386c1a2418b8f6c7b9c7e366f09da888853b201ab3af49"
+  },
+  "ilguk": {
+   "head": [
+    118,
+    0,
+    148,
+    148
+   ],
+   "src": "sources/character_profile/차일국.jpg",
+   "src_sha256": "bd11e04837fbc803156c146154b15bc49bf036ce25d2a650c581ddc5057550ad"
+  },
+  "immuyeol": {
+   "head": [
+    89,
+    9,
+    204,
+    204
+   ],
+   "src": "sources/character_profile/모리_임무열.jpg",
+   "src_sha256": "c1990e6af61f40f232fbb6ffb50feae9723bb7007d0ca5d3a1c21ff103936056"
+  },
+  "iriwon": {
+   "head": [
+    127,
+    22,
+    136,
+    136
+   ],
+   "src": "sources/character_profile/이리원.jpg",
+   "src_sha256": "93cace7276fa183a8b9dd8f300a9db7cca4393bbe8fa814685831af39952f7a8"
+  },
+  "iseul": {
+   "head": [
+    78,
+    9,
+    204,
+    204
+   ],
+   "src": "sources/character_profile/이슬.jpg",
+   "src_sha256": "588fb361d6d4a668ba532be9897547d04bab846806f8e5790096ea8f65b8999a"
+  },
+  "jintae": {
+   "head": [
+    6,
+    46,
+    173,
+    173
+   ],
+   "src": "sources/character_profile/서진태.jpg",
+   "src_sha256": "bd29a42af42d6be8f4bb08f017ddf54c1d5df68099f42f507525dd0eb6f18a90"
+  },
+  "juro": {
+   "head": [
+    93,
+    1,
+    173,
+    173
+   ],
+   "src": "sources/character_profile/호텔캐슬_주로.jpg",
+   "src_sha256": "1390e282ed7081fca533e94a1faf9a5b60b78299e3006ae358259ce1e9aabdbe"
+  },
+  "kimdaegeon": {
+   "head": [
+    93,
+    12,
+    198,
+    198
+   ],
+   "src": "sources/character_profile/김대건.jpg",
+   "src_sha256": "fdc2ab88d7a818fd5827fc5241e04355d2119d102e42ad9c23892dae75f1eb2b"
+  },
+  "kimhwang": {
+   "head": [
+    112,
+    43,
+    204,
+    204
+   ],
+   "src": "sources/character_profile/골드_김황.jpg",
+   "src_sha256": "a2c379e52549c5ed5ced002c542a445361e4cb713da3f1a75990e49f110b8b5a"
+  },
+  "kimjaehoon": {
+   "head": [
+    99,
+    18,
+    186,
+    186
+   ],
+   "src": "sources/character_profile/하성_김재훈.jpg",
+   "src_sha256": "9eb3a40f88e7d283e6d56afc8c486c74f51164fa7d536540c56270d26aca1f90"
+  },
+  "kimseongjun": {
+   "head": [
+    63,
+    18,
+    186,
+    186
+   ],
+   "src": "sources/character_profile/김성준.jpg",
+   "src_sha256": "e517172e90eec36f313d26d43bc86f103fb2e41c77599874d472cdf9d9d64c32"
+  },
+  "kimshin": {
+   "head": [
+    109,
+    18,
+    186,
+    186
+   ],
+   "src": "sources/character_profile/김신.jpg",
+   "src_sha256": "ed84516e73db9782272254b976a3be3ebca80fea49aec73be2ecfe4b2e999a79"
+  },
+  "kimtaehoon": {
+   "head": [
+    112,
+    9,
+    204,
+    204
+   ],
+   "src": "sources/character_profile/하성_김태훈.jpg",
+   "src_sha256": "57e7b85ed4ea51cc588333c7371bbda1987cf1b2b0eea4259c36d7d19ed17f22"
+  },
+  "kimyongseong": {
+   "head": [
+    109,
+    2,
+    186,
+    186
+   ],
+   "src": "sources/character_profile/하성_김용성.jpg",
+   "src_sha256": "4262f84c30840c5b412c9dc150739ff8f8dc6583245df4b8d07df88d6a5b01d5"
+  },
+  "lingling": {
+   "head": [
+    173,
+    86,
+    124,
+    124
+   ],
+   "src": "sources/character_profile/화진_링링.jpg",
+   "src_sha256": "aff475894a89edb205e45a47efbec0b0c84e2008372edc44441d307cd907fb44"
+  },
+  "namilho": {
+   "head": [
+    112,
+    9,
+    204,
+    204
+   ],
+   "src": "sources/character_profile/남일호.jpg",
+   "src_sha256": "106af593ff91c2e9031965c2c648f87283e2ecd618faef17936fd4da0e69260d"
+  },
+  "namyong": {
+   "head": [
+    89,
+    9,
+    204,
+    204
+   ],
+   "src": "sources/character_profile/남용.jpg",
+   "src_sha256": "2fa0ec6484c54fbb5bba7ea65a3bebd3ec66d210cf5ff955c308be6bb53f4888"
+  },
+  "ojiin": {
+   "head": [
+    116,
+    1,
+    173,
+    173
+   ],
+   "src": "sources/character_profile/하성_오지인.jpg",
+   "src_sha256": "09c0f1561d48ea5c9aef139b38148067856a0a2954fd5a0c16ee3e7d05b7f7b9"
+  },
+  "pyoyoung": {
+   "head": [
+    99,
+    18,
+    186,
+    186
+   ],
+   "src": "sources/character_profile/표영.jpg",
+   "src_sha256": "06ee3c8cdf8c8b3ff0d189b8909d0561dd487c84e7ed5c39c831898114e5e49a"
+  },
+  "ryujihak": {
+   "head": [
+    125,
+    0,
+    155,
+    155
+   ],
+   "src": "sources/character_profile/하성_류지학.jpg",
+   "src_sha256": "0f3f1fbd27e6bdb0a3bfa5b23eae9a6fb01d34c32261c7ea5c5972803adcb580"
+  },
+  "sintaejin": {
+   "head": [
+    81,
+    0,
+    198,
+    198
+   ],
+   "src": "sources/character_profile/하성_신태진.jpg",
+   "src_sha256": "8f67366fc31482846bb58ea3452e38c592743b5e3292360ac5c2af4c09ee662b"
+  },
+  "wonil": {
+   "head": [
+    89,
+    0,
+    204,
+    204
+   ],
+   "src": "sources/character_profile/신원일.jpg",
+   "src_sha256": "9a2df6b499c89cd1f7a4ac484f0c5f1cf482de25ebfcc76cdf262b3c169cbf53"
+  },
+  "wonyong": {
+   "head": [
+    93,
+    0,
+    198,
+    198
+   ],
+   "src": "sources/character_profile/원용.jpg",
+   "src_sha256": "75c91443cbe2712dd83a033ac337bdb1188b5a4b645cc0bc323126d86928b7c9"
+  },
+  "woojin": {
+   "head": [
+    75,
+    0,
+    186,
+    186
+   ],
+   "src": "sources/character_profile/피우진.jpg",
+   "src_sha256": "214324c37eded17710af48fdd0ef4b7fba213d191272001de41db074be72660c"
+  },
+  "yundeoksu": {
+   "head": [
+    103,
+    22,
+    223,
+    223
+   ],
+   "src": "sources/character_profile/DS씨큐리티_윤덕수.jpg",
+   "src_sha256": "85e9e987501712095ddc795b75b2c12a7aefc4a10f803b77d2ee2a7eb58ce28f"
+  },
+  "yuwoosung": {
+   "head": [
+    100,
+    0,
+    204,
+    204
+   ],
+   "src": "sources/character_profile/화진_유우성.jpg",
+   "src_sha256": "03da628c33bed8701cd188836a9228be9295cd01381a2b3c51283a47505c16b7"
+  }
+ }
+}

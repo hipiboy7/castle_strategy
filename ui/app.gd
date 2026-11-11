@@ -22,7 +22,9 @@ const ZoneCard = preload("res://ui/zone_card.gd")
 const OfficerStrip = preload("res://ui/officer_strip.gd")
 const OrderPicker = preload("res://ui/order_picker.gd")
 const ReportView = preload("res://ui/report_view.gd")
+const BattleView = preload("res://ui/battle_view.gd")
 const Pages = preload("res://ui/tab_pages.gd")
+const TouchScroll = preload("res://ui/touch_scroll.gd")
 
 const SAVE := "user://save_auto.json"
 const BROKEN := "user://save_auto.broken.json"
@@ -45,15 +47,18 @@ var _note := ""
 var _tab := "map"
 var _zone := ""
 var _officer := ""
-var _sheet := ""                       # "" · pick · report
+var _sheet := ""                       # "" · pick · report · battle
 var _pick := ["", ""]                  # 고르기 창의 [간부, 구역]
 var _report_i := -1
 var _ephemeral := false
 var _resumed := false
 var _self_hash := ""
 var _boot_ms := 0
-var _turn_ms := 0
+var _turn_us := 0
 var _fps_t := 0
+var _fr_n := 0                         # 이번 1초 창의 프레임 수
+var _fr_t0 := 0                        # 이번 1초 창을 연 때(µs)
+var _map_fps: Array = []               # 지도가 보이는 동안 1초마다 센 fps(최근 10개) — 성능.md 1절 '지도 탭 가만히'
 var _wide := false
 
 var _top: PanelContainer
@@ -65,6 +70,7 @@ var _card
 var _strip
 var _picker
 var _report
+var _battle
 var _actions: HBoxContainer
 var _hint: Label
 var _auto: Button
@@ -79,6 +85,7 @@ var _confirm_new: ConfirmationDialog
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	get_tree().node_added.connect(TouchScroll.fit)      # 스크롤 목록 안 판은 끌기를 스크롤로 넘긴다(T-6)
 	_ephemeral = String(args.get("shot", "")) != ""
 	_t = DataFiles.load_tables()
 	_sprites = Sprites.new()
@@ -121,6 +128,8 @@ func _open_game() -> void:
 				notes.append("다시 돌린 해시가 저장과 다르다(보고만 다를 수 있음)")
 			_draft = r["save"].get("pending", [])
 			_note = ("저장 알림: " + ", ".join(notes)) if not notes.is_empty() else "이어 하기 — %d주" % int(_g["state"]["turn"])
+			if _over():
+				_note = "앞 판이 %d주로 끝나 있다 — 아래 '새 판으로'를 누르면 1주부터" % int(_g["state"]["length"])
 	if _g.is_empty():
 		_g = Game.new_game(_t, SCENARIO, int(args.get("seed", SELF_SEED)) if _ephemeral else SELF_SEED)
 	_phase = "over" if _over() else "play"
@@ -132,6 +141,8 @@ func _setup_shot() -> void:
 	var weeks := int(args.get("week", 1)) - 1
 	if v == "report":
 		weeks = maxi(1, weeks)
+	if v == "battle":
+		weeks = 1
 	for i in weeks:
 		if not _over():
 			Game.step_player(_g, _t, Draft.auto(_g["state"], _t))
@@ -151,10 +162,15 @@ func _setup_shot() -> void:
 		_open_pick(s["orgs"][me]["boss"], z)
 	elif v == "report":
 		_open_report(_g["reports"].size() - 1)
+	elif v == "battle":
+		_open_report(0)
+		_open_battle(0)
+		_battle.hold_at_first_duel()
 
 
 func _build() -> void:
 	_top = PanelContainer.new()
+	_top.theme_type_variation = "TopPanel"
 	add_child(_top)
 	var th := HBoxContainer.new()
 	th.add_theme_constant_override("separation", 24)
@@ -232,7 +248,12 @@ func _build() -> void:
 	add_child(_picker)
 	_report = ReportView.new()
 	_report.closed.connect(_close_sheet)
+	_report.battle.connect(_open_battle)
 	add_child(_report)
+	_battle = BattleView.new()
+	_battle.visible = false
+	_battle.closed.connect(_close_battle)
+	add_child(_battle)
 
 	_tabbar = HBoxContainer.new()
 	_tabbar.add_theme_constant_override("separation", 8)
@@ -268,6 +289,8 @@ func _dialog(text: String, ok: String, cancel: String) -> ConfirmationDialog:
 
 ## 틀 다시 놓기 — 크기가 바뀔 때(접기 · 펴기) · 탭 · 카드 · 판이 바뀔 때. 화면 상태는 그대로 둔다
 func _relayout() -> void:
+	if _phase == "report" and _sheet != "report" and _sheet != "battle":
+		_phase = "over" if _over() else "play"          # 보고 단계인데 보고가 닫혀 있으면 되돌린다(입력이 다 막히지 않게)
 	var view := get_viewport_rect().size
 	var ins := Vector4.ZERO
 	if OS.get_name() == "Android":
@@ -298,6 +321,8 @@ func _relayout() -> void:
 	_place(_picker, f["sheet"])
 	_report.visible = _sheet == "report"
 	_place(_report, f["body"])
+	_battle.visible = _sheet == "battle"
+	_place(_battle, f["body"])
 	for k in _tab_btn:
 		_tab_btn[k].set_pressed_no_signal(k == _tab)
 	_print_ui.call_deferred()
@@ -326,19 +351,21 @@ func _refresh() -> void:
 	_cash.text = "%s %s · %s" % [View.org_name(_t, me), top["cash"], top["net"]]
 	_acts.text = top["actions"]
 	_map.selected = _zone
+	_map.me = me
 	_map.show_map(_t["map"]["zones"], _t["map"]["links"], View.map_nodes(s, _t, me), View.fronts(s, _t))
 	_strip.show_cards(View.officer_cards(s, _t, me, Draft.used(_draft)), _officer)
 	if _zone != "":
 		_card.show_card(View.zone_card(s, _t, _zone, me))
 	else:
 		_card.show_empty("구역을 누르면 사업장 · 주둔 · 정보가 여기 뜬다. 간부 카드를 끌어 구역에 놓으면 명령을 고른다.")
-	_end.disabled = _phase != "play"
+	_end.disabled = _phase != "play" and _phase != "over"
+	_end.text = "새 판으로" if _phase == "over" else "주 끝내기"      # 끝난 판에서도 나갈 길이 늘 아래에 있다(C3 rc.2 — 폰에서 막힘)
 	_auto.disabled = _phase != "play"
 	var hint := "간부를 끌어 구역에 놓거나, 간부 → 구역 순으로 누른다"
 	if _officer != "":
 		hint = "%s — 이제 구역을 누른다" % View.person(_t, _officer)
 	elif _phase == "over":
-		hint = "끝 — %d주(승패는 C5)" % int(s["length"])
+		hint = "판이 끝났다(%d주) — 아래 '새 판으로'를 누르면 1주부터" % int(s["length"])
 	_hint.text = _note if _note != "" else hint
 	_fill_pages(s, me, top)
 
@@ -350,13 +377,13 @@ func _fill_pages(s: Dictionary, me: String, top: Dictionary) -> void:
 	for i in _draft.size():
 		rows.append({"text": View.order_text(_t, _draft[i]), "ok": marks[i]["ok"], "why": marks[i]["why"]})
 	_pages["orders"].show_orders(rows, top["actions"] + " 남음")
-	_pages["log"].show_log(_g.get("reports", []).map(func(e): return View.report_title(e, me)), _info(s, top))
+	_pages["log"].show_log(_g.get("reports", []).map(func(e): return View.report_title(e, me)), _info(s, top), _perf_text())
 
 
 func _info(s: Dictionary, top: Dictionary) -> String:
-	return "판 %s · C2 화면 · castle_common %s\n자가 해시 (%s · 시드 %d · %d주) %s\n상태 해시 %s\n잠정: AI 후보 데이터 · 지도 좌표 · 등급 자리값 %d명\n%s" % [
-		version, common_sha if common_sha != "" else "받기 전", SCENARIO, SELF_SEED, SELF_TURNS, _self_hash, State.hash_of(s),
-		top["prov"], _perf_text()]
+	return "판 %s · C3 화면 · 상태 %s / %s · castle_common %s\n자가 해시 (%s · 시드 %d · %d주) %s\n상태 해시 %s\n잠정: AI 후보 데이터 · 지도 좌표 · 등급 자리값 %d명" % [
+		version, _phase, _sheet if _sheet != "" else "-", common_sha if common_sha != "" else "받기 전", SCENARIO, SELF_SEED, SELF_TURNS, _self_hash, State.hash_of(s),
+		top["prov"]]
 
 
 func _on_tab(tab: String) -> void:
@@ -372,6 +399,9 @@ func _on_zone(z: String) -> void:
 	if _officer != "" and _phase == "play":
 		_open_pick(_officer, z)
 		return
+	if _officer != "":
+		_officer = ""
+		_why_not()
 	_zone = z
 	_relayout()
 	_refresh()
@@ -385,6 +415,20 @@ func _on_officer(id: String) -> void:
 func _on_drop(officer: String, z: String) -> void:
 	if _phase == "play":
 		_open_pick(officer, z)
+	else:
+		_why_not()
+
+
+## 받지 않은 손 입력의 까닭을 아래 글에 보인다(끝난 판 · 보고 · 오류) — 조용히 무시하지 않는다
+func _why_not() -> void:
+	if _phase == "over":
+		_note = "판이 끝났다(%d주) — 아래 '새 판으로'를 누르면 1주부터" % int(_g["state"]["length"])
+	elif _phase == "report":
+		_note = "보고를 닫은 뒤 명령을 낸다"
+	elif _phase == "error":
+		return
+	print("INPUT ignored phase=%s sheet=%s" % [_phase, _sheet])
+	_refresh()
 
 
 func _open_pick(officer: String, z: String) -> void:
@@ -409,6 +453,7 @@ func _on_picked(order: Dictionary) -> void:
 
 func _on_auto() -> void:
 	if _phase != "play":
+		_why_not()
 		return
 	_draft = Draft.auto(_g["state"], _t)
 	_note = "맡기기 — 명령 %d개(명령 탭에서 빼거나 고칠 수 있다)" % _draft.size()
@@ -432,7 +477,11 @@ func _on_clear() -> void:
 
 
 func _on_end() -> void:
+	if _phase == "over":
+		_confirm_new.popup_centered()
+		return
 	if _phase != "play":
+		_why_not()
 		return
 	if _draft.is_empty():
 		_confirm_end.popup_centered()
@@ -461,7 +510,7 @@ func _end_week() -> void:
 		return
 	var t0 := Time.get_ticks_usec()
 	var report: Dictionary = Game.step_player(_g, _t, _draft)
-	_turn_ms = int((Time.get_ticks_usec() - t0) / 1000)
+	_turn_us = Time.get_ticks_usec() - t0
 	_draft = []
 	_officer = ""
 	_note = "" if _save() else "저장하지 못했다"
@@ -484,8 +533,29 @@ func _open_report(i: int) -> void:
 	_report.show_report("%d주 보고" % int(e["report"]["turn"]), View.report_cards(e, _t, me),
 		"닫기 — %d주로" % int(_g["state"]["turn"]) if last and not _over() else "닫기")
 	print("REPORT %d" % int(e["report"]["turn"]))
+	for ev in e["report"]["events"]:
+		if ev.get("kind") == "outcome":
+			print("OUTCOME %s %s turn=%d" % [ev["result"], ev["why"], int(e["report"]["turn"])])
 	_relayout()
 	_refresh()
+
+
+## 전투 화면 — 지금 연 보고의 i 번째 습격
+func _open_battle(i: int) -> void:
+	if _report_i < 0 or _report_i >= _g.get("reports", []).size():
+		return
+	var battles: Array = _g["reports"][_report_i]["report"].get("battles", [])
+	if i < 0 or i >= battles.size():
+		return
+	_sheet = "battle"
+	_battle.show_battle(battles[i], _t, _g["state"]["player"], _sprites)
+	print("BATTLE %d" % i)
+	_relayout()
+
+
+func _close_battle() -> void:
+	_sheet = "report"
+	_relayout()
 
 
 func _close_sheet() -> void:
@@ -522,6 +592,8 @@ func _back() -> void:
 		_confirm.hide()
 		_confirm_end.hide()
 		_confirm_new.hide()
+	elif _sheet == "battle":
+		_close_battle()
 	elif _sheet != "":
 		_close_sheet()
 	elif _tab == "map" and _zone != "" and not _wide:
@@ -535,7 +607,18 @@ func _back() -> void:
 		_confirm.popup_centered()
 
 
+## 바탕 — 위는 남색 · 아래는 거의 검정(테마 Frame bg_top · bg_bottom). 띠 몇 줄로 나눠 칠한다(그림 자원 없이).
+func _draw() -> void:
+	var a := get_theme_color("bg_top", "Frame")
+	var b := get_theme_color("bg_bottom", "Frame")
+	var n := 24
+	for i in n:
+		draw_rect(Rect2(0, size.y * i / n, size.x, size.y / n + 1.0), a.lerp(b, float(i) / (n - 1)))
+
+
 func _notification(what: int) -> void:
+	if what == NOTIFICATION_RESIZED:
+		queue_redraw()
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
 		_back()
 	elif what == NOTIFICATION_APPLICATION_PAUSED:
@@ -550,7 +633,9 @@ func _notification(what: int) -> void:
 func _print_ui() -> void:
 	await get_tree().process_frame
 	var xf := get_viewport().get_final_transform()
-	var at := {"auto": _auto, "end": _end, "close": _report.close_button}
+	var at := {"auto": _auto, "end": _end, "close": _report.close_button, "battle_close": _battle.close_button}
+	for i in _report.battle_buttons.size():
+		at["battle_%d" % i] = _report.battle_buttons[i]
 	for k in _tab_btn:
 		at["tab_" + k] = _tab_btn[k]
 	for i in _picker.buttons.size():
@@ -562,23 +647,41 @@ func _print_ui() -> void:
 			print("UI %s %d %d" % [k, int(p.x), int(p.y)])
 
 
+## 기록 탭 성능 줄 — fps 는 엔진 값 대신 직접 센 지도 fps(폰 rc.3 에서 값이 안 보였다 · 성능.md 3절)
 func _perf_text() -> String:
-	return "성능: 켜기 %d ms · 마지막 주 처리 %d ms · %d fps" % [_boot_ms, _turn_ms, Engine.get_frames_per_second()]
+	var f := "지도를 10초 본 뒤 다시 열기"
+	if not _map_fps.is_empty():
+		var lo: int = _map_fps.min()
+		var sum := 0
+		for v in _map_fps:
+			sum += int(v)
+		f = "평균 %d · 최저 %d(최근 %d초)" % [int(round(float(sum) / _map_fps.size())), lo, _map_fps.size()]
+	return "성능\n켜기 %d ms\n마지막 주 처리 %.1f ms\n지도 fps %s" % [_boot_ms, _turn_us / 1000.0, f]
 
 
 func _perf() -> void:
-	print("PERF boot_ms=%d turn_ms=%d fps=%d" % [_boot_ms, _turn_ms, Engine.get_frames_per_second()])
+	print("PERF boot_ms=%d turn_ms=%d fps=%d" % [_boot_ms, int(_turn_us / 1000), Engine.get_frames_per_second()])
 
 
 func _process(_dt: float) -> void:
+	var us := Time.get_ticks_usec()
+	_fr_n += 1
+	if _fr_t0 == 0:
+		_fr_t0 = us
+	elif us - _fr_t0 >= 1000000:
+		var fps := int(round(_fr_n * 1000000.0 / (us - _fr_t0)))
+		_fr_n = 0
+		_fr_t0 = us
+		if _map.visible and _phase == "play":
+			_map_fps.append(fps)
+			if _map_fps.size() > 10:
+				_map_fps.pop_front()
+		if _tab == "log" and _phase != "error":
+			_pages["log"].set_perf(_perf_text())
 	var now := Time.get_ticks_msec()
 	if now - _fps_t >= 10000:
 		_fps_t = now
-		print("FPS_LOG fps=%d" % Engine.get_frames_per_second())
-		if _tab == "log" and _phase != "error":
-			var s: Dictionary = _g["state"]
-			_pages["log"].show_log(_g.get("reports", []).map(func(e): return View.report_title(e, s["player"])),
-				_info(s, View.top(s, _t, s["player"], 0, 0)))
+		print("FPS_LOG fps=%d map_fps=%s" % [Engine.get_frames_per_second(), str(_map_fps.back()) if not _map_fps.is_empty() else "-"])
 
 
 func _label(text: String, variation: String) -> Label:

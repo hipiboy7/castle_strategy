@@ -2,7 +2,8 @@ extends RefCounted
 ## 읽기 전용 보기 — 순수 함수(상태 + 정적 표 → 사전 · 배열 · 글). 장면(ui/*.gd)은 이것을 그리기만 한다(CLAUDE.md 2절 ISP).
 ## 노드 · 텍스처 · 테마를 읽지 않고, 입력 상태를 바꾸지 않는다(커버리지 사본에서 돈다). 이름은 받은 데이터에서 id 로 찾는다.
 ## 돈 정수 1 = 1만 원(docs/기획_차이.md (나)15). 지도 노드의 '열기'는 구역 경찰 압력 3칸((나)17).
-## 설계: docs/C2_설계서_화면과명령.md 4절 · 요구: FR-202 · 203 · 208 · 209 · 215 · 시험: tests/unit/test_view.gd
+## C3: 습격 · 지키기 글 · 보고 전투 카드(battle_lines) · 전투 화면 재생 장면(battle_frames) · 승패(top.result).
+## 설계: docs/C2_설계서_화면과명령.md 4절 · docs/C3_설계서_습격과일기토.md 6절 · 요구: FR-202 · 203 · 208 · 209 · 215 · FR-309 · FR-310 · 시험: tests/unit/test_view.gd · test_view_battle.gd
 
 const State = preload("res://sim/state.gd")
 const Economy = preload("res://sim/economy.gd")
@@ -10,7 +11,12 @@ const Tables = preload("res://sim/tables.gd")
 
 ## 화면 글 — id → 글(거점 · 명령 종류 · 자리 · 상태)
 const FACILITY := {"hq": "본거지", "office": "사무실", "warehouse": "창고", "dojo": "수련장", "clinic": "의무실"}
-const KIND := {"move": "이동", "open": "개업", "expand": "확장", "recruit": "모집", "rest": "쉼"}
+const KIND := {"move": "이동", "open": "개업", "expand": "확장", "recruit": "모집", "rest": "쉼", "raid": "습격", "defend": "지키기"}
+const CARD := {"charge": "정면 돌파", "surprise": "기습", "decoy": "미끼", "bypass": "우회로", "shield": "방패조", "ambush": "매복"}
+const SECTION := ["입구", "안", "본진"]
+const DUEL_CARD := {"attack": "공격", "skill": "기술", "guard": "막기", "parry": "쳐내기", "stunned": "기절"}
+const RESULT := {"win": "승리", "lose": "패배"}
+const RESULT_WHY := {"hold_all": "판의 구역을 모두 차지했다", "boss": "두목이 잡히거나 죽었다", "zones": "구역을 모두 잃었다", "time": "판 길이 안에 목표를 이루지 못했다"}
 const POST := {"boss": "두목", "staff": "참모", "zone_chief": "구역장", "captain": "조장", "guard": "경호", "": "간부"}
 const STATUS := {"active": "움직임", "wounded": "다침", "captive": "잡힘", "dead": "죽음", "away": "판 밖"}
 const POLICE_STEPS := [1000, 2000]          # 경찰 압력(×100) 10% · 20% 에서 칸이 는다
@@ -88,9 +94,13 @@ static func top(s: Dictionary, t: Dictionary, me: String, left: int, total: int)
 	for id in State.sorted_keys(s["officers"]):
 		if s["officers"][id]["rank_prov"]:
 			prov += 1
-	return {"week": ("끝 — %d주" % length) if over else "%d주 / %d" % [int(s["turn"]), length],
+	var res: String = String(s["flags"].get("result", ""))
+	var week: String = ("끝 — %d주" % length) if over else "%d주 / %d" % [int(s["turn"]), length]
+	if res != "":
+		week += " · %s(%d주)" % [RESULT.get(res, res), int(s["flags"].get("result_turn", 0))]
+	return {"week": week,
 		"cash": money(int(s["orgs"][me]["cash"])), "net": delta(net) + " / 주", "actions": "행동 %d / %d" % [left, total],
-		"left": left, "total": total, "prov": prov, "over": over}
+		"left": left, "total": total, "prov": prov, "over": over, "result": res}
 
 
 ## 지도 노드(구역 id 순) — {id, name, owner, mark, police_lv, mine[내 간부 id], others(남의 간부 수), slots_mine, slots_n}
@@ -172,12 +182,30 @@ static func order_text(t: Dictionary, o: Dictionary) -> String:
 	var head := "%s · %s" % [person(t, o["by"]), KIND.get(o["kind"], o["kind"])]
 	if o["kind"] == "rest" or o["to"] == "":
 		return head
-	return head + (" → " if o["kind"] == "move" else " — ") + zone_name(t, o["to"])
+	var out: String = head + (" → " if o["kind"] == "move" or o["kind"] == "raid" else " — ") + zone_name(t, o["to"])
+	var cards := _cards_of(o)
+	return out + (" (%s)" % " · ".join(cards) if not cards.is_empty() else "")
+
+
+## 명령의 작전 카드 이름(습격 args.cards · 지키기 args.card)
+static func _cards_of(o: Dictionary) -> Array:
+	var args: Dictionary = o.get("args", {})
+	var ids: Array = args.get("cards", []) if args.get("cards") is Array else []
+	if args.get("card") is String:
+		ids = [args["card"]]
+	return ids.map(func(c): return CARD.get(c, c))
 
 
 ## 명령 고르기 줄 — Draft.options 한 줄 → "개업 — 140만 원" · "모집 +7명 — 21만 원" · "확장 — 안 됨: 까닭"
 static func option_text(opt: Dictionary) -> String:
 	var name: String = KIND.get(opt["kind"], opt["kind"])
+	var cards := _cards_of(opt.get("order", {}))
+	if opt["kind"] == "raid":
+		name += " · " + (" · ".join(cards) if not cards.is_empty() else "카드 없음")
+	elif not cards.is_empty():
+		name += " · " + " · ".join(cards)
+	if opt.get("later", false) and opt["ok"]:
+		return name + " — 결과는 주 끝 보고"
 	if not opt["ok"]:
 		return "%s — 안 됨: %s" % [name, opt["why"]]
 	if int(opt["gain"]) > 0:
@@ -222,12 +250,144 @@ static func report_cards(entry: Dictionary, t: Dictionary, me: String) -> Array:
 	intel = _moves(t, b, a, me) + intel
 	if intel.is_empty():
 		intel.append("눈에 띄는 움직임 없음")
-	return [
+	var battles: Array = rep.get("battles", [])
+	var blines := []
+	for i in battles.size():
+		blines.append_array(battle_lines(battles[i], t, me))
+	if blines.is_empty():
+		blines.append("이번 주 습격 · 전투 없음")
+	var cards := []
+	for ev in rep["events"]:
+		if ev.get("kind") == "outcome":
+			cards.append({"kind": "outcome", "title": "%s — %s" % [RESULT.get(ev["result"], ev["result"]), org_name(t, ev["org"])],
+				"lines": [RESULT_WHY.get(ev["why"], ev["why"]), "판 길이까지 이어서 둘 수 있다"]})
+	var goal := goal_card(a, t, me)
+	if not goal.is_empty():
+		cards.append(goal)
+	# 싸움이 있던 주는 전투 카드를 앞에 — 맨 아래에 두면 폰에서 '전투 보기' 단추가 스크롤 밖으로 숨는다(폰 v0.3.0-rc.2 · 트러블슈팅 T-6)
+	var battle := {"kind": "battle", "title": "전투 %d" % battles.size() if not battles.is_empty() else "전투", "lines": blines,
+		"battles": battles.size()}
+	if not battles.is_empty():
+		cards.append(battle)
+	cards.append_array([
 		{"kind": "money", "title": "돈", "lines": money_lines},
 		{"kind": "orders", "title": "내 명령 — 받음 %d · 거절 %d" % [mine_ok.size(), mine_no.size()], "lines": order_lines},
 		{"kind": "intel", "title": "다른 조직", "lines": intel},
-		{"kind": "battle", "title": "전투", "lines": ["이번 주 습격 · 전투 없음(습격은 C3)"]},
-	]
+	])
+	if battles.is_empty():
+		cards.append(battle)
+	return cards
+
+
+## 목표 카드(아직 승패가 안 났을 때) — hold_all: "목표 — 판의 구역 모두 차지 3/4" · 남은 곳 · 어떻게. 목표가 없거나 승패가 났으면 {}
+static func goal_card(s: Dictionary, t: Dictionary, me: String) -> Dictionary:
+	var goal: Dictionary = t.get("game", {}).get("goals", {}).get(s.get("scenario", ""), {})
+	if goal.get("kind", "") != "hold_all" or String(s.get("flags", {}).get("result", "")) != "":
+		return {}
+	var left := []
+	for z in State.sorted_keys(s["zones"]):
+		if s["zones"][z]["owner"] != me:
+			left.append(zone_name(t, z))
+	var n: int = s["zones"].size()
+	return {"kind": "goal", "title": "목표 — 판의 구역 모두 차지 %d / %d" % [n - left.size(), n],
+		"lines": ["남은 곳: " + " · ".join(left), "간부를 남은 구역에 놓아 습격하거나 '맡기기'(컴퓨터가 습격도 고른다) → 주 끝내기"]}
+
+
+## 보고의 전투 한 줄 묶음 — "[부] 부진파 → [D] DS 씨큐리티 · 회암시장 — 차지함" · 구간 · 일기토 · 손실 · 다침 · 잡힘
+static func battle_lines(rec: Dictionary, t: Dictionary, me: String) -> Array:
+	var out := []
+	var def_name: String = org_name(t, rec["def"]) if rec["def"] != "" else "주인 없음"
+	var head := "[%s] %s → %s · %s — %s" % [mark(t, rec["att"]), org_name(t, rec["att"]), def_name, zone_name(t, rec["zone"]),
+		"차지함" if rec["won"] else "막힘"]
+	if not rec["cards"].is_empty():
+		head += " (%s)" % " · ".join(rec["cards"].map(func(c): return CARD.get(c, c)))
+	out.append(head)
+	var secs := []
+	for sec in rec["sections"]:
+		var r: String = {"att": "뚫음", "def": "막힘", "skip": "건너뜀"}.get(sec["result"], sec["result"])
+		secs.append("%s %s%s" % [SECTION[int(sec["i"])], r, (" %d틱" % int(sec["ticks"])) if int(sec["ticks"]) > 0 else ""])
+	if not secs.is_empty():
+		out.append("   " + " · ".join(secs))
+	for sec in rec["sections"]:
+		for d in sec["duels"]:
+			out.append("   일기토 %s — %s 이김(%d합%s)" % [_pair(t, d), person(t, d["winner"]), d["rounds"].size(), " · 한 방" if d["ko"] else ""])
+	for n in rec["notes"]:
+		out.append("   %s %s%s" % [CARD.get(n["card"], n["card"]), "됨" if n["ok"] else "안 됨", (" — " + person(t, n["who"])) if n["who"] != "" else ""])
+	if not rec.get("reinforce", []).is_empty():
+		out.append("   원군 — " + ", ".join(rec["reinforce"].map(func(id): return person(t, id))))
+	for org in State.sorted_keys(rec["loss"]):
+		var lost: Array = State.TROOP_GRADES.filter(func(g): return int(rec["loss"][org].get(g, 0)) > 0) \
+			.map(func(g): return "%s %d" % [g, int(rec["loss"][org][g])])
+		if not lost.is_empty():
+			out.append("   [%s] 잃음 — %s" % [mark(t, org), " · ".join(lost)])
+	if not rec["down"].is_empty():
+		out.append("   다침 — " + ", ".join(rec["down"].map(func(id): return person(t, id))))
+	if not rec["captive"].is_empty():
+		out.append("   잡힘 — " + ", ".join(rec["captive"].map(func(id): return person(t, id))))
+	for l in rec["learned"]:
+		out.append("   %s 카피 — %s" % [person(t, l["id"]), skill_name(t, l["skill"])])
+	return out
+
+
+static func _pair(t: Dictionary, d: Dictionary) -> String:
+	var w: int = int(d["w"])
+	var a: String = d["winner"] if w == 0 else d["loser"]
+	var b: String = d["loser"] if w == 0 else d["winner"]
+	return "%s vs %s" % [person(t, a), person(t, b)]
+
+
+## 전투 화면 재생 장면 — 기록 하나 → [{sec, tick, att, def, am, dm, text}] (아래 = 들어가는 쪽 · 위 = 지키는 쪽).
+## 구간 시작 장면 · 일기토 합마다 · 틱마다 · 끝 장면. 장면 수가 많으면 틱을 고르게 건너뛴다(최대 max_ticks 장면 / 구간)
+static func battle_frames(rec: Dictionary, t: Dictionary, max_ticks: int = 12) -> Array:
+	var out := []
+	for sec in rec["sections"]:
+		var i := int(sec["i"])
+		var st: Array = sec["start"]
+		out.append({"sec": i, "tick": 0, "att": int(st[0]), "def": int(st[1]), "am": 100, "dm": 100, "duel": {},
+			"text": "%s — %s" % [SECTION[i], "건너뜀(우회로)" if sec["result"] == "skip" else "들어감"]})
+		for d in sec["duels"]:
+			var w: int = int(d["w"])
+			var ids := [d["winner"] if w == 0 else d["loser"], d["loser"] if w == 0 else d["winner"]]
+			for k in d["rounds"].size():
+				var rd: Dictionary = d["rounds"][k]
+				out.append({"sec": i, "tick": 0, "att": int(st[0]), "def": int(st[1]), "am": 100, "dm": 100,
+					"duel": {"a": ids[0], "b": ids[1], "a_name": person(t, ids[0]), "b_name": person(t, ids[1]),
+						"hp": rd["hp"], "max": d["max"], "gauge": rd["gauge"],
+						"cards": [_duel_card(t, rd["cards"][0]), _duel_card(t, rd["cards"][1])]},
+					"text": "일기토 %d합 — %s %s / %s %s" % [k + 1, person(t, ids[0]), _duel_card(t, rd["cards"][0]),
+						person(t, ids[1]), _duel_card(t, rd["cards"][1])]})
+			out.append({"sec": i, "tick": 0, "att": int(st[0]), "def": int(st[1]), "am": 100, "dm": 100, "duel": {},
+				"text": "일기토 — %s 이김%s" % [person(t, d["winner"]), " · 한 방" if d["ko"] else ""]})
+		var log: Array = sec["log"]
+		var step := maxi(1, _ceil_div(log.size(), max_ticks))
+		for k in log.size():
+			if k % step != 0 and k != log.size() - 1:
+				continue
+			var row: Array = log[k]
+			out.append({"sec": i, "tick": k + 1, "att": int(row[0]), "def": int(row[1]), "am": int(row[2]), "dm": int(row[3]), "duel": {},
+				"text": "%s %d틱 — 우리 %d · 적 %d" % [SECTION[i], k + 1, int(row[0]), int(row[1])]})
+		if sec["result"] != "skip":
+			var e: Array = sec.get("end", st)
+			out.append({"sec": i, "tick": int(sec["ticks"]), "att": int(e[0]), "def": int(e[1]),
+				"am": int(sec.get("morale", [100, 100])[0]), "dm": int(sec.get("morale", [100, 100])[1]), "duel": {},
+				"text": "%s %s" % [SECTION[i], "뚫음" if sec["result"] == "att" else "막힘"]})
+	out.append({"sec": -1, "tick": 0, "att": 0, "def": 0, "am": 0, "dm": 0, "duel": {},
+		"text": "%s — %s" % [zone_name(t, rec["zone"]), "차지함" if rec["won"] else "막힘"]})
+	return out
+
+
+static func _duel_card(t: Dictionary, c: Dictionary) -> String:
+	var n: String = DUEL_CARD.get(c["card"], c["card"])
+	return n + ("(%s)" % skill_name(t, c["skill"]) if c["skill"] != "" else "")
+
+
+## 기술 이름(skills.json name — 없으면 id)
+static func skill_name(t: Dictionary, id: String) -> String:
+	return String(t["rules"].skill_info(id).get("name", id))
+
+
+static func _ceil_div(a: int, d: int) -> int:
+	return (a + d - 1) / d
 
 
 ## 다른 조직 움직임(전 · 뒤 상태 비교) — 개업 · 확장 · 구역 주인 바뀜 · 간부 이동

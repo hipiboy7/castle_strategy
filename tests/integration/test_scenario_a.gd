@@ -37,6 +37,27 @@ func test_autoplay_26_turns_matches_golden() -> void:
 		eq(Game.autoplay(t, "A", seed, 26)["hash"], a["hash"], "seed %d 두 번 같다" % seed)
 
 
+## C3 완료 기준(08 17절 'A 완주') — 컴퓨터끼리 A 26주: 습격 · 일기토가 일어나고 승패가 난다(시드 1~3 · 불변식 위반 0 · 다친 간부는 낫는다)
+func test_scenario_a_completes_with_raids() -> void:
+	var t := _t()
+	for seed in [1, 2, 3]:
+		var g: Dictionary = Game.new_game(t, "A", seed)
+		var raids := 0
+		var duels := 0
+		for i in 26:
+			var rep: Dictionary = Game.step(g, t)
+			eq(rep["violations"], [], "seed %d 주 %d 불변식" % [seed, i + 1])
+			raids += rep["battles"].size()
+			for b in rep["battles"]:
+				for sec in b["sections"]:
+					duels += sec["duels"].size()
+		var f: Dictionary = g["state"]["flags"]
+		check(String(f.get("result", "")) != "", "seed %d 승패가 난다 %s" % [seed, f])
+		check(raids > 0 and duels > 0, "seed %d 습격 %d · 일기토 %d" % [seed, raids, duels])
+		for id in g["state"]["officers"]:
+			check(g["state"]["officers"][id]["status"] != "wounded" or int(g["state"]["officers"][id]["wound"]) > 0, "다침이면 부상 값이 있다 %s" % id)
+
+
 func test_ai_runs_the_economy() -> void:
 	var t := _t()
 	var a: Dictionary = Game.autoplay(t, "A", 1, 26)

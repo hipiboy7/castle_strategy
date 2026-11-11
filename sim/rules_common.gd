@@ -41,6 +41,16 @@ func _skill(id: String) -> Dictionary:
 	return _skills.get(id, {})
 
 
+## 2층 상수 하나(rules.json 의 절 · 칸) — 없으면 dflt. 습격 · 일기토(sim/duel.gd)가 gauge.gain · guard.damage_k · copy.seen 을 읽는다
+func rule(section: String, key: String, dflt = null):
+	return _rules.get(section, {}).get(key, dflt)
+
+
+## 기술 한 줄(skills.json — 읽기 전용 사본). 모르는 기술은 빈 사전
+func skill_info(id: String) -> Dictionary:
+	return _skill(id).duplicate(true)
+
+
 func rank_index(rank: String) -> int:
 	return int(_rank_no.get(rank, -1))
 

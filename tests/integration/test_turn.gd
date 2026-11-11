@@ -32,7 +32,7 @@ func test_phases_follow_08_13() -> void:
 	eq(Turn.PHASES, ["plan", "move", "manage", "intrigue", "diplomacy", "clash", "events", "council", "settle"], "08 13절 순서")
 	var with_handler := Turn.HANDLERS.keys()
 	with_handler.sort()
-	eq(with_handler, ["manage", "move", "plan", "settle"], "C1 처리기가 있는 단계")
+	eq(with_handler, ["clash", "manage", "move", "plan", "settle"], "C1 처리기가 있는 단계 + C3 충돌")
 
 
 func test_run_returns_new_state_and_report() -> void:

@@ -1,19 +1,29 @@
 extends RefCounted
-## 명령 — 꼴 · 정렬 · 마감 검사(plan 단계) · 단계별 적용(move · manage 단계) · 처리기 등록부(OCP: 새 종류 = KINDS 에 한 줄 + sim/kinds/<종류>.gd).
+## 명령 — 꼴 · 정렬 · 마감 검사(plan 단계) · 단계별 적용(move · manage 단계 — clash 는 sim/combat.gd) · 처리기 등록부(OCP: 새 종류 = KINDS 에 한 줄 + sim/kinds/<종류>.gd).
 ## 꼴: {"org", "by", "kind", "to", "args", "src": "player"|"ai"} — 플레이어와 AI 가 같은 꼴을 낸다(LSP). 시뮬은 누가 냈는지 보지 않는다.
 ## 처리 순서: 조직 id → 간부 id → 한 간부 안에서는 낸 순서(08 13절 1). 행동 수는 간부 1 · 두목 2(data/game/game.json actions).
 ## 틀린 명령은 적용하지 않고 까닭을 보고(rejected)에 남긴다 — 같은 입력이면 같은 거절. 설계: docs/C1_설계서_상태와턴.md 3-4 · 시험: tests/unit/test_orders.gd
 
 ## at: 화면이 그 명령을 어디에 놓을 때 고르게 하나(C2 sim/draft.gd options) — "here" = 간부가 서 있는 구역 · "other" = 다른 구역
+## zone: 화면이 그 줄을 보일 구역 — "own" 우리 구역만 · "foe" 우리 구역이 아닌 곳만(없으면 늘). variants: 화면 · AI 가 고를 args 꼴들(없으면 [{}]) — C3 습격 · 지키기의 작전 카드. clash 단계 처리기는 검사만 하고 전투는 sim/combat.gd
 const KINDS := {
 	"move": {"phase": "move", "at": "other", "mod": preload("res://sim/kinds/move.gd")},
 	"open": {"phase": "manage", "at": "here", "mod": preload("res://sim/kinds/open.gd")},
 	"expand": {"phase": "manage", "at": "here", "mod": preload("res://sim/kinds/expand.gd")},
 	"recruit": {"phase": "manage", "at": "here", "mod": preload("res://sim/kinds/recruit.gd")},
 	"rest": {"phase": "manage", "at": "here", "mod": preload("res://sim/kinds/rest.gd")},
+	"defend": {"phase": "clash", "at": "here", "zone": "own", "mod": preload("res://sim/kinds/defend.gd"),
+		"variants": [{"card": "ambush"}, {"card": "shield"}]},
+	"raid": {"phase": "clash", "at": "other", "zone": "foe", "mod": preload("res://sim/kinds/raid.gd"),
+		"variants": [{"cards": []}, {"cards": ["surprise"]}, {"cards": ["charge"]}, {"cards": ["decoy"]}, {"cards": ["shield"]}, {"cards": ["bypass"]}]},
 }
 const FIELDS := {"org": TYPE_STRING, "by": TYPE_STRING, "kind": TYPE_STRING, "to": TYPE_STRING, "args": TYPE_DICTIONARY, "src": TYPE_STRING}
 const SOURCES := ["player", "ai"]
+
+
+## 그 종류의 args 꼴들(화면 고르기 · AI)
+static func variants(kind: String) -> Array:
+	return KINDS[kind].get("variants", [{}])
 
 
 static func make(org: String, by: String, kind: String, to: String = "", args: Dictionary = {}, src: String = "ai") -> Dictionary:

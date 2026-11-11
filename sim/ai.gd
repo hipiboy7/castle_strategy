@@ -8,12 +8,19 @@ extends RefCounted
 ##     없으면 자기 사업장이 없는 구역에 있을 때 자기 사업장이 있는 이웃(본거지 먼저)으로 돌아간다 5 쉼
 ## 구역장 = 그 구역 자기 사업장의 수입에 수완을 보태는 간부(sim/economy.gd chief_business 와 같은 사람). 돈은 '쓰고 나서도
 ## RESERVE_WEEKS 주 적자를 버틸 만큼' 남긴다. 성향 · 점수(08 14-5)는 C4.
+## C3 습격(raid_plan): 경영보다 먼저 — 우리 간부가 서 있는 구역의 땅길 이웃 가운데 남의 구역 · 주인 없는 구역을 (적 간부가 많은 곳 → 남의 구역 → 빈 구역 · 같으면 id 순)
+## 차례로 사본에서 미리 돌려 보고
+## (난수 갈래 "ai_clash" — 실제 싸움과 다른 갈래라 미리 아는 것이 아니다) 처음 이기는 곳 하나에 나선다. 나서는 간부 = 그 구역에 이웃하거나 들어가 있는
+## 움직일 수 있는 간부(등급 높은 순 · max_officers). 카드는 주인 있는 구역이면 [기습] → [정면 돌파] → [] 차례로 미리 본다. 나선 간부는 이번 주 이동하지 않는다.
 ## 설계: docs/C1_설계서_상태와턴.md 3-4 · 요구: FR-119 · 시험: tests/integration/test_scenario_a.gd
 
 const State = preload("res://sim/state.gd")
 const Orders = preload("res://sim/orders.gd")
 const Economy = preload("res://sim/economy.gd")
 const Tables = preload("res://sim/tables.gd")
+const Combat = preload("res://sim/combat.gd")
+const Pcg32 = preload("res://sim/rng.gd")
+const RAID_TRIES := [["surprise"], ["charge"], []]
 const RESERVE_WEEKS := 2
 const RESERVE_MIN := 20
 const TROOPS_PER_SLOT := 5
@@ -40,14 +47,47 @@ static func orders_for(s: Dictionary, t: Dictionary, org: String) -> Array:
 		var z: String = s["officers"][by]["zone"]
 		plan["claimed"][z] = int(plan["claimed"].get(z, 0)) + 1
 	var game: Dictionary = t["game"]
+	var rp := raid_plan(s, t, org)
 	for by in State.officers_of(s, org):
 		var n := int(game["actions"]["boss"] if s["orgs"][org]["boss"] == by else game["actions"]["officer"])
 		var moved := false
-		for i in n:
+		var first := 0
+		if not rp.is_empty() and rp["by"].has(by):
+			out.append(Orders.make(org, by, "raid", rp["zone"], {"cards": rp["cards"].duplicate()}))
+			moved = true
+			first = 1
+		for i in range(first, n):
 			var o := _pick(scratch, t, by, moved, plan, ctx)
 			moved = moved or o["kind"] == "move"
 			out.append(o)
 	return out
+
+
+## 이번 주 습격 하나 {"zone", "by", "cards"} 또는 {}(나서지 않음)
+static func raid_plan(s: Dictionary, t: Dictionary, org: String) -> Dictionary:
+	var mine := State.officers_of(s, org)
+	var targets := {}
+	for id in mine:
+		for nb in Tables.neighbors(t, s["officers"][id]["zone"]):
+			if s["zones"].has(nb) and s["zones"][nb]["owner"] != org:
+				targets[nb] = true
+	var order: Array = State.sorted_keys(targets)
+	var weight := {}
+	for zid in order:
+		var owner: String = s["zones"][zid]["owner"]
+		var foes := 0 if owner == "" else State.officers_of(s, owner).filter(func(id): return s["officers"][id]["zone"] == zid).size()
+		weight[zid] = (foes + 1) * 2 if owner != "" else 0
+	order.sort_custom(func(x, y): return weight[x] > weight[y] if weight[x] != weight[y] else x < y)
+	for zid in order:
+		var near: Array = mine.filter(func(id): return s["officers"][id]["zone"] == zid or Tables.neighbors(t, s["officers"][id]["zone"]).has(zid))
+		var by: Array = Combat.by_rank(s, t, near).slice(0, int(t["combat"]["raid"]["max_officers"]))
+		var tries: Array = RAID_TRIES if s["zones"][zid]["owner"] != "" else [[]]
+		for cards in tries:
+			var sc := State.to_dict(s)
+			var rng = Pcg32.new().init_stream(s["seed"], s["turn"], "ai_clash", "%s|%s" % [zid, org])
+			if Combat.raid(sc, t, s["turn"], zid, org, by, cards, [], rng)["won"]:
+				return {"zone": zid, "by": by, "cards": cards}
+	return {}
 
 
 static func _pick(sc: Dictionary, t: Dictionary, by: String, moved: bool, plan: Dictionary, ctx: Dictionary) -> Dictionary:

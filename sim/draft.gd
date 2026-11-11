@@ -3,7 +3,7 @@ extends RefCounted
 ## 미리 보기는 사본 상태에 턴의 명령 단계(plan → move → manage — sim/turn.gd ORDER_PHASES)를 그대로 돌린다: 같은 처리기 · 같은 갈래 난수라
 ## 내 조직만 놓고 보면 실제 주 결과와 같다(다른 조직 명령이 먼저 빈칸을 가져가면 다를 수 있다 — 보고에 남는다). 입력은 바꾸지 않는다.
 ## 고를 수 있는 명령은 등록부(Orders.KINDS 의 at)를 따라간다 — 새 종류는 등록부 한 줄로 화면에 뜬다(OCP). 검사는 처리기가 한다.
-## 설계: docs/C2_설계서_화면과명령.md 4절 · 요구: FR-204 · FR-205 · 시험: tests/unit/test_draft.gd
+## 설계: docs/C2_설계서_화면과명령.md 4절 · docs/C3_설계서_습격과일기토.md 6절 · 요구: FR-204 · FR-205 · FR-309 · 시험: tests/unit/test_draft.gd
 
 const Orders = preload("res://sim/orders.gd")
 const Turn = preload("res://sim/turn.gd")
@@ -65,10 +65,33 @@ static func remove(d: Array, i: int) -> Array:
 	return out
 
 
-## 미리 보기 — {"state": 명령 단계 뒤 사본, "applied", "rejected", "events"}
+## 미리 보기 — {"state": 명령 단계 뒤 사본, "applied", "rejected", "events"}. 충돌 단계 명령(습격 · 지키기 — C3)은 싸움을 미리 돌리지 않고
+## 명령 단계 뒤 상태에서 처리기 검사만 한다(받으면 applied — 싸움 결과는 주 끝 보고에서 · 다른 조직 명령에 따라 달라진다)
 static func preview(s: Dictionary, t: Dictionary, d: Array) -> Dictionary:
 	var r: Dictionary = Turn.phases(s, d, t, Turn.ORDER_PHASES)
-	return {"state": r["state"], "applied": r["report"]["applied"], "rejected": r["report"]["rejected"], "events": r["report"]["events"]}
+	var applied: Array = r["report"]["applied"]
+	var rejected: Array = r["report"]["rejected"]
+	var ctx := {"t": t, "seed": s["seed"], "turn": s["turn"], "phase": "", "report": {"applied": [], "rejected": [], "events": [], "money": {}}}
+	var no := {}
+	for x in rejected:
+		if x["order"] is Dictionary and Orders.shape_error(x["order"]) == "":
+			no[_key(x["order"])] = int(no.get(_key(x["order"]), 0)) + 1
+	for o in d:
+		if not (o is Dictionary) or Orders.shape_error(o) != "" or not Orders.KINDS.has(o["kind"]):
+			continue
+		var ph: String = Orders.KINDS[o["kind"]]["phase"]
+		if Turn.ORDER_PHASES.has(ph):
+			continue
+		if int(no.get(_key(o), 0)) > 0:
+			no[_key(o)] -= 1
+			continue
+		ctx["phase"] = ph
+		var why := Orders.apply_one(r["state"], o, ctx) if r["state"]["officers"].has(o["by"]) else "모르는 간부"
+		if why == "":
+			applied.append(o)
+		else:
+			rejected.append({"order": o, "why": why})
+	return {"state": r["state"], "applied": applied, "rejected": rejected, "events": r["report"]["events"]}
 
 
 ## 줄마다 결과 [{ok, why}] — 같은 명령이 여럿이면 받은 수만큼 앞에서부터 ok
@@ -89,7 +112,8 @@ static func marks(s: Dictionary, t: Dictionary, d: Array) -> Array:
 	return out
 
 
-## 그 간부를 zone 에 놓았을 때 고를 수 있는 명령 [{kind, order, ok, why, cost, gain}] — 등록부 순
+## 그 간부를 zone 에 놓았을 때 고를 수 있는 명령 [{kind, order, ok, why, cost, gain, later}] — 등록부 순 · 종류마다 args 꼴(variants — 작전 카드)
+## later = 결과가 주 끝 충돌 단계에서 난다(습격 · 지키기)
 static func options(s: Dictionary, t: Dictionary, d: Array, by: String, zone: String) -> Array:
 	var me: String = s["player"]
 	var base := preview(s, t, d)
@@ -100,22 +124,28 @@ static func options(s: Dictionary, t: Dictionary, d: Array, by: String, zone: St
 	for kind in Orders.KINDS:
 		if Orders.KINDS[kind]["at"] != where:
 			continue
-		var o := Orders.make(me, by, kind, zone, {}, "player")
-		var row := {"kind": kind, "order": o, "ok": false, "why": "", "cost": 0, "gain": 0}
-		if spare <= 0:
-			row["why"] = "이번 주 행동을 다 썼다"
-		else:
-			var d2 := d.duplicate(true)
-			d2.append(o)
-			var p := preview(s, t, d2)
-			var k := _key(o)
-			row["ok"] = _count(p["applied"], k) > _count(base["applied"], k)
-			if row["ok"]:
-				row["cost"] = int(base["state"]["orgs"][me]["cash"]) - int(p["state"]["orgs"][me]["cash"])
-				row["gain"] = int(p["state"]["orgs"][me]["troops"]["건달급"]) - int(base["state"]["orgs"][me]["troops"]["건달급"])
+		var zk: String = Orders.KINDS[kind].get("zone", "")
+		var own: bool = base["state"]["zones"].has(zone) and base["state"]["zones"][zone]["owner"] == me
+		if (zk == "own" and not own) or (zk == "foe" and own):
+			continue
+		for args in Orders.variants(kind):
+			var o := Orders.make(me, by, kind, zone, args.duplicate(true), "player")
+			var row := {"kind": kind, "order": o, "ok": false, "why": "", "cost": 0, "gain": 0,
+				"later": not Turn.ORDER_PHASES.has(Orders.KINDS[kind]["phase"])}
+			if spare <= 0:
+				row["why"] = "이번 주 행동을 다 썼다"
 			else:
-				row["why"] = _why(p["rejected"], o)
-		out.append(row)
+				var d2 := d.duplicate(true)
+				d2.append(o)
+				var p := preview(s, t, d2)
+				var k := _key(o)
+				row["ok"] = _count(p["applied"], k) > _count(base["applied"], k)
+				if row["ok"]:
+					row["cost"] = int(base["state"]["orgs"][me]["cash"]) - int(p["state"]["orgs"][me]["cash"])
+					row["gain"] = int(p["state"]["orgs"][me]["troops"]["건달급"]) - int(base["state"]["orgs"][me]["troops"]["건달급"])
+				else:
+					row["why"] = _why(p["rejected"], o)
+			out.append(row)
 	return out
 
 
