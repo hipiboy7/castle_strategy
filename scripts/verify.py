@@ -47,7 +47,8 @@ COV_FILES = {
           "sim/rules_common.gd", "sim/tables.gd", "sim/state.gd", "sim/fixed.gd", "sim/economy.gd", "sim/setup.gd",
           "sim/orders.gd", "sim/kinds/move.gd", "sim/kinds/open.gd", "sim/kinds/expand.gd", "sim/kinds/recruit.gd",
           "sim/kinds/rest.gd", "sim/save.gd", "ui/map_layout.gd", "ui/view.gd", "sim/draft.gd",
-          "sim/duel.gd", "sim/combat.gd", "sim/outcome.gd", "sim/kinds/raid.gd", "sim/kinds/defend.gd"],
+          "sim/duel.gd", "sim/combat.gd", "sim/outcome.gd", "sim/kinds/raid.gd", "sim/kinds/defend.gd",
+          "ui/touch_scroll.gd"],
     "B": ["src/storage.gd", "src/data_files.gd", "sim/turn.gd", "sim/ai.gd", "sim/game.gd"],
 }
 COV_DIRS = ("sim", "src", "ui", "tests", "data")

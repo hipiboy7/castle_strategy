@@ -261,14 +261,36 @@ static func report_cards(entry: Dictionary, t: Dictionary, me: String) -> Array:
 		if ev.get("kind") == "outcome":
 			cards.append({"kind": "outcome", "title": "%s — %s" % [RESULT.get(ev["result"], ev["result"]), org_name(t, ev["org"])],
 				"lines": [RESULT_WHY.get(ev["why"], ev["why"]), "판 길이까지 이어서 둘 수 있다"]})
+	var goal := goal_card(a, t, me)
+	if not goal.is_empty():
+		cards.append(goal)
+	# 싸움이 있던 주는 전투 카드를 앞에 — 맨 아래에 두면 폰에서 '전투 보기' 단추가 스크롤 밖으로 숨는다(폰 v0.3.0-rc.2 · 트러블슈팅 T-6)
+	var battle := {"kind": "battle", "title": "전투 %d" % battles.size() if not battles.is_empty() else "전투", "lines": blines,
+		"battles": battles.size()}
+	if not battles.is_empty():
+		cards.append(battle)
 	cards.append_array([
 		{"kind": "money", "title": "돈", "lines": money_lines},
 		{"kind": "orders", "title": "내 명령 — 받음 %d · 거절 %d" % [mine_ok.size(), mine_no.size()], "lines": order_lines},
 		{"kind": "intel", "title": "다른 조직", "lines": intel},
-		{"kind": "battle", "title": "전투 %d" % battles.size() if not battles.is_empty() else "전투", "lines": blines,
-			"battles": battles.size()},
 	])
+	if battles.is_empty():
+		cards.append(battle)
 	return cards
+
+
+## 목표 카드(아직 승패가 안 났을 때) — hold_all: "목표 — 판의 구역 모두 차지 3/4" · 남은 곳 · 어떻게. 목표가 없거나 승패가 났으면 {}
+static func goal_card(s: Dictionary, t: Dictionary, me: String) -> Dictionary:
+	var goal: Dictionary = t.get("game", {}).get("goals", {}).get(s.get("scenario", ""), {})
+	if goal.get("kind", "") != "hold_all" or String(s.get("flags", {}).get("result", "")) != "":
+		return {}
+	var left := []
+	for z in State.sorted_keys(s["zones"]):
+		if s["zones"][z]["owner"] != me:
+			left.append(zone_name(t, z))
+	var n: int = s["zones"].size()
+	return {"kind": "goal", "title": "목표 — 판의 구역 모두 차지 %d / %d" % [n - left.size(), n],
+		"lines": ["남은 곳: " + " · ".join(left), "간부를 남은 구역에 놓아 습격하거나 '맡기기'(컴퓨터가 습격도 고른다) → 주 끝내기"]}
 
 
 ## 보고의 전투 한 줄 묶음 — "[부] 부진파 → [D] DS 씨큐리티 · 회암시장 — 차지함" · 구간 · 일기토 · 손실 · 다침 · 잡힘

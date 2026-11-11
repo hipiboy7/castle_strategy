@@ -24,6 +24,7 @@ const OrderPicker = preload("res://ui/order_picker.gd")
 const ReportView = preload("res://ui/report_view.gd")
 const BattleView = preload("res://ui/battle_view.gd")
 const Pages = preload("res://ui/tab_pages.gd")
+const TouchScroll = preload("res://ui/touch_scroll.gd")
 
 const SAVE := "user://save_auto.json"
 const BROKEN := "user://save_auto.broken.json"
@@ -81,6 +82,7 @@ var _confirm_new: ConfirmationDialog
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	get_tree().node_added.connect(TouchScroll.fit)      # 스크롤 목록 안 판은 끌기를 스크롤로 넘긴다(T-6)
 	_ephemeral = String(args.get("shot", "")) != ""
 	_t = DataFiles.load_tables()
 	_sprites = Sprites.new()

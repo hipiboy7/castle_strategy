@@ -59,3 +59,22 @@ func test_battle_lines_frames_and_outcome() -> void:
 	eq(cards[0]["title"], "승리 — %s" % View.org_name(t, "bujinpa"), "승리 제목")
 	check(View.top(g["state"], t, "bujinpa", 0, 0)["week"].contains("승리(1주)"), "위 막대에 승패")
 	eq(r["battles"], [], "명령이 없으면 전투 없음")
+
+
+## T-6 — 싸움이 있던 주는 전투 카드가 앞(목표 다음) · 목표 카드에 차지한 수 · 남은 곳 · 조용한 주는 전투 카드가 맨 끝
+func test_report_order_battle_first() -> void:
+	var t := _t()
+	var g: Dictionary = Game.new_game(t, "A", 1)
+	const Draft = preload("res://sim/draft.gd")
+	Game.step_player(g, t, Draft.auto(g["state"], t))
+	var e: Dictionary = g["reports"][-1]
+	check(not e["report"]["battles"].is_empty(), "1주 맡기기에 습격이 있다")
+	var cards := View.report_cards(e, t, "bujinpa")
+	eq(cards.map(func(c): return c["kind"]), ["goal", "battle", "money", "orders", "intel"], "목표 · 전투가 앞")
+	eq(cards[0]["title"], "목표 — 판의 구역 모두 차지 2 / 4", "목표 수")
+	check(cards[0]["lines"][0].begins_with("남은 곳: ") and cards[0]["lines"][0].contains(View.zone_name(t, "bukgu")), "남은 곳: %s" % cards[0]["lines"][0])
+	check(not cards[0]["lines"][0].contains(View.zone_name(t, "hoeamsijang")), "차지한 곳은 남은 곳에 없다")
+	var quiet := {"report": {"turn": 1, "applied": [], "rejected": [], "events": [], "money": {}, "battles": []},
+		"before": g["state"], "after": g["state"]}
+	eq(View.report_cards(quiet, t, "bujinpa").map(func(c): return c["kind"]), ["goal", "money", "orders", "intel", "battle"], "조용한 주는 전투가 끝")
+	eq(View.goal_card({"scenario": "Z", "zones": {}, "flags": {}}, t, "bujinpa"), {}, "목표 없는 시나리오는 카드 없음")
