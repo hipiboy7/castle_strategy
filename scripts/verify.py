@@ -51,7 +51,7 @@ COV_FILES = {
           "sim/duel.gd", "sim/combat.gd", "sim/outcome.gd", "sim/kinds/raid.gd", "sim/kinds/defend.gd",
           "ui/touch_scroll.gd",
           "fight/rules_rt.gd", "fight/build.gd", "fight/world.gd", "fight/fighter.gd", "fight/fighter_body.gd",
-          "fight/moves.gd", "fight/skills.gd"],
+          "fight/moves.gd", "fight/skills.gd", "ui/fight3d/screen_mode.gd"],
     "B": ["src/storage.gd", "src/data_files.gd", "sim/turn.gd", "sim/ai.gd", "sim/game.gd",
           "fight/section.gd", "fight/bot.gd", "fight/enemy_ai.gd", "src/fight_test.gd"],
 }

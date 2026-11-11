@@ -1,6 +1,6 @@
 # 자산 출처 — 모든 자산은 여기 있어야 한다
 
-> 정정 이력: 2026-11-10 — 첫 작성(C1-0). 2026-11-10(C2) — 인물 도트 묶음 `chars/` 세 줄(취호전 시트 내보내기 · 보류 #2 답). 2026-11-11 — 도트를 그만 쓰고(사용자 지시 · `docs/기획_차이.md` (라)12) 벡터 초상 두 줄(`chars/looks.json` · `chars/svg/*.svg`)과 글꼴 Noto Sans KR 로 바꿨다. 옛 도트 묶음 · Galmuri11 은 지웠다(git 이력에 있음). 2026-11-11 — 원작 공식 인물 카드 초상 두 줄(`chars/cut/` · 개인 빌드 전용 · 사용자 답 (나) · `docs/기획_차이.md` (라)14).
+> 정정 이력: 2026-11-10 — 첫 작성(C1-0). 2026-11-10(C2) — 인물 도트 묶음 `chars/` 세 줄(취호전 시트 내보내기 · 보류 #2 답). 2026-11-11 — 도트를 그만 쓰고(사용자 지시 · `docs/기획_차이.md` (라)12) 벡터 초상 두 줄(`chars/looks.json` · `chars/svg/*.svg`)과 글꼴 Noto Sans KR 로 바꿨다. 옛 도트 묶음 · Galmuri11 은 지웠다(git 이력에 있음). 2026-11-11 — 원작 공식 인물 카드 초상 두 줄(`chars/cut/` · 개인 빌드 전용 · 사용자 답 (나) · `docs/기획_차이.md` (라)14). 2026-11-11(C4-0) — 전투 화면 그림 A 모델 줄 `models/*_a.glb`(castle_M3D 에서 복사 · 스크립트 생성물).
 
 `scripts/verify.py` '자산 출처' 단계가 `assets/` 의 파일(`.import` 빼고)과 아래 표 첫 칸을 대조한다(CLAUDE.md 13절). 원작 그림을 쓴 자산은 `chars/cut/` 뿐이다(공식 인물 카드 — 화/컷이 아니라 카드 파일 이름을 원작 위치로 적는다). **개인 빌드 전용**이고 배포 빌드에서는 기본으로 뺀다(`export_presets.cfg` exclude_filter 에 `assets/chars/cut/*` — 배포 때 다시 묻는다 · 00 결정 5).
 
@@ -13,3 +13,4 @@
 | `chars/svg/*.svg` | 직접 — `scripts/draw_portraits.py` 가 `chars/looks.json` 에서 코드로 그린 벡터 초상(3/4 흉상 · 셀 음영 · 굵기가 변하는 잉크 선 · 배경 투명 · 384px · 밉맵 — 2026-11-11 2차). 원작 그림 · 다른 게임 그림 아님 | 간부 카드 · 지도 얼굴 패 · 구역 카드 · 조직 탭 · 전투 화면 — `ui/sprites.gd` |
 | `chars/cut/*.png` | **원작** — 「캐슬」 공식 인물 카드(773×1124 · © 2019 CASTLE 정연) 36장의 그림 칸 위쪽 정사각형을 384px 로 줄임. 원본은 castle_common `sources/character_profile/<이름>.jpg`(읽기만 · 파일 ↔ id 는 castle_common `work/profile/profiles.json` cards) · `scripts/cut_portraits.py`(python3.11 · Pillow · 멱등). **개인 빌드 전용** · 공개 저장소에 커밋함(사용자 답 (다) · `docs/기획_차이.md` (라)16) | 간부 카드 · 지도 얼굴 패 · 구역 카드 · 조직 탭 · 전투 화면 — `ui/sprites.gd`(있으면 벡터 초상보다 먼저) |
 | `chars/cut/heads.json` | 직접 — 위 초상마다 얼굴 자리(사람이 카드 묶음을 보고 적은 값 · `scripts/cut_portraits.py` FACES)와 원본 카드 sha256 | 지도 얼굴 패 — `ui/sprites.gd` `head_region` |
+| `models/*_a.glb` | 직접(스크립트 생성) — castle_M3D `tools/make_models.gd` 가 외형 표에서 만든 그림 A 모델(뼈대 17 + 피부 메시 · 툰 · 정점 색 — 사람 손 · 외부 올리기 없음 · 원작 그림 아님)을 castle_M3D `2c3e69b` `assets/models/` 에서 `.import` 와 함께 복사(2026-11-11 C4-0 — `kimshin_p1` · `ds_member`). 다시 만들려면 castle_M3D 에서 그 도구를 돌려 복사한다(도구 이식은 C7 — `docs/기획_차이.md` (나)46) | 전투 화면 인형 — `ui/fight3d/puppet_glb.gd`(외형 이름 → 파일은 `ui/fight3d/looks.gd` ART · 역할은 `data/game/fight_roles.json` look) |

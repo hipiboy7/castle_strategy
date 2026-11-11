@@ -103,6 +103,7 @@ class OrdersPage extends PanelContainer:
 class LogPage extends PanelContainer:
 	signal open_report(i: int)
 	signal new_game
+	signal fight_test
 	var _v: VBoxContainer
 	var _perf: Label
 
@@ -130,6 +131,12 @@ class LogPage extends PanelContainer:
 		n.custom_minimum_size = Vector2(0, 130)
 		n.pressed.connect(func() -> void: new_game.emit())
 		_v.add_child(n)
+		var ft := Button.new()                          # C4-0 기술 검증 — 실시간 전투 화면 한 판(가로 · 3D). 판에는 영향이 없다
+		ft.text = "전투 시험(가로 화면 · 한 판)"
+		ft.theme_type_variation = "TabButton"
+		ft.custom_minimum_size = Vector2(0, 130)
+		ft.pressed.connect(func() -> void: fight_test.emit())
+		_v.add_child(ft)
 		_perf = T._line(_v, perf, "Label")
 		T._line(_v, "판 정보", "Label")
 		T._line(_v, info, "TinyLabel")

@@ -25,6 +25,8 @@ const ReportView = preload("res://ui/report_view.gd")
 const BattleView = preload("res://ui/battle_view.gd")
 const Pages = preload("res://ui/tab_pages.gd")
 const TouchScroll = preload("res://ui/touch_scroll.gd")
+const FightScreen = preload("res://ui/fight3d/fight_screen.gd")
+const FightTest = preload("res://src/fight_test.gd")
 
 const SAVE := "user://save_auto.json"
 const BROKEN := "user://save_auto.broken.json"
@@ -60,6 +62,9 @@ var _fr_n := 0                         # 이번 1초 창의 프레임 수
 var _fr_t0 := 0                        # 이번 1초 창을 연 때(µs)
 var _map_fps: Array = []               # 지도가 보이는 동안 1초마다 센 fps(최근 10개) — 성능.md 1절 '지도 탭 가만히'
 var _wide := false
+var _fight = null                      # 전투 화면(ui/fight3d/fight_screen.gd) — 열린 동안 다른 부품은 숨기고 배치 · 바탕 그리기를 멈춘다(C4)
+var _fight_hidden: Array = []
+var _fight_fps := {}                   # 마지막 전투 화면 fps {"avg", "min", "n"} — 기록 탭 성능 줄
 
 var _top: PanelContainer
 var _week: Label
@@ -166,6 +171,8 @@ func _setup_shot() -> void:
 		_open_report(0)
 		_open_battle(0)
 		_battle.hold_at_first_duel()
+	if args.get("fight_test", false):
+		_open_fight(FightTest.need(_t, int(args.get("seed", SELF_SEED))), true, "전투 시험")       # --fight-test --shot: 봇이 돌리는 전투 화면을 찍는다
 
 
 func _build() -> void:
@@ -199,6 +206,7 @@ func _build() -> void:
 	_pages["log"] = Pages.LogPage.new()
 	_pages["log"].open_report.connect(_open_report)
 	_pages["log"].new_game.connect(func() -> void: _confirm_new.popup_centered())
+	_pages["log"].fight_test.connect(func() -> void: _open_fight(FightTest.need(_t, SELF_SEED), false, "전투 시험"))
 	for k in SOON:
 		var p := PanelContainer.new()
 		var l := _label(SOON[k], "SmallLabel")
@@ -289,6 +297,8 @@ func _dialog(text: String, ok: String, cancel: String) -> ConfirmationDialog:
 
 ## 틀 다시 놓기 — 크기가 바뀔 때(접기 · 펴기) · 탭 · 카드 · 판이 바뀔 때. 화면 상태는 그대로 둔다
 func _relayout() -> void:
+	if _fight != null:
+		return                                          # 전투 화면이 화면을 쓴다 — 닫힐 때 다시 배치한다
 	if _phase == "report" and _sheet != "report" and _sheet != "battle":
 		_phase = "over" if _over() else "play"          # 보고 단계인데 보고가 닫혀 있으면 되돌린다(입력이 다 막히지 않게)
 	var view := get_viewport_rect().size
@@ -335,6 +345,8 @@ func _place(c: Control, r: Rect2) -> void:
 
 ## 화면 내용 다시 채우기 — 상태 · 대기 명령 · 화면 상태가 바뀔 때
 func _refresh() -> void:
+	if _fight != null:
+		return
 	if _phase == "error":
 		_week.text = "오류"
 		_cash.text = ""
@@ -558,6 +570,39 @@ func _close_battle() -> void:
 	_relayout()
 
 
+## 전투 화면 열기(C4) — 다른 부품을 숨기고 가로 3D 전투 화면을 띄운다. need = 구간 준비(설계서 2-2) · auto = 봇이 조종(자동 플레이 보기)
+func _open_fight(need: Dictionary, auto: bool, title: String) -> void:
+	if _fight != null or _phase == "error":
+		return
+	_fight_hidden = []
+	for c in get_children():
+		if c is CanvasItem and c.visible:
+			_fight_hidden.append(c)
+			c.visible = false
+	_fight = FightScreen.new()
+	add_child(_fight)
+	_fight.finished.connect(_on_fight_done)
+	_fight.start(_t, need, {"auto": auto, "title": title})
+	queue_redraw()
+
+
+## 전투 화면이 끝났다 — 구간 결과 · 요약을 받고 세로 화면으로 돌아온다(C4-0 은 결과를 알림 글로만 — 판에 넣는 것은 C4-2)
+func _on_fight_done(outcome: Dictionary, summary: Dictionary) -> void:
+	_fight.queue_free()
+	_fight = null
+	for c in _fight_hidden:
+		if is_instance_valid(c):
+			c.visible = true
+	_fight_hidden = []
+	_fight_fps = summary.get("fps", {})
+	_note = "전투 시험 — %s · 쓰러뜨림 %d · %d초 · 전투 fps 평균 %d · 최저 %d" % ["이김" if summary["over"] == "win" else "짐",
+		int(outcome["kills"][0]), int(summary["frames"]) / 60, int(_fight_fps.get("avg", 0)), int(_fight_fps.get("min", 0))]
+	print("FIGHT close result=%s ticks=%d" % [outcome["result"], int(outcome["ticks"])])
+	queue_redraw()
+	_relayout()
+	_refresh()
+
+
 func _close_sheet() -> void:
 	if _sheet == "report":
 		_phase = "over" if _over() else "play"
@@ -588,7 +633,9 @@ func _save() -> bool:
 
 ## 뒤로 — 열린 것부터 닫고(고르기 · 보고 → 카드 → 고른 간부 → 다른 탭), 다 닫혔으면 '끝낼까요?'
 func _back() -> void:
-	if _confirm.visible or _confirm_end.visible or _confirm_new.visible:
+	if _fight != null:
+		_fight.back()
+	elif _confirm.visible or _confirm_end.visible or _confirm_new.visible:
 		_confirm.hide()
 		_confirm_end.hide()
 		_confirm_new.hide()
@@ -609,6 +656,8 @@ func _back() -> void:
 
 ## 바탕 — 위는 남색 · 아래는 거의 검정(테마 Frame bg_top · bg_bottom). 띠 몇 줄로 나눠 칠한다(그림 자원 없이).
 func _draw() -> void:
+	if _fight != null:
+		return                                          # 3D 전투 화면 위에 바탕을 칠하지 않는다
 	var a := get_theme_color("bg_top", "Frame")
 	var b := get_theme_color("bg_bottom", "Frame")
 	var n := 24
@@ -622,6 +671,8 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
 		_back()
 	elif what == NOTIFICATION_APPLICATION_PAUSED:
+		if _fight != null:
+			_fight.set_paused(true)
 		_save()
 		print("APP hide")
 	elif what == NOTIFICATION_APPLICATION_RESUMED:
@@ -656,7 +707,10 @@ func _perf_text() -> String:
 		for v in _map_fps:
 			sum += int(v)
 		f = "평균 %d · 최저 %d(최근 %d초)" % [int(round(float(sum) / _map_fps.size())), lo, _map_fps.size()]
-	return "성능\n켜기 %d ms\n마지막 주 처리 %.1f ms\n지도 fps %s" % [_boot_ms, _turn_us / 1000.0, f]
+	var ff := "전투 시험을 한 판 한 뒤"
+	if int(_fight_fps.get("n", 0)) > 0:
+		ff = "평균 %d · 최저 %d(%d초)" % [int(_fight_fps["avg"]), int(_fight_fps["min"]), int(_fight_fps["n"])]
+	return "성능\n켜기 %d ms\n마지막 주 처리 %.1f ms\n지도 fps %s\n전투 fps %s" % [_boot_ms, _turn_us / 1000.0, f, ff]
 
 
 func _perf() -> void:

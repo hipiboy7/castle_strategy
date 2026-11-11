@@ -8,6 +8,7 @@ const Skills = preload("res://fight/skills.gd")
 const Moves = preload("res://fight/moves.gd")
 const Build = preload("res://fight/build.gd")
 const EnemyAI = preload("res://fight/enemy_ai.gd")
+const Looks = preload("res://ui/fight3d/looks.gd")
 const Combat = preload("res://sim/combat.gd")
 const Duel = preload("res://sim/duel.gd")
 const Game = preload("res://sim/game.gd")
@@ -145,10 +146,13 @@ func test_fight_roles_ids_exist() -> void:
 			check(Moves.M.has(row["moveset"][k]), "동작 %s 이 동작 표에 있다" % row["moveset"][k])
 		check(row["moveset"].has("combo"), "연타 동작이 있다")
 		check(EnemyAI.PROFILES.has(row["ai"]), "AI 프로필 %s" % row["ai"])
+		check(Looks.known(row["look"]), "외형 %s 이 외형 표에 있다" % row["look"])
 	for g in fr["troops"]:
 		check(t["rules"].rank_index(g) >= 0, "조직원 등급 %s 는 사다리에 있다" % g)
 		for p in fr["troops"][g]["ai"]:
 			check(EnemyAI.PROFILES.has(p), "조직원 AI 프로필 %s" % p)
+		for lk in fr["troops"][g]["look"]:
+			check(Looks.known(lk), "조직원 외형 %s" % lk)
 	for name in EnemyAI.PROFILES:
 		for pat in EnemyAI.PROFILES[name]["patterns"].values():
 			for step in pat:
