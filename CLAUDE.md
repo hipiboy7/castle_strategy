@@ -67,7 +67,7 @@
   - Actions 무료 분량(비공개 저장소 · 계정 전체 월 2,000분 · artifact 저장 500MB)은 **공개인 동안 이 저장소에 들지 않는다.** 비공개로 되돌리면 다시 든다.
   - Artifact 저장 한도가 찼었다(2026-11-09 castle_M3D run #65 · #66 실패 → 2026-11-10 만료 · castle_M3D 공개로 비공개 사용량 약 39MB). 비공개로 되돌릴 때를 위해 artifact 는 계속 최소로 쓴다(7절).
 - **핵심 상수**
-  - 화면: 기준 해상도 **1080×1920 세로** · stretch `canvas_items` + aspect `expand` · 렌더러 `gl_compatibility`.
+  - 화면: 기준 해상도 **1080×1920 세로** · stretch `canvas_items` + aspect `expand` · 렌더러 `gl_compatibility`. 실시간 전투 화면만 **가로 1280×720**(`ui/fight3d/screen_mode.gd` · (나)47).
   - 시간: **1턴 = 1주**(주 시나리오 26턴).
   - 판정: 정수 상태 + 시드 하나. 같은 시드 · 같은 명령이면 상태 해시가 같다(서버 · CI · 폰).
   - 이름: 패키지 `com.hipiboy7.castlestrategy`. castle_common 판 id 는 `castle_strategy` 다.
@@ -128,7 +128,7 @@ Phase 번호 대신 **기획서 08 17절의 마일스톤 id C0~C7** 을 쓰고, 
 | 8 | castle_common 92차 받기 — 공개 판 예외(받은 사본을 커밋하지 않음): **Actions 읽기 토큰을 Secrets 에 넣을지 · 저장소를 비공개로 되돌릴지** | C4-0 뒤 '받기' 배치 | 사용자 답 · `.gitignore` · CI 가 sync 로 받는지 | `docs/기획_차이.md` (다)14 |
 
 ## 2. SOLID 준수 (게임판)
-- **판정은 순수 함수다.** `sim/` 은 노드 · 장면 · 엔진 RNG · 파일 접근을 가져오지 않는다(RefCounted · static). 장면(`ui/`)은 상태 기계와 부품 연결만 하고, 판정을 계산하지 않는다.
+- **판정은 순수 함수다.** `sim/` 은 노드 · 장면 · 엔진 RNG · 파일 접근을 가져오지 않는다(RefCounted · static). 실시간 구간 판정 `fight/` 도 노드 · 파일을 쓰지 않는다 — 다만 실수와 시드를 준 엔진 RNG 는 쓴다(값이 구간 결과로 줄어 기록된 뒤에만 상태에 들어간다 · `docs/C4_설계서_직접조작전투.md` 4-6). 장면(`ui/`)은 상태 기계와 부품 연결만 하고, 판정을 계산하지 않는다.
 - **SRP**: `sim/` 모듈 하나는 책임 하나다(economy · orders · combat · duel · intrigue · diplomacy · politics · heat · events · ai). 실시간 직접 조작 전투는 `sim/` 밖 `fight/`(순수 · 60프레임 고정 · 실수 허용 — 결과 사전만 내고 상태를 고치지 않는다)와 `ui/fight3d/`(그림)에 둔다((나)46). `turn.gd` 는 08 13절 순서대로 부르기만 한다.
 - **OCP**: 명령 종류 · 사건 결과(`effect_kinds` 29) · 작전 카드 · 조직 고유 명령은 **처리기 등록부**(id → 처리기)로 늘린다. turn 이나 economy 를 고치지 않는다. 조직 · 인물 · 구역 · 사건은 코드가 아니라 데이터로 늘린다.
 - **LSP**: 플레이어와 컴퓨터는 같은 꼴의 명령(`orders[]`)을 낸다. 시뮬은 누가 냈는지 모른다. 처리기는 모두 같은 꼴(`apply(state, order, ctx) -> 결과`)을 지킨다.
@@ -205,6 +205,7 @@ Phase 번호 대신 **기획서 08 17절의 마일스톤 id C0~C7** 을 쓰고, 
   - `python3 -B scripts/verify.py`: 전체 검증 · 종료 코드 0/1
   - `python3 -B scripts/get_godot.py`: 엔진 받기
   - headless 게임: `<godot> --headless --path . -- --autoplay --turns N --seed S` — `RESULT {json}` 한 줄을 찍는다
+  - headless 전투 시험(C4): `<godot> --headless --path . -- --fight-test --seed S` — `FIGHT {json}` 한 줄(실시간 구간 판을 봇으로 끝까지)
   - castle_common 받기: castle_common 폴더에서 `python3 -B tools/sync.py castle_strategy`
 - **멱등**: get_godot · sync · verify 는 다시 돌려도 결과가 같다.
 - **단방향**: castle_common → `data/common/`(받은 사본 · `SOURCE.json` 도장) → 이 판. 받은 사본은 손으로 고치지 않는다.
