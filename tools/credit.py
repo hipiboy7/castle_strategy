@@ -44,12 +44,13 @@ PRICES = {  # $/MTok: (입력, 출력, 캐시 읽기)
     "claude-opus-5-5": (4.00, 20.00, 0.20),
     "claude-opus-5": (5.00, 25.00, 0.50),
     "claude-fable-5-1": (10.00, 50.00, 0.25),
+    "claude-fable-5-2": (8.00, 40.00, 0.20),  # 스킬 모델표 2026-11-03 판 — 2026-11-11 더함(없으면 Sonnet 단가로 낮게 잡힌다)
     "claude-haiku-5-5": (0.10, 0.50, 0.01),
     "claude-haiku-4-5-20251001": (1.00, 5.00, 0.10),  # 공개 단가 — 스킬 표에 없어 추가
 }
 FALLBACK = "claude-sonnet-5-5"
 SID = os.environ.get("CLAUDE_CODE_SESSION_ID") or None  # 지금 대화 — 작업 상한을 대화마다 따로 센다
-PRICE_NOTE = "claude-api 스킬 모델표(2026-10-06 기준) · 캐시 쓰기는 입력 × 1.25(5분) · × 2(1시간) · Haiku 4.5 는 공개 단가 $1/$5"
+PRICE_NOTE = "claude-api 스킬 모델표(2026-10-06 기준 · Fable 5.2 는 2026-11-03 판 $8/$40) · 캐시 쓰기는 입력 × 1.25(5분) · × 2(1시간) · Haiku 4.5 는 공개 단가 $1/$5"
 
 
 def _slug(path):
