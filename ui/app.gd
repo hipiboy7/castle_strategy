@@ -54,8 +54,11 @@ var _ephemeral := false
 var _resumed := false
 var _self_hash := ""
 var _boot_ms := 0
-var _turn_ms := 0
+var _turn_us := 0
 var _fps_t := 0
+var _fr_n := 0                         # 이번 1초 창의 프레임 수
+var _fr_t0 := 0                        # 이번 1초 창을 연 때(µs)
+var _map_fps: Array = []               # 지도가 보이는 동안 1초마다 센 fps(최근 10개) — 성능.md 1절 '지도 탭 가만히'
 var _wide := false
 
 var _top: PanelContainer
@@ -374,13 +377,13 @@ func _fill_pages(s: Dictionary, me: String, top: Dictionary) -> void:
 	for i in _draft.size():
 		rows.append({"text": View.order_text(_t, _draft[i]), "ok": marks[i]["ok"], "why": marks[i]["why"]})
 	_pages["orders"].show_orders(rows, top["actions"] + " 남음")
-	_pages["log"].show_log(_g.get("reports", []).map(func(e): return View.report_title(e, me)), _info(s, top))
+	_pages["log"].show_log(_g.get("reports", []).map(func(e): return View.report_title(e, me)), _info(s, top), _perf_text())
 
 
 func _info(s: Dictionary, top: Dictionary) -> String:
-	return "판 %s · C3 화면 · 상태 %s / %s · castle_common %s\n자가 해시 (%s · 시드 %d · %d주) %s\n상태 해시 %s\n잠정: AI 후보 데이터 · 지도 좌표 · 등급 자리값 %d명\n%s" % [
+	return "판 %s · C3 화면 · 상태 %s / %s · castle_common %s\n자가 해시 (%s · 시드 %d · %d주) %s\n상태 해시 %s\n잠정: AI 후보 데이터 · 지도 좌표 · 등급 자리값 %d명" % [
 		version, _phase, _sheet if _sheet != "" else "-", common_sha if common_sha != "" else "받기 전", SCENARIO, SELF_SEED, SELF_TURNS, _self_hash, State.hash_of(s),
-		top["prov"], _perf_text()]
+		top["prov"]]
 
 
 func _on_tab(tab: String) -> void:
@@ -507,7 +510,7 @@ func _end_week() -> void:
 		return
 	var t0 := Time.get_ticks_usec()
 	var report: Dictionary = Game.step_player(_g, _t, _draft)
-	_turn_ms = int((Time.get_ticks_usec() - t0) / 1000)
+	_turn_us = Time.get_ticks_usec() - t0
 	_draft = []
 	_officer = ""
 	_note = "" if _save() else "저장하지 못했다"
@@ -644,23 +647,41 @@ func _print_ui() -> void:
 			print("UI %s %d %d" % [k, int(p.x), int(p.y)])
 
 
+## 기록 탭 성능 줄 — fps 는 엔진 값 대신 직접 센 지도 fps(폰 rc.3 에서 값이 안 보였다 · 성능.md 3절)
 func _perf_text() -> String:
-	return "성능: 켜기 %d ms · 마지막 주 처리 %d ms · %d fps" % [_boot_ms, _turn_ms, Engine.get_frames_per_second()]
+	var f := "지도를 10초 본 뒤 다시 열기"
+	if not _map_fps.is_empty():
+		var lo: int = _map_fps.min()
+		var sum := 0
+		for v in _map_fps:
+			sum += int(v)
+		f = "평균 %d · 최저 %d(최근 %d초)" % [int(round(float(sum) / _map_fps.size())), lo, _map_fps.size()]
+	return "성능\n켜기 %d ms\n마지막 주 처리 %.1f ms\n지도 fps %s" % [_boot_ms, _turn_us / 1000.0, f]
 
 
 func _perf() -> void:
-	print("PERF boot_ms=%d turn_ms=%d fps=%d" % [_boot_ms, _turn_ms, Engine.get_frames_per_second()])
+	print("PERF boot_ms=%d turn_ms=%d fps=%d" % [_boot_ms, int(_turn_us / 1000), Engine.get_frames_per_second()])
 
 
 func _process(_dt: float) -> void:
+	var us := Time.get_ticks_usec()
+	_fr_n += 1
+	if _fr_t0 == 0:
+		_fr_t0 = us
+	elif us - _fr_t0 >= 1000000:
+		var fps := int(round(_fr_n * 1000000.0 / (us - _fr_t0)))
+		_fr_n = 0
+		_fr_t0 = us
+		if _map.visible and _phase == "play":
+			_map_fps.append(fps)
+			if _map_fps.size() > 10:
+				_map_fps.pop_front()
+		if _tab == "log" and _phase != "error":
+			_pages["log"].set_perf(_perf_text())
 	var now := Time.get_ticks_msec()
 	if now - _fps_t >= 10000:
 		_fps_t = now
-		print("FPS_LOG fps=%d" % Engine.get_frames_per_second())
-		if _tab == "log" and _phase != "error":
-			var s: Dictionary = _g["state"]
-			_pages["log"].show_log(_g.get("reports", []).map(func(e): return View.report_title(e, s["player"])),
-				_info(s, View.top(s, _t, s["player"], 0, 0)))
+		print("FPS_LOG fps=%d map_fps=%s" % [Engine.get_frames_per_second(), str(_map_fps.back()) if not _map_fps.is_empty() else "-"])
 
 
 func _label(text: String, variation: String) -> Label:

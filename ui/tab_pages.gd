@@ -104,12 +104,13 @@ class LogPage extends PanelContainer:
 	signal open_report(i: int)
 	signal new_game
 	var _v: VBoxContainer
+	var _perf: Label
 
 	func _ready() -> void:
 		_v = load("res://ui/tab_pages.gd")._scroll(self)
 
-	## titles = 보고 한 줄(오래된 것부터) · info = 판 · 해시 · 성능 글
-	func show_log(titles: Array, info: String) -> void:
+	## titles = 보고 한 줄(오래된 것부터) · info = 판 · 해시 글 · perf = 성능 줄(1초마다 set_perf 로 글만 바꾼다 — 끌어 둔 자리를 지키려고)
+	func show_log(titles: Array, info: String, perf: String) -> void:
 		var T = load("res://ui/tab_pages.gd")
 		T._clear(_v)
 		T._line(_v, "지난 보고 %d" % titles.size(), "CardTitle")
@@ -129,5 +130,10 @@ class LogPage extends PanelContainer:
 		n.custom_minimum_size = Vector2(0, 130)
 		n.pressed.connect(func() -> void: new_game.emit())
 		_v.add_child(n)
+		_perf = T._line(_v, perf, "Label")
 		T._line(_v, "판 정보", "Label")
 		T._line(_v, info, "TinyLabel")
+
+	func set_perf(text: String) -> void:
+		if is_instance_valid(_perf):
+			_perf.text = text
