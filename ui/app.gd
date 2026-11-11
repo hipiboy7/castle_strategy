@@ -123,6 +123,8 @@ func _open_game() -> void:
 				notes.append("다시 돌린 해시가 저장과 다르다(보고만 다를 수 있음)")
 			_draft = r["save"].get("pending", [])
 			_note = ("저장 알림: " + ", ".join(notes)) if not notes.is_empty() else "이어 하기 — %d주" % int(_g["state"]["turn"])
+			if _over():
+				_note = "앞 판이 %d주로 끝나 있다 — 아래 '새 판으로'를 누르면 1주부터" % int(_g["state"]["length"])
 	if _g.is_empty():
 		_g = Game.new_game(_t, SCENARIO, int(args.get("seed", SELF_SEED)) if _ephemeral else SELF_SEED)
 	_phase = "over" if _over() else "play"
@@ -243,6 +245,7 @@ func _build() -> void:
 	_report.battle.connect(_open_battle)
 	add_child(_report)
 	_battle = BattleView.new()
+	_battle.visible = false
 	_battle.closed.connect(_close_battle)
 	add_child(_battle)
 
@@ -280,6 +283,8 @@ func _dialog(text: String, ok: String, cancel: String) -> ConfirmationDialog:
 
 ## 틀 다시 놓기 — 크기가 바뀔 때(접기 · 펴기) · 탭 · 카드 · 판이 바뀔 때. 화면 상태는 그대로 둔다
 func _relayout() -> void:
+	if _phase == "report" and _sheet != "report" and _sheet != "battle":
+		_phase = "over" if _over() else "play"          # 보고 단계인데 보고가 닫혀 있으면 되돌린다(입력이 다 막히지 않게)
 	var view := get_viewport_rect().size
 	var ins := Vector4.ZERO
 	if OS.get_name() == "Android":
@@ -346,13 +351,14 @@ func _refresh() -> void:
 		_card.show_card(View.zone_card(s, _t, _zone, me))
 	else:
 		_card.show_empty("구역을 누르면 사업장 · 주둔 · 정보가 여기 뜬다. 간부 카드를 끌어 구역에 놓으면 명령을 고른다.")
-	_end.disabled = _phase != "play"
+	_end.disabled = _phase != "play" and _phase != "over"
+	_end.text = "새 판으로" if _phase == "over" else "주 끝내기"      # 끝난 판에서도 나갈 길이 늘 아래에 있다(C3 rc.2 — 폰에서 막힘)
 	_auto.disabled = _phase != "play"
 	var hint := "간부를 끌어 구역에 놓거나, 간부 → 구역 순으로 누른다"
 	if _officer != "":
 		hint = "%s — 이제 구역을 누른다" % View.person(_t, _officer)
 	elif _phase == "over":
-		hint = "끝 — %d주(승패는 C5)" % int(s["length"])
+		hint = "판이 끝났다(%d주) — 아래 '새 판으로'를 누르면 1주부터" % int(s["length"])
 	_hint.text = _note if _note != "" else hint
 	_fill_pages(s, me, top)
 
@@ -368,8 +374,8 @@ func _fill_pages(s: Dictionary, me: String, top: Dictionary) -> void:
 
 
 func _info(s: Dictionary, top: Dictionary) -> String:
-	return "판 %s · C2 화면 · castle_common %s\n자가 해시 (%s · 시드 %d · %d주) %s\n상태 해시 %s\n잠정: AI 후보 데이터 · 지도 좌표 · 등급 자리값 %d명\n%s" % [
-		version, common_sha if common_sha != "" else "받기 전", SCENARIO, SELF_SEED, SELF_TURNS, _self_hash, State.hash_of(s),
+	return "판 %s · C3 화면 · 상태 %s / %s · castle_common %s\n자가 해시 (%s · 시드 %d · %d주) %s\n상태 해시 %s\n잠정: AI 후보 데이터 · 지도 좌표 · 등급 자리값 %d명\n%s" % [
+		version, _phase, _sheet if _sheet != "" else "-", common_sha if common_sha != "" else "받기 전", SCENARIO, SELF_SEED, SELF_TURNS, _self_hash, State.hash_of(s),
 		top["prov"], _perf_text()]
 
 
@@ -386,6 +392,9 @@ func _on_zone(z: String) -> void:
 	if _officer != "" and _phase == "play":
 		_open_pick(_officer, z)
 		return
+	if _officer != "":
+		_officer = ""
+		_why_not()
 	_zone = z
 	_relayout()
 	_refresh()
@@ -399,6 +408,20 @@ func _on_officer(id: String) -> void:
 func _on_drop(officer: String, z: String) -> void:
 	if _phase == "play":
 		_open_pick(officer, z)
+	else:
+		_why_not()
+
+
+## 받지 않은 손 입력의 까닭을 아래 글에 보인다(끝난 판 · 보고 · 오류) — 조용히 무시하지 않는다
+func _why_not() -> void:
+	if _phase == "over":
+		_note = "판이 끝났다(%d주) — 아래 '새 판으로'를 누르면 1주부터" % int(_g["state"]["length"])
+	elif _phase == "report":
+		_note = "보고를 닫은 뒤 명령을 낸다"
+	elif _phase == "error":
+		return
+	print("INPUT ignored phase=%s sheet=%s" % [_phase, _sheet])
+	_refresh()
 
 
 func _open_pick(officer: String, z: String) -> void:
@@ -423,6 +446,7 @@ func _on_picked(order: Dictionary) -> void:
 
 func _on_auto() -> void:
 	if _phase != "play":
+		_why_not()
 		return
 	_draft = Draft.auto(_g["state"], _t)
 	_note = "맡기기 — 명령 %d개(명령 탭에서 빼거나 고칠 수 있다)" % _draft.size()
@@ -446,7 +470,11 @@ func _on_clear() -> void:
 
 
 func _on_end() -> void:
+	if _phase == "over":
+		_confirm_new.popup_centered()
+		return
 	if _phase != "play":
+		_why_not()
 		return
 	if _draft.is_empty():
 		_confirm_end.popup_centered()
