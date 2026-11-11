@@ -133,7 +133,7 @@ jobs:
           set -e
           unzip -l "build/$APK.apk" > build/apk_list.txt
           for f in sim/rng.gd sim/hash.gd sim/turn.gd sim/rules_common.gd sim/tables.gd src/main.gd ui/app.gd sim/draft.gd ui/view.gd \
-                   data/game/economy.json data/common/packs/strategy/scenarios.json data/common/canon/characters.json assets/chars/index.json; do
+                   data/game/economy.json data/common/packs/strategy/scenarios.json data/common/canon/characters.json assets/chars/svg/kimshin.svg.import assets/fonts/NotoSansKR-wght.ttf.import; do
             grep -qE "assets/${f}c?$" build/apk_list.txt || { echo "::error::APK 에 $f 가 없다"; exit 1; }
           done
           if grep -q "assets/tests/" build/apk_list.txt; then echo "::error::시험(tests/)이 APK 에 들었다"; exit 1; fi

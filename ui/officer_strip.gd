@@ -1,5 +1,5 @@
 extends HBoxContainer
-## 간부 줄 — View.officer_cards 를 카드(초상 · 이름 · 남은 행동)로 그린다. 카드를 끌면 {officer: id} 를 지도에 놓을 수 있고(끌어 놓기),
+## 간부 줄 — View.officer_cards 를 카드(초상 일러스트 · 이름 · 남은 행동)로 그린다. 카드를 끌면 {officer: id} 를 지도에 놓을 수 있고(끌어 놓기),
 ## 누르면 그 간부를 고른다(누르기 두 번 — 간부 → 구역). 상태는 바꾸지 않고 신호만 올린다(ISP). 요구: FR-204 · 기획_차이 (나)18
 
 signal officer_pressed(officer: String)
@@ -15,8 +15,8 @@ class Card extends Button:
 	func _get_drag_data(_at: Vector2):
 		var prev := TextureRect.new()
 		prev.texture = tex
-		prev.custom_minimum_size = Vector2(144, 144)
-		prev.size = Vector2(144, 144)
+		prev.custom_minimum_size = Vector2(180, 180)
+		prev.size = Vector2(180, 180)
 		prev.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		prev.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		prev.position = -prev.size / 2.0
@@ -57,18 +57,16 @@ func show_cards(cards: Array, picked: String) -> void:
 		v.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		v.alignment = BoxContainer.ALIGNMENT_CENTER
 		b.add_child(v)
-		var r := TextureRect.new()
-		r.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		r.texture = b.tex
-		r.custom_minimum_size = Vector2(0, 112)
-		r.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		r.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		v.add_theme_constant_override("separation", 4)
+		var r: Control = sprites.box(c["id"], c["name"], 150) if sprites != null else Control.new()
+		r.size_flags_vertical = Control.SIZE_EXPAND_FILL
 		v.add_child(r)
-		for txt in [c["name"] + (" ★" if c["boss"] else ""), "●".repeat(c["left"]) + "○".repeat(c["total"] - c["left"])]:
+		for k in 2:
+			var txt: String = c["name"] + (" ★" if c["boss"] else "") if k == 0 else "●".repeat(c["left"]) + "○".repeat(c["total"] - c["left"])
 			var l := Label.new()
 			l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			l.text = txt
-			l.theme_type_variation = "TinyLabel"
+			l.theme_type_variation = "NameLabel" if k == 0 else "TinyLabel"
 			l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 			v.add_child(l)

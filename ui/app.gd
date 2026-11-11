@@ -165,6 +165,7 @@ func _setup_shot() -> void:
 
 func _build() -> void:
 	_top = PanelContainer.new()
+	_top.theme_type_variation = "TopPanel"
 	add_child(_top)
 	var th := HBoxContainer.new()
 	th.add_theme_constant_override("separation", 24)
@@ -345,6 +346,7 @@ func _refresh() -> void:
 	_cash.text = "%s %s · %s" % [View.org_name(_t, me), top["cash"], top["net"]]
 	_acts.text = top["actions"]
 	_map.selected = _zone
+	_map.me = me
 	_map.show_map(_t["map"]["zones"], _t["map"]["links"], View.map_nodes(s, _t, me), View.fronts(s, _t))
 	_strip.show_cards(View.officer_cards(s, _t, me, Draft.used(_draft)), _officer)
 	if _zone != "":
@@ -600,7 +602,18 @@ func _back() -> void:
 		_confirm.popup_centered()
 
 
+## 바탕 — 위는 남색 · 아래는 거의 검정(테마 Frame bg_top · bg_bottom). 띠 몇 줄로 나눠 칠한다(그림 자원 없이).
+func _draw() -> void:
+	var a := get_theme_color("bg_top", "Frame")
+	var b := get_theme_color("bg_bottom", "Frame")
+	var n := 24
+	for i in n:
+		draw_rect(Rect2(0, size.y * i / n, size.x, size.y / n + 1.0), a.lerp(b, float(i) / (n - 1)))
+
+
 func _notification(what: int) -> void:
+	if what == NOTIFICATION_RESIZED:
+		queue_redraw()
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
 		_back()
 	elif what == NOTIFICATION_APPLICATION_PAUSED:

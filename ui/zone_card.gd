@@ -70,15 +70,10 @@ func show_card(c: Dictionary) -> void:
 	_body.add_child(flow)
 	for o in c["officers"]:
 		var box := VBoxContainer.new()
-		box.custom_minimum_size = Vector2(150, 0)
-		var tex: Texture2D = sprites.portrait(o["id"]) if sprites != null else null
-		if tex != null:
-			var r := TextureRect.new()
-			r.texture = tex
-			r.custom_minimum_size = Vector2(96, 96)
-			r.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-			r.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-			box.add_child(r)
+		box.custom_minimum_size = Vector2(170, 0)
+		box.add_theme_constant_override("separation", 6)
+		if sprites != null:
+			box.add_child(sprites.box(o["id"], o["name"], 150))
 		box.add_child(_line("%s[%s]" % [o["name"], o["mark"]] + ("" if o["status"] == "움직임" else " · " + o["status"]), "TinyLabel"))
 		flow.add_child(box)
 

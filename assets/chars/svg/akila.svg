@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="384" height="384" viewBox="0 0 256 256">
+<!-- akila · scripts/draw_portraits.py 가 assets/chars/looks.json 에서 그림(손대지 않음) -->
+<defs><clipPath id="cb"><path d="M -8 256 C -4 224 30 204 74 194 C 92 190 104 184 112 176 L 144 176 C 152 184 164 190 182 194 C 226 204 260 224 264 256 Z"/></clipPath><linearGradient id="bg_fade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1a1424" stop-opacity="0"/><stop offset="1" stop-color="#1a1424" stop-opacity="0.38"/></linearGradient><clipPath id="f_akila"><path d="M 84 98 C 84 64 104 48 128 48 C 152 48 172 64 172 98 L 171 122 C 169 141 159 155 146 165 Q 128 178 110 165 C 97 155 87 141 85 122 Z"/></clipPath><linearGradient id="ig_akila" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3b2835"/><stop offset="1" stop-color="#89786a"/></linearGradient><clipPath id="e0_akila"><path d="M 121 121 Q 109 109 93 117.5 Q 107 126.6 121 121 Z"/></clipPath><clipPath id="e2_akila"><path d="M 135 121 Q 147 109 163 117.5 Q 149 126.6 135 121 Z"/></clipPath><clipPath id="h_akila"><path d="M 82 104 C 76 56 100 30 130 30 C 160 30 182 54 174 104 C 170 88 162 76 150 70 Q 128 62 104 70 C 94 76 86 88 82 104 Z"/></clipPath></defs>
+<path d="M 112 130 L 112 184 Q 128 196 144 184 L 144 130 Z" fill="#b29a8e" stroke="#3e323e" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 112 140 Q 128 172 144 140 L 144 166 Q 128 186 112 166 Z" fill="#857074" opacity="0.8"/>
+<path d="M -8 256 C -4 224 30 204 74 194 C 92 190 104 184 112 176 L 144 176 C 152 184 164 190 182 194 C 226 204 260 224 264 256 Z" fill="#846155" stroke="#18131d" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<g clip-path="url(#cb)"><path d="M 166 190 C 206 198 244 214 262 240 L 266 256 L 206 256 C 204 232 192 210 166 190 Z" fill="#60454d"/><ellipse cx="128" cy="184" rx="40" ry="12" fill="#50394a" opacity="0.45"/><rect x="0" y="176" width="256" height="80" fill="url(#bg_fade)"/></g>
+<path d="M 14 230 C 26 212 50 202 80 196" fill="none" stroke="#a98e81" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 104 184 L 128 244 L 152 184 Q 128 198 104 184 Z" fill="#191717" stroke="#18131d" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 106 182 L 115 210 L 128 194 Z" fill="#524f4b" stroke="#18131d" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 150 182 L 141 210 L 128 194 Z" fill="#1c181d" stroke="#18131d" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 100 186 L 128 246 L 96 214 L 98 204 Z" fill="#98796d" stroke="#18131d" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 156 186 L 128 246 L 160 214 L 158 204 Z" fill="#715251" stroke="#18131d" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<g transform="matrix(0.9 0 0 0.9 12.8 4)">
+<g fill="#342938" stroke="#342938" stroke-width="3" stroke-linejoin="round"><path d="M 85 102 C 72 98 70 128 84 134 Z"/><path d="M 171 102 C 184 98 186 128 172 134 Z"/><path d="M 84 98 C 84 64 104 48 128 48 C 152 48 172 64 172 98 L 171 122 C 169 141 159 155 146 165 Q 128 178 110 165 C 97 155 87 141 85 122 Z"/></g><g><path d="M 85 102 C 72 98 70 128 84 134 Z" fill="#b29a8e"/><path d="M 171 102 C 184 98 186 128 172 134 Z" fill="#b29a8e"/><path d="M 84 98 C 84 64 104 48 128 48 C 152 48 172 64 172 98 L 171 122 C 169 141 159 155 146 165 Q 128 178 110 165 C 97 155 87 141 85 122 Z" fill="#b29a8e"/></g>
+<g clip-path="url(#f_akila)"><path d="M 84 98 C 84 64 104 48 128 48 C 152 48 172 64 172 98 L 171 122 C 169 141 159 155 146 165 Q 128 178 110 165 C 97 155 87 141 85 122 Z" fill="#d5c3b6"/><g transform="translate(3 2)"><path d="M 84 98 C 84 64 104 48 128 48 C 152 48 172 64 172 98 L 171 122 C 169 141 159 155 146 165 Q 128 178 110 165 C 97 155 87 141 85 122 Z" fill="#b29a8e"/></g><path d="M 172 96 L 171 122 C 169 141 159 155 146 165 Q 128 178 110 165 C 128 168 142 160 151 146 C 160 132 163 114 161 96 Z" fill="#7d6870" opacity="0.5"/></g>
+<path d="M 82 108 Q 75 116 82 126" fill="none" stroke="#7d6870" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 174 108 Q 181 116 174 126" fill="none" stroke="#7d6870" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
+<g fill="#18131d" stroke="#18131d" stroke-width="2.4" stroke-linejoin="round"><path d="M 90 130 C 94 160 110 180 128 182 C 146 180 162 160 166 130 C 158 150 146 162 128 162 C 110 162 98 150 90 130 Z"/></g><g><path d="M 90 130 C 94 160 110 180 128 182 C 146 180 162 160 166 130 C 158 150 146 162 128 162 C 110 162 98 150 90 130 Z" fill="#5b3a26"/></g>
+<path d="M 118 170 Q 128 176 138 170" fill="none" stroke="#947c6a" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 114 151 Q 122 145 128 149 Q 134 145 142 151 Q 134 151 128 152 Q 122 151 114 151 Z" fill="#5b3a26" stroke="#18131d" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 121 121 Q 109 109 93 117.5 Q 107 126.6 121 121 Z" fill="#fbf7f0"/>
+<g clip-path="url(#e0_akila)"><path d="M 121 109 L 93 109 L 93 117.8 Q 107 113.4 121 117.8 Z" fill="#7d6870" opacity="0.35"/><ellipse cx="106.5" cy="120" rx="6.8" ry="8.8" fill="url(#ig_akila)" stroke="#392737" stroke-width="1.2"/><ellipse cx="106.5" cy="120.5" rx="2.9" ry="4.2" fill="#120d12"/></g>
+<circle cx="103.9" cy="116.8" r="2.2" fill="#ffffff"/>
+<circle cx="109.3" cy="123.5" r="1.2" fill="#ffffff" opacity="0.8"/>
+<path d="M 122 121.5 Q 109 107.5 91.5 117" fill="none" stroke="#18131d" stroke-width="3.8" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 101 125.5 Q 95 121.5 93 118.5" fill="none" stroke="#635060" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 115 104.5 Q 107 102.5 98 105.5" fill="none" stroke="#8a7577" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 121 101.4 Q 109 95.5 92 102.6" fill="none" stroke="#442c34" stroke-width="5.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 135 121 Q 147 109 163 117.5 Q 149 126.6 135 121 Z" fill="#fbf7f0"/>
+<g clip-path="url(#e2_akila)"><path d="M 135 109 L 163 109 L 163 117.8 Q 149 113.4 135 117.8 Z" fill="#7d6870" opacity="0.35"/><ellipse cx="149.5" cy="120" rx="6.8" ry="8.8" fill="url(#ig_akila)" stroke="#392737" stroke-width="1.2"/><ellipse cx="149.5" cy="120.5" rx="2.9" ry="4.2" fill="#120d12"/></g>
+<circle cx="146.9" cy="116.8" r="2.2" fill="#ffffff"/>
+<circle cx="152.3" cy="123.5" r="1.2" fill="#ffffff" opacity="0.8"/>
+<path d="M 134 121.5 Q 147 107.5 164.5 117" fill="none" stroke="#18131d" stroke-width="3.8" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 155 125.5 Q 161 121.5 163 118.5" fill="none" stroke="#635060" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 141 104.5 Q 149 102.5 158 105.5" fill="none" stroke="#8a7577" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 135 101.4 Q 147 95.5 164 102.6" fill="none" stroke="#442c34" stroke-width="5.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 130 124 L 134 140 Q 131 144 127 142 Q 130 136 130 124 Z" fill="#77626c" opacity="0.5"/>
+<path d="M 126 142 Q 130 145 134 141" fill="none" stroke="#705c68" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<ellipse cx="129" cy="138" rx="1.6" ry="1.2" fill="#ffffff" opacity="0.5"/>
+<path d="M 118 155 Q 128 156.1 138 154.5" fill="none" stroke="#433547" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 123 161 Q 128 162.5 133 161" fill="none" stroke="#8d7779" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 92 111 L 122 111 Q 123 128 118 131 L 96 131 Q 91 128 92 111 Z" fill="#625c53" opacity="0.85"/>
+<path d="M 97 116 L 104 116" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" opacity="0.55"/>
+<path d="M 92 111 L 122 111 Q 123 128 118 131 L 96 131 Q 91 128 92 111 Z" fill="none" stroke="#151515" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 134 111 L 164 111 Q 165 128 160 131 L 138 131 Q 133 128 134 111 Z" fill="#625c53" opacity="0.85"/>
+<path d="M 139 116 L 146 116" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" opacity="0.55"/>
+<path d="M 134 111 L 164 111 Q 165 128 160 131 L 138 131 Q 133 128 134 111 Z" fill="none" stroke="#151515" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 122 115 Q 128 111 134 115" fill="none" stroke="#151515" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<g fill="#18131d" stroke="#18131d" stroke-width="3" stroke-linejoin="round"><path d="M 82 104 C 76 56 100 30 130 30 C 160 30 182 54 174 104 C 170 88 162 76 150 70 Q 128 62 104 70 C 94 76 86 88 82 104 Z"/></g><g><path d="M 82 104 C 76 56 100 30 130 30 C 160 30 182 54 174 104 C 170 88 162 76 150 70 Q 128 62 104 70 C 94 76 86 88 82 104 Z" fill="#5b3a26"/></g>
+<g clip-path="url(#h_akila)"><path d="M 82 104 C 76 56 100 30 130 30 C 160 30 182 54 174 104 C 170 88 162 76 150 70 Q 128 62 104 70 C 94 76 86 88 82 104 Z" fill="#ad9887"/><g transform="translate(3.5 3)"><path d="M 82 104 C 76 56 100 30 130 30 C 160 30 182 54 174 104 C 170 88 162 76 150 70 Q 128 62 104 70 C 94 76 86 88 82 104 Z" fill="#5b3a26"/></g><path d="M 150 70 C 168 76 176 90 174 104 C 174 70 158 44 134 36 C 152 44 158 58 150 70 Z" fill="#4a2f31"/><path d="M 96 50 C 112 38 144 38 160 50 L 157 55 C 142 45 114 45 99 56 Z" fill="#ad9887" opacity="0.45"/><path d="M 96 70 C 100 52 110 42 124 38" fill="none" stroke="#4a2f31" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><path d="M 112 70 C 116 52 126 42 140 38" fill="none" stroke="#4a2f31" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><path d="M 128 70 C 132 52 142 42 156 38" fill="none" stroke="#4a2f31" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><path d="M 144 70 C 148 52 158 42 172 38" fill="none" stroke="#4a2f31" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></g>
+</g>
+</svg>

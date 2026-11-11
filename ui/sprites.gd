@@ -1,52 +1,43 @@
 extends RefCounted
-## 인물 도트 칸 — assets/chars/index.json(scripts/import_chars.py 가 만든 색인)을 읽어 canon id → AtlasTexture(초상 32×32 · 서기 24×32).
-## 그림이 없는 인물(색인 missing · 외형 없음)은 null — 부른 쪽이 세력색 바탕 + 이름 첫 글자로 대신한다(설계서 5절).
-## 그림은 최근접 필터(project.godot 기본 텍스처 필터). 요구: FR-212 · 출처: assets/ASSETS.md
+## 인물 초상 — assets/chars/svg/<canon id>.svg(scripts/draw_portraits.py 가 assets/chars/looks.json 에서 그린 벡터 일러스트 · 384px 로 가져옴).
+## 그림이 없는 인물은 null — 부른 쪽(또는 box())이 이름 첫 글자로 대신한다. 배경판은 테마 PortraitPanel(ui/theme.tres).
+## 도트(취호전 시트)는 2026-11-11 에 그만 썼다(사용자 지시 · docs/기획_차이.md (라)12). 요구: FR-212 · 출처: assets/ASSETS.md
 
-const INDEX := "res://assets/chars/index.json"
-const PORTRAITS := "res://assets/chars/portraits.png"
-const FIGURES := "res://assets/chars/figures.png"
+const DIR := "res://assets/chars/svg/"
+## 얼굴 둘레(그림 384px 안) — 지도 위 동그란 패에 머리만 넣을 때 쓴다(머리 공간 → 화면: scripts/draw_portraits.py HEAD)
+const HEAD_REGION := Rect2(84, 24, 216, 216)
 
-var _ids: Dictionary = {}
-var _cols := 16
-var _cell := {"portrait": Vector2(32, 32), "figure": Vector2(24, 32)}
-var _tex := {}
 var _cache := {}
 
 
-func _init() -> void:
-	if not FileAccess.file_exists(INDEX):
-		return
-	var d = JSON.parse_string(FileAccess.get_file_as_string(INDEX))
-	if not (d is Dictionary):
-		return
-	_ids = d.get("ids", {})
-	_cols = int(d.get("cols", 16))
-	for k in ["portrait", "figure"]:
-		var c: Array = d.get("cell", {}).get(k, [])
-		if c.size() == 2:
-			_cell[k] = Vector2(c[0], c[1])
-	_tex["portrait"] = load(PORTRAITS)
-	_tex["figure"] = load(FIGURES)
-
-
 func portrait(id: String) -> Texture2D:
-	return _atlas("portrait", id)
+	if not _cache.has(id):
+		var p := DIR + id + ".svg"
+		_cache[id] = load(p) if ResourceLoader.exists(p) else null
+	return _cache[id]
 
 
-func figure(id: String) -> Texture2D:
-	return _atlas("figure", id)
-
-
-func _atlas(kind: String, id: String) -> Texture2D:
-	if not _ids.has(id) or _tex.get(kind) == null:
-		return null
-	var key := kind + ":" + id
-	if not _cache.has(key):
-		var n := int(_ids[id])
-		var a := AtlasTexture.new()
-		a.atlas = _tex[kind]
-		var c: Vector2 = _cell[kind]
-		a.region = Rect2(Vector2(n % _cols, n / _cols) * c, c)
-		_cache[key] = a
-	return _cache[key]
+## 초상 한 칸 — 테마 판(PortraitPanel) 위에 그림(없으면 이름 첫 글자). 누름은 통과시킨다.
+func box(id: String, name: String, side: float) -> Control:
+	var p := PanelContainer.new()
+	p.theme_type_variation = "PortraitPanel"
+	p.custom_minimum_size = Vector2(side, side)
+	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	p.clip_contents = true
+	var tex := portrait(id)
+	if tex != null:
+		var r := TextureRect.new()
+		r.texture = tex
+		r.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		r.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		r.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		p.add_child(r)
+	else:
+		var l := Label.new()
+		l.text = name.left(1)
+		l.theme_type_variation = "CardTitle"
+		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		p.add_child(l)
+	return p

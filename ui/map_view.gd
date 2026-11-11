@@ -1,5 +1,5 @@
 extends Control
-## 지도 그리기 — 구역 노드(세력색 + 세력 글자 · 이름 · 경찰 압력 3칸) · 땅길 · 전선 · 내 간부 서기 그림 · 남의 간부 수 · 고른 구역 · 끌어 놓을 자리.
+## 지도 그리기 — 거리 격자 바닥 · 구역 패(세력색 + 세력 글자 · 이름판 · 경찰 압력 3칸 · 내 구역 금테) · 땅길 · 전선(붉은 빛) · 내 간부 얼굴 패 · 남의 간부 수 · 고른 구역 · 끌어 놓을 자리.
 ## 계산은 ui/map_layout.gd(맞춤 · 반지름 · 누르기)와 ui/view.gd(노드 · 전선 보기)가 하고, 이 장면은 그리고 누름 · 끌어 놓기를 올린다(ISP).
 ## 색 · 치수는 테마 Map · Faction(ui/theme.tres). 설계: docs/C2_설계서_화면과명령.md 3절 · 요구: FR-202 · FR-204
 
@@ -9,6 +9,7 @@ signal zone_pressed(zone: String)
 signal officer_dropped(officer: String, zone: String)
 
 var sprites = null                     # ui/sprites.gd
+var me := ""                           # 내 조직 id — 내 구역은 금테 · 금 이름판
 var _coords: Dictionary = {}
 var _nodes: Array = []
 var _links: Array = []
@@ -70,43 +71,118 @@ func _faction(org: String) -> Color:
 
 
 func _draw() -> void:
-	draw_rect(Rect2(Vector2.ZERO, size), _col("bg"))
-	var font := get_theme_default_font()
+	_draw_ground()
+	for p in _links:
+		draw_line(_pts[p[0]], _pts[p[1]], _col("link_casing"), float(_c("line_w")) * 2.4, true)
 	for p in _links:
 		draw_line(_pts[p[0]], _pts[p[1]], _col("link"), float(_c("line_w")), true)
+		_dashes(_pts[p[0]], _pts[p[1]], _col("link_hi"), 2.0, 14.0, 22.0)
 	for p in _fronts:
 		if _pts.has(p[0]) and _pts.has(p[1]):
+			draw_line(_pts[p[0]], _pts[p[1]], _col("front_glow"), float(_c("front_w")) * 3.0, true)
 			draw_line(_pts[p[0]], _pts[p[1]], _col("front"), float(_c("front_w")), true)
+			_dashes(_pts[p[0]], _pts[p[1]], _col("select"), 3.0, 10.0, 26.0)
+	for n in _nodes:
+		var c: Vector2 = _pts.get(n["id"], Vector2(-1, -1))
+		if c.x >= 0:
+			_draw_node(n, c)
+
+
+## 바닥 — 어두운 거리 격자(구역 사이 길 느낌) + 가장자리 그늘. 무늬는 칸 번호로만 정해 같은 화면이면 늘 같다.
+func _draw_ground() -> void:
+	draw_rect(Rect2(Vector2.ZERO, size), _col("bg"))
+	var g := float(_c("grid"))
+	var cols := int(size.x / g) + 2
+	var rows := int(size.y / g) + 2
+	for j in rows:
+		for i in cols:
+			var k := (i * 7 + j * 13) % 5
+			var inset := 6.0 + float(k)
+			var r := Rect2(Vector2(i * g + inset, j * g + inset), Vector2(g - inset * 2.0, g - inset * 2.0))
+			if k != 0:
+				draw_rect(r, _col("block"))
+	for i in range(0, cols, 4):
+		draw_line(Vector2(i * g, 0), Vector2(i * g, size.y), _col("street"), 3.0)
+	for j in range(0, rows, 4):
+		draw_line(Vector2(0, j * g), Vector2(size.x, j * g), _col("street"), 3.0)
+	var v := _col("vignette")
+	var edge := minf(size.x, size.y) * 0.18
+	for k in 6:
+		var a := v.a * (1.0 - k / 6.0) * 0.35
+		var w := edge * (1.0 - k / 6.0)
+		var cc := Color(v.r, v.g, v.b, a)
+		draw_rect(Rect2(0, 0, size.x, w), cc)
+		draw_rect(Rect2(0, size.y - w, size.x, w), cc)
+		draw_rect(Rect2(0, 0, w, size.y), cc)
+		draw_rect(Rect2(size.x - w, 0, w, size.y), cc)
+
+
+func _dashes(a: Vector2, b: Vector2, col: Color, w: float, dash: float, gap: float) -> void:
+	var d := b - a
+	var dl := d.length()
+	if dl <= 0.0:
+		return
+	var u := d / dl
+	var t := _r * 0.9
+	while t + dash < dl - _r * 0.9:
+		draw_line(a + u * t, a + u * (t + dash), col, w, true)
+		t += dash + gap
+
+
+func _draw_node(n: Dictionary, c: Vector2) -> void:
 	var name_fs := get_theme_font_size("name", "Map")
 	var mark_fs := get_theme_font_size("mark", "Map")
 	var small_fs := get_theme_font_size("small", "Map")
-	for n in _nodes:
-		var c: Vector2 = _pts.get(n["id"], Vector2(-1, -1))
-		if c.x < 0:
-			continue
-		draw_circle(c, _r, _faction(n["owner"]))
-		var ring := _col("select") if n["id"] == selected else (_col("drop") if n["id"] == _hover else Color(0, 0, 0, 0))
-		if ring.a > 0.0:
-			draw_arc(c, _r + float(_c("ring_w")), 0.0, TAU, 64, ring, float(_c("ring_w")) * 1.5, true)
-		draw_string(font, c + Vector2(-_r, mark_fs * 0.35), n["mark"], HORIZONTAL_ALIGNMENT_CENTER, _r * 2.0, mark_fs, _col("mark"))
-		draw_string(font, c + Vector2(-_r * 2.0, _r + name_fs + 6.0), n["name"], HORIZONTAL_ALIGNMENT_CENTER, _r * 4.0, name_fs, _col("text"))
-		var pip := Vector2(_r * 0.28, _r * 0.12)
-		for i in 3:
-			var at := c + Vector2(-pip.x * 1.65 + i * pip.x * 1.1, -_r - pip.y - 10.0)
-			draw_rect(Rect2(at, pip), _col("police_on") if i < int(n["police_lv"]) else _col("police_off"))
-		var k := float(_c("fig_scale"))
-		var x := c.x + _r * 0.55
-		for id in n["mine"]:
-			var tex: Texture2D = sprites.figure(id) if sprites != null else null
-			var sz := Vector2(24, 32) * k
-			var at := Vector2(x, c.y + _r * 0.2 - sz.y * 0.5)
-			if tex != null:
-				draw_texture_rect(tex, Rect2(at, sz), false)
-			else:
-				draw_rect(Rect2(at + Vector2(sz.x * 0.2, sz.y * 0.3), sz * Vector2(0.6, 0.7)), _col("select"))
-			x += sz.x * 0.6
-		if int(n["others"]) > 0:
-			draw_string(font, c + Vector2(-_r * 1.6, _r * 0.15), "남 %d" % int(n["others"]), HORIZONTAL_ALIGNMENT_LEFT, -1, small_fs, _col("text"))
+	var bold := get_theme_font("bold", "Map")
+	var body := get_theme_font("body", "Map")
+	var mine: bool = me != "" and n["owner"] == me
+	var fc := _faction(n["owner"])
+	draw_circle(c + Vector2(0, _r * 0.1), _r * 1.06, _col("node_shadow"))
+	if n["id"] == selected or n["id"] == _hover:
+		var ring := _col("select") if n["id"] == selected else _col("drop")
+		draw_circle(c, _r * 1.32, _col("select_glow"))
+		draw_arc(c, _r * 1.18, 0.0, TAU, 72, ring, float(_c("ring_w")), true)
+	draw_circle(c, _r + 6.0, _col("mine_ring") if mine else _col("node_rim"))
+	draw_circle(c, _r, fc.darkened(0.28))
+	draw_circle(c + Vector2(-_r * 0.06, -_r * 0.08), _r * 0.9, fc)
+	draw_circle(c + Vector2(-_r * 0.28, -_r * 0.32), _r * 0.42, _col("node_light"))
+	draw_arc(c, _r * 0.78, PI * 0.15, PI * 0.85, 24, _col("node_dark"), _r * 0.12, true)
+	draw_arc(c, _r * 0.74, 0.0, TAU, 64, Color(fc.darkened(0.45), 0.6), 2.0, true)
+	draw_string(bold, c + Vector2(-_r, mark_fs * 0.36), n["mark"], HORIZONTAL_ALIGNMENT_CENTER, _r * 2.0, mark_fs, _col("mark"))
+	# 이름 판
+	var sb: StyleBox = get_theme_stylebox("plate_mine" if mine else "plate", "Map")
+	var tw := body.get_string_size(n["name"], HORIZONTAL_ALIGNMENT_LEFT, -1, name_fs).x
+	var pr := Rect2(c + Vector2(-tw * 0.5 - sb.content_margin_left, _r + 14.0), Vector2(tw + sb.content_margin_left + sb.content_margin_right, name_fs * 1.3 + sb.content_margin_top + sb.content_margin_bottom))
+	draw_style_box(sb, pr)
+	draw_string(body, Vector2(pr.position.x + sb.content_margin_left, pr.position.y + sb.content_margin_top + name_fs * 1.02), n["name"], HORIZONTAL_ALIGNMENT_LEFT, -1, name_fs, _col("text"))
+	# 경찰 압력 3칸
+	var pip := maxf(_r * 0.09, 6.0)
+	for i in 3:
+		var at := c + Vector2((i - 1) * pip * 2.8, -_r - pip - 14.0)
+		draw_circle(at, pip + 2.0, _col("node_rim"))
+		draw_circle(at, pip, _col("police_on") if i < int(n["police_lv"]) else _col("police_off"))
+	# 내 간부 — 동그란 얼굴 패(구역 아래쪽에 가운데 맞춰 한 줄 · 세력 글자를 가리지 않게)
+	var ids: Array = n["mine"]
+	var tr := minf(float(_c("token_r")), _r * 0.42)
+	var step := tr * 1.55
+	var x := c.x - step * (ids.size() - 1) * 0.5
+	for id in ids:
+		var tc := Vector2(x, c.y + _r * 0.74)
+		draw_circle(tc + Vector2(0, 3), tr + 4.0, _col("node_shadow"))
+		draw_circle(tc, tr + 4.0, _col("token_ring"))
+		draw_circle(tc, tr, _col("token_bg"))
+		var tex: Texture2D = sprites.portrait(id) if sprites != null else null
+		if tex != null:
+			var side := tr * 1.42
+			draw_texture_rect_region(tex, Rect2(tc - Vector2(side, side) * 0.5, Vector2(side, side)), sprites.HEAD_REGION)
+		x += step
+	if int(n["others"]) > 0:
+		var txt := "남 %d" % int(n["others"])
+		var w := body.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, small_fs).x + 20.0
+		var br := Rect2(c + Vector2(-_r * 1.05 - w, -small_fs * 0.8), Vector2(w, small_fs * 1.5))
+		draw_rect(br, _col("badge"))
+		draw_rect(br, _col("front"), false, 2.0)
+		draw_string(body, br.position + Vector2(10, small_fs * 1.08), txt, HORIZONTAL_ALIGNMENT_LEFT, -1, small_fs, _col("text"))
 
 
 func _gui_input(event: InputEvent) -> void:

@@ -50,14 +50,9 @@ class OrgPage extends PanelContainer:
 			row.theme_type_variation = "RowPanel"
 			var h := HBoxContainer.new()
 			row.add_child(h)
-			var tex: Texture2D = sprites.portrait(p["id"]) if sprites != null else null
-			if tex != null:
-				var r := TextureRect.new()
-				r.texture = tex
-				r.custom_minimum_size = Vector2(96, 96)
-				r.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-				r.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-				h.add_child(r)
+			h.add_theme_constant_override("separation", 20)
+			if sprites != null:
+				h.add_child(sprites.box(p["id"], p["name"], 128))
 			var l: Label = T._line(h, "%s · %s · %s\n충성 %s · %s · %s" % [p["name"], p["post"], p["rank"], p["loyalty"], p["status"], p["zone_name"]])
 			l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			_v.add_child(row)
