@@ -8,6 +8,7 @@
   공통 데이터   data/common/ 받은 파일이 도장 SOURCE.json 의 sha256(CRLF → LF)과 같다(손으로 고치지 않았다). 옆 castle_common
                 (환경 변수 CASTLE_COMMON, 없으면 ../castle_common)이 앞서 있으면 알림(--strict 는 실패). 받기 전이면 건너뛴다
   자산 출처     assets/ 의 파일(.import 빼고)이 모두 assets/ASSETS.md 에 있고, 목록에만 있는 파일이 없다
+  도트 묶음     scripts/import_chars.py --check — assets/chars/ 묶음 그림 크기 = 칸 수 · id 가 canon 에 있음 · 명단 인물이 색인에 있음(C2 FR-212)
   기준 구현     tools/rng_ref.py --check — 기대값 파일이 기준 구현 그대로이고, PCG32 공개 데모 수열과 같다
   가져오기      godot --headless --path . --import (스크립트 문법 · 자원)
   시험          godot --headless --path . -s res://tests/run_tests.gd (tests/unit = A · tests/integration = B)
@@ -40,12 +41,12 @@ COMMON_SRC = os.environ.get("CASTLE_COMMON") or os.path.join(os.path.dirname(ROO
 RECEIVES = ("data/*.json", "cases/*.json", "canon/*.json", "packs/strategy/*.json", "docs/개발규격/*.md")  # docs/castle_common_요청.md #14
 ASSETS = os.path.join(ROOT, "assets")
 GOLDEN = os.path.join(ROOT, "tests", "integration", "golden_a.json")   # 시나리오 A 26턴 기준 해시(seed → hash)
-# CLAUDE.md 3절 TDD 등급 — 함수 단위 커버리지를 재는 파일(화면 장면 ui/home.gd · 진입 src/main.gd 는 C · 화면 단계가 본다)
+# CLAUDE.md 3절 TDD 등급 — 함수 단위 커버리지를 재는 파일(화면 장면 ui/app.gd 와 부품 · 진입 src/main.gd 는 C · 화면 단계가 본다)
 COV_FILES = {
     "A": ["sim/rng.gd", "sim/hash.gd", "src/launch.gd", "ui/layout.gd",
           "sim/rules_common.gd", "sim/tables.gd", "sim/state.gd", "sim/fixed.gd", "sim/economy.gd", "sim/setup.gd",
           "sim/orders.gd", "sim/kinds/move.gd", "sim/kinds/open.gd", "sim/kinds/expand.gd", "sim/kinds/recruit.gd",
-          "sim/kinds/rest.gd", "sim/save.gd"],
+          "sim/kinds/rest.gd", "sim/save.gd", "ui/map_layout.gd", "ui/view.gd", "sim/draft.gd"],
     "B": ["src/storage.gd", "src/data_files.gd", "sim/turn.gd", "sim/ai.gd", "sim/game.gd"],
 }
 COV_DIRS = ("sim", "src", "ui", "tests", "data")
@@ -288,6 +289,8 @@ def main():
     t0 = time.time()
     results = [r for r in (step_common(strict),) if r is not None]
     results.append(step_assets())
+    results.append(run("도트 묶음", [sys.executable, "-B", os.path.join("scripts", "import_chars.py"), "--check"],
+                       lambda out: (True, (re.findall(r"^chars: .*$", out, re.M) or [""])[-1])))
     results.append(run("기준 구현", [sys.executable, "-B", os.path.join("tools", "rng_ref.py"), "--check"]))
     with open(GOLDEN, encoding="utf-8") as f:
         want = {int(k): v for k, v in json.load(f)["hash"].items()}

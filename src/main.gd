@@ -2,15 +2,15 @@ extends Control
 ## 진입점(main.tscn) — 실행 인자(src/launch.gd)에 따라:
 ##   --autoplay  화면 없이 시나리오 A 를 --turns 턴 자동 진행(모든 조직 AI)하고 RESULT 한 줄을 찍고 끝낸다(scripts/verify.py 가 읽는다).
 ##               불변식 위반이 있으면 VIOLATION 줄 · 종료 코드 1, 데이터 오류면 DATA 줄 · 종료 코드 3
-##   (없음)      화면(ui/home.gd)을 띄운다. --shot PATH 면 --shot-frame 번째 프레임을 PNG 로 찍고 끝낸다(xvfb · CI)
+##   (없음)      화면(ui/app.gd)을 띄운다. --shot PATH 면 --shot-frame 번째 프레임을 PNG 로 찍고 끝낸다(xvfb · CI)
 ## 인자가 틀리면 ARGS 줄을 찍고 종료 코드 2. 요구: FR-106 · FR-107 · FR-119 · 설계: docs/C1_설계서_상태와턴.md 1절
 
 const Launch = preload("res://src/launch.gd")
 const DataFiles = preload("res://src/data_files.gd")
 const Game = preload("res://sim/game.gd")
 const State = preload("res://sim/state.gd")
-const Home = preload("res://ui/home.gd")
-const GAME_VERSION := "0.1.0"
+const App = preload("res://ui/app.gd")
+const GAME_VERSION := "0.2.0"
 const SCENARIO := "A"
 
 var _args: Dictionary = {}
@@ -27,10 +27,11 @@ func _ready() -> void:
 	if _args["autoplay"]:
 		get_tree().quit(_autoplay())
 		return
-	var home = Home.new()
-	home.version = GAME_VERSION
-	home.common_sha = DataFiles.source_sha().substr(0, 7)
-	add_child(home)
+	var app = App.new()
+	app.version = GAME_VERSION
+	app.common_sha = DataFiles.source_sha().substr(0, 7)
+	app.args = _args
+	add_child(app)
 	set_process(_args["shot"] != "")
 
 

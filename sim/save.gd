@@ -1,14 +1,16 @@
 extends RefCounted
 ## 저장 형식 v1 — 사전 ↔ 글(정규형 JSON · 정수만). 파일 읽기 · 쓰기는 src/storage.gd 가 한다(sim/ 은 파일을 쓰지 않는다).
 ## {"format": "castle_strategy.save", "format_version": 1, "game_version", "castle_common", "seed", "scenario", "player", "mode", "turn",
-##  "state": GameState v1(빈 사전이면 명령 기록을 다시 돌려 만든다 — sim/game.gd from_save), "orders": [{"turn", "orders": [명령]}]}
+##  "state": GameState v1(빈 사전이면 명령 기록을 다시 돌려 만든다 — sim/game.gd from_save), "orders": [{"turn", "orders": [명령]}],
+##  "pending": [이번 주 대기 명령](C2 선택 칸 — 없으면 [] · 꼴이 틀린 것은 버리고 알림 · 형식 버전은 그대로 — C2 설계서 6절)}
 ## 불러오기: 깨짐 · 다른 형식 · 더 새 판은 오류(원본 파일은 부른 쪽이 그대로 둔다) → 옛 판은 MIGRATE 를 차례로 → replaced_by 로 id 옮기기.
 ## v0 = C1-0 빈 시뮬 저장({v, seed, turn, acc, last}) — 같은 시드의 새 판(A)으로 옮긴다.
-## 설계: docs/C1_설계서_상태와턴.md 3-7 · 요구: FR-118 · 시험: tests/unit/test_save.gd · tests/integration/test_save_resume.gd
+## 설계: docs/C1_설계서_상태와턴.md 3-7 · 요구: FR-118 · FR-213 · 시험: tests/unit/test_save.gd · tests/integration/test_save_resume.gd
 
 const State = preload("res://sim/state.gd")
 const StateHash = preload("res://sim/hash.gd")
 const Tables = preload("res://sim/tables.gd")
+const Orders = preload("res://sim/orders.gd")
 const FORMAT := "castle_strategy.save"
 const FORMAT_VERSION := 1
 const META := ["game_version", "castle_common", "seed", "scenario", "player", "mode"]
@@ -16,9 +18,9 @@ const MIGRATE := {0: "_v0_to_v1"}
 const V0_KEYS := ["v", "seed", "turn", "acc", "last"]
 
 
-static func make(meta: Dictionary, state: Dictionary, log: Array) -> Dictionary:
+static func make(meta: Dictionary, state: Dictionary, log: Array, pending: Array = []) -> Dictionary:
 	var sv := {"format": FORMAT, "format_version": FORMAT_VERSION, "turn": int(state.get("turn", 1)),
-		"state": State.to_dict(state), "orders": log.duplicate(true)}
+		"state": State.to_dict(state), "orders": log.duplicate(true), "pending": pending.duplicate(true)}
 	for k in META:
 		sv[k] = meta.get(k, "" if k != "seed" else 0)
 	return sv
@@ -64,6 +66,15 @@ static func from_text(text: String, t: Dictionary) -> Dictionary:
 		if not r["errors"].is_empty():
 			return {"save": {}, "errors": r["errors"], "notes": notes}
 		d["state"] = r["state"]
+	var raw = d.get("pending", [])
+	var keep := []
+	for o in (raw if raw is Array else []):
+		if Orders.shape_error(o) == "":
+			keep.append(o)
+	var dropped: int = (raw.size() if raw is Array else 1) - keep.size()
+	if dropped > 0:
+		notes.append("대기 명령 %d개 버림(꼴이 틀림)" % dropped)
+	d["pending"] = keep
 	_rename(d, t, notes)
 	return {"save": d, "errors": [], "notes": notes}
 
@@ -104,8 +115,10 @@ static func _rename(d: Dictionary, t: Dictionary, notes: Array) -> void:
 			z["owner"] = cur.call(z["owner"])
 			for sl in z["slots"]:
 				sl["org"] = cur.call(sl["org"])
-	for entry in d["orders"]:
-		for o in entry.get("orders", []):
+	var lists: Array = d["orders"].map(func(e): return e.get("orders", []))
+	lists.append(d.get("pending", []))
+	for list in lists:
+		for o in list:
 			for f in ["org", "by", "to"]:
 				if o.has(f):
 					o[f] = cur.call(o[f])

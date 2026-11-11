@@ -132,15 +132,15 @@ jobs:
         run: |
           set -e
           unzip -l "build/$APK.apk" > build/apk_list.txt
-          for f in sim/rng.gd sim/hash.gd sim/turn.gd sim/rules_common.gd sim/tables.gd src/main.gd ui/home.gd \
-                   data/game/economy.json data/common/packs/strategy/scenarios.json data/common/canon/characters.json; do
+          for f in sim/rng.gd sim/hash.gd sim/turn.gd sim/rules_common.gd sim/tables.gd src/main.gd ui/app.gd sim/draft.gd ui/view.gd \
+                   data/game/economy.json data/common/packs/strategy/scenarios.json data/common/canon/characters.json assets/chars/index.json; do
             grep -qE "assets/${f}c?$" build/apk_list.txt || { echo "::error::APK 에 $f 가 없다"; exit 1; }
           done
           if grep -q "assets/tests/" build/apk_list.txt; then echo "::error::시험(tests/)이 APK 에 들었다"; exit 1; fi
           if grep -q "assets/data/common/cases/" build/apk_list.txt; then echo "::error::cases 가 APK 에 들었다"; exit 1; fi
           echo "APK 에 판정 · 화면 코드 있음 · 시험 없음 · 크기 $(stat -c %s "build/$APK.apk") 바이트"
 
-      - name: 화면 찍기 (가상 화면 · 폰 세로 1080x2340 · 폴드 안쪽 1812x2176)
+      - name: 화면 찍기 (가상 화면 · 폰 세로 1080x2340 구역 카드 · 보고 · 폴드 안쪽 1812x2176)
         if: ${{ !cancelled() }}
         continue-on-error: true
         timeout-minutes: 10
@@ -148,10 +148,12 @@ jobs:
           sudo apt-get update -q && sudo apt-get install -y -q xvfb libgl1 libgl1-mesa-dri libglx-mesa0 libegl1 \
             libx11-6 libxcursor1 libxinerama1 libxrandr2 libxi6 libxext6 libxrender1 libxkbcommon0 > /dev/null
           mkdir -p shots
-          for s in 1080x2340:phone 1812x2176:fold_inner; do
-            R=${s%%:*}; N=${s##*:}
+          # 해상도:이름:장면(C2 FR-217 --view) — 맡기기로 2주 둔 뒤(--week 3)
+          for s in 1080x2340:phone_card:card 1080x2340:phone_report:report 1812x2176:fold_inner_card:card; do
+            R=${s%%:*}; rest=${s#*:}; N=${rest%%:*}; V=${rest##*:}
             timeout 240 xvfb-run -a -s "-screen 0 ${R}x24" "$GODOT" --path . --rendering-driver opengl3 --audio-driver Dummy \
-              --resolution "$R" -- --shot "$PWD/shots/$N.png" --shot-frame 30 2>&1 | grep --line-buffered -vE "^\s*$" || true
+              --resolution "$R" -- --shot "$PWD/shots/$N.png" --shot-frame 30 --view "$V" --week 3 2>&1 \
+              | grep --line-buffered -vE "^\s*$|^UI " || true
           done
           ls -la shots
 

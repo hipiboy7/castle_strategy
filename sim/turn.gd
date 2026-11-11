@@ -9,6 +9,7 @@ const State = preload("res://sim/state.gd")
 const Orders = preload("res://sim/orders.gd")
 const Economy = preload("res://sim/economy.gd")
 const PHASES := ["plan", "move", "manage", "intrigue", "diplomacy", "clash", "events", "council", "settle"]
+const ORDER_PHASES := ["plan", "move", "manage"]      # 명령이 바로 바꾸는 단계(미리 보기)
 const HANDLERS := {
 	"plan": {"mod": Orders, "fn": "plan"},
 	"move": {"mod": Orders, "fn": "run_phase"},
@@ -18,14 +19,21 @@ const HANDLERS := {
 
 
 static func run(state: Dictionary, orders: Array, t: Dictionary) -> Dictionary:
+	var r := phases(state, orders, t, PHASES)
+	r["report"]["invariants"] = State.check_invariants(r["state"], t)
+	r["state"]["turn"] += 1
+	return r
+
+
+## 단계 일부만 돌린다(입력 상태 불변 · 턴을 넘기지 않음) — 대기 명령 미리 보기(sim/draft.gd)가 ORDER_PHASES 로 부른다.
+## 같은 ctx(seed · turn · 단계 · 대상 id 갈래 난수)라 그 단계의 결과는 run 과 같다(C2 설계서 4절)
+static func phases(state: Dictionary, orders: Array, t: Dictionary, names: Array) -> Dictionary:
 	var s := State.to_dict(state)
 	var report := {"turn": s["turn"], "applied": [], "rejected": [], "events": [], "money": {}, "invariants": []}
 	var ctx := {"t": t, "seed": s["seed"], "turn": s["turn"], "phase": "", "all": orders, "accepted": {}, "report": report}
 	for phase in PHASES:
-		if not HANDLERS.has(phase):
+		if not HANDLERS.has(phase) or not names.has(phase):
 			continue
 		ctx["phase"] = phase
 		HANDLERS[phase]["mod"].call(HANDLERS[phase]["fn"], s, ctx)
-	report["invariants"] = State.check_invariants(s, t)
-	s["turn"] += 1
 	return {"state": s, "report": report}
