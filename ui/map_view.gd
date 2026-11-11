@@ -174,7 +174,7 @@ func _draw_node(n: Dictionary, c: Vector2) -> void:
 		var tex: Texture2D = sprites.portrait(id) if sprites != null else null
 		if tex != null:
 			var side := tr * 1.42
-			draw_texture_rect_region(tex, Rect2(tc - Vector2(side, side) * 0.5, Vector2(side, side)), sprites.HEAD_REGION)
+			draw_texture_rect_region(tex, Rect2(tc - Vector2(side, side) * 0.5, Vector2(side, side)), sprites.head_region(id))
 		x += step
 	if int(n["others"]) > 0:
 		var txt := "남 %d" % int(n["others"])

@@ -1,8 +1,8 @@
 # 자산 출처 — 모든 자산은 여기 있어야 한다
 
-> 정정 이력: 2026-11-10 — 첫 작성(C1-0). 2026-11-10(C2) — 인물 도트 묶음 `chars/` 세 줄(취호전 시트 내보내기 · 보류 #2 답). 2026-11-11 — 도트를 그만 쓰고(사용자 지시 · `docs/기획_차이.md` (라)12) 벡터 초상 두 줄(`chars/looks.json` · `chars/svg/*.svg`)과 글꼴 Noto Sans KR 로 바꿨다. 옛 도트 묶음 · Galmuri11 은 지웠다(git 이력에 있음).
+> 정정 이력: 2026-11-10 — 첫 작성(C1-0). 2026-11-10(C2) — 인물 도트 묶음 `chars/` 세 줄(취호전 시트 내보내기 · 보류 #2 답). 2026-11-11 — 도트를 그만 쓰고(사용자 지시 · `docs/기획_차이.md` (라)12) 벡터 초상 두 줄(`chars/looks.json` · `chars/svg/*.svg`)과 글꼴 Noto Sans KR 로 바꿨다. 옛 도트 묶음 · Galmuri11 은 지웠다(git 이력에 있음). 2026-11-11 — 원작 공식 인물 카드 초상 두 줄(`chars/cut/` · 개인 빌드 전용 · 사용자 답 (나) · `docs/기획_차이.md` (라)14).
 
-`scripts/verify.py` '자산 출처' 단계가 `assets/` 의 파일(`.import` 빼고)과 아래 표 첫 칸을 대조한다(CLAUDE.md 13절). 원작 컷 · 원작 그림을 쓴 자산은 아직 없다 — 생기면 원작 위치(`화/컷`)를 적고, 배포 빌드에서는 기본으로 뺀다.
+`scripts/verify.py` '자산 출처' 단계가 `assets/` 의 파일(`.import` 빼고)과 아래 표 첫 칸을 대조한다(CLAUDE.md 13절). 원작 그림을 쓴 자산은 `chars/cut/` 뿐이다(공식 인물 카드 — 화/컷이 아니라 카드 파일 이름을 원작 위치로 적는다). **개인 빌드 전용**이고 배포 빌드에서는 기본으로 뺀다(`export_presets.cfg` exclude_filter 에 `assets/chars/cut/*` — 배포 때 다시 묻는다 · 00 결정 5).
 
 | 파일 | 출처 | 쓰는 곳 |
 |---|---|---|
@@ -11,3 +11,5 @@
 | `icon.svg` | 직접 — 밤 바탕 · 흰 성벽 · 붉은 점(원작 그림 아님 · 2026-11-10) | 앱 아이콘 — `project.godot` `config/icon` |
 | `chars/looks.json` | 직접 — 인물 136명의 외형 표(성별 · 머리 모양 · 머리/피부/옷 색 · 안경 · 수염 · 흉터 · 차림). 처음 값은 2026-11-11 한 번 뽑음: 색은 옛 도트 초상(취호전 `tools/export_characters.py` 결과 · 취호전 커밋 b5c8991)에서, 모양 낱말은 canon `look.text` 에서(원작 컷은 읽지 않음). 손으로 고쳐도 된다 | `scripts/draw_portraits.py` 의 원본 |
 | `chars/svg/*.svg` | 직접 — `scripts/draw_portraits.py` 가 `chars/looks.json` 에서 코드로 그린 벡터 초상(3/4 흉상 · 셀 음영 · 굵기가 변하는 잉크 선 · 배경 투명 · 384px · 밉맵 — 2026-11-11 2차). 원작 그림 · 다른 게임 그림 아님 | 간부 카드 · 지도 얼굴 패 · 구역 카드 · 조직 탭 · 전투 화면 — `ui/sprites.gd` |
+| `chars/cut/*.png` | **원작** — 「캐슬」 공식 인물 카드(773×1124 · © 2019 CASTLE 정연) 36장의 그림 칸 위쪽 정사각형을 384px 로 줄임. 원본은 castle_common `sources/character_profile/<이름>.jpg`(읽기만 · 파일 ↔ id 는 castle_common `work/profile/profiles.json` cards) · `scripts/cut_portraits.py`(python3.11 · Pillow · 멱등). **개인 빌드 전용** · 비공개 저장소에서만 커밋 | 간부 카드 · 지도 얼굴 패 · 구역 카드 · 조직 탭 · 전투 화면 — `ui/sprites.gd`(있으면 벡터 초상보다 먼저) |
+| `chars/cut/heads.json` | 직접 — 위 초상마다 얼굴 자리(사람이 카드 묶음을 보고 적은 값 · `scripts/cut_portraits.py` FACES)와 원본 카드 sha256 | 지도 얼굴 패 — `ui/sprites.gd` `head_region` |

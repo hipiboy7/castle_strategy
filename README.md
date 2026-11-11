@@ -39,6 +39,6 @@
 ## 폴더
 - 코드: `sim/`(판정 — 순수 · 노드 없음 · 명령 처리기 `sim/kinds/`) · `ui/`(화면 · 테마) · `src/`(진입 · 실행 인자 · 데이터 · 저장소 입출력)
 - 데이터: `data/common/`(castle_common 받은 사본 — 손대지 않음 · `SOURCE.json` 도장) · `data/game/`(3층 표 — 경제 · 시작값 · 지도 · 규칙 값)
-- 시험 · 검증: `tests/`(unit = A · integration = B · 시나리오 A 기준 해시 `tests/integration/golden_a.json`) · `scripts/`(get_godot · verify · emu_check · draw_portraits) · `tools/`(rng_ref 기준 구현 · credit · xvfb_shot)
+- 시험 · 검증: `tests/`(unit = A · integration = B · 시나리오 A 기준 해시 `tests/integration/golden_a.json`) · `scripts/`(get_godot · verify · emu_check · draw_portraits · cut_portraits — 원작 카드 초상 · 개인 빌드 전용) · `tools/`(rng_ref 기준 구현 · credit · xvfb_shot)
 - 빌드 · 자산: `android/`(고정 디버그 키) · `.github/workflows/` · `assets/`
 - 문서 · 기록: `docs/` · `history/`
