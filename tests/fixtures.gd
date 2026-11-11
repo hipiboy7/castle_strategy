@@ -43,8 +43,16 @@ static func files() -> Dictionary:
 			"zone_default": {"flow": 10000.0, "people": 3.0, "police": 1000.0, "slots": 3.0, "owned_slots": 1.0},
 			"scenarios": {"A": {"orgs": {"org_a": {"cash": 500.0}}, "zones": {"z2": {"slots": 2.0, "people": 4.0}}}}},
 		"game/combat.json": combat(),
+		"game/fight.json": game_file("fight"),
+		"game/fight_roles.json": game_file("fight_roles"),
 		"game/map.json": {"zones": {"z1": {"x": 100.0, "y": 100.0}, "z2": {"x": 300.0, "y": 100.0}}, "links": [["z1", "z2"]]},
 	}
+
+
+## 3층 표 하나 — data/game/<이름>.json 그대로(실시간 구간 전투 fight · fight_roles)
+static func game_file(name: String) -> Dictionary:
+	var v = JSON.parse_string(FileAccess.get_file_as_string("res://data/game/%s.json" % name))
+	return v if v is Dictionary else {}
 
 
 ## 습격 · 일기토 3층 값 — data/game/combat.json 그대로(값을 바꾸는 시험은 사본을 고친다)

@@ -17,8 +17,9 @@ const NEEDS := [
 	"common/packs/strategy/factions.json", "common/packs/strategy/districts.json",
 	"common/packs/strategy/scenarios.json", "common/packs/strategy/characters.json",
 	"game/game.json", "game/economy.json", "game/setup.json", "game/map.json", "game/combat.json",
+	"game/fight.json", "game/fight_roles.json",
 ]
-const GAME := ["game", "economy", "setup", "map", "combat"]     # data/game/<이름>.json → t[이름] (정수로)
+const GAME := ["game", "economy", "setup", "map", "combat", "fight", "fight_roles"]     # data/game/<이름>.json → t[이름] (정수로) · fight* = 실시간 구간 전투(C4)
 
 
 static func build(files: Dictionary) -> Dictionary:

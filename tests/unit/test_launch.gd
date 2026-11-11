@@ -56,3 +56,12 @@ func test_view_week_zone() -> void:
 	eq(_p(["--week", "0"])["errors"].size(), 1, "--week 는 1 이상")
 	eq(_p(["--zone", "--autoplay"])["errors"].size(), 1, "값 없는 --zone")
 	eq(_p(["--zone", "--autoplay"])["autoplay"], true, "다음 인자는 그대로 읽는다")
+
+
+## C4 FR-405 — 전투 시험 인자
+func test_fight_test_flag() -> void:
+	eq(_p([])["fight_test"], false, "기본은 꺼짐")
+	var a := _p(["--fight-test", "--seed", "5"])
+	eq(a["fight_test"], true, "--fight-test")
+	eq(a["seed"], 5, "시드와 함께")
+	eq(a["errors"], [], "오류 없음")

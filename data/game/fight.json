@@ -1,0 +1,14 @@
+{
+  "_about": "3층(이 판 소유) 실시간 구간 전투 환산값 — fight/build.gd · fight/section.gd · ui/fight3d. 틱 습격(data/game/combat.json · 08 14-2 · 14-3)의 값을 실시간 판으로 옮기는 데 드는 값만 둔다(docs/C4_설계서_직접조작전투.md 4-3 · 5절 · docs/기획_차이.md (나)43 ⓔ). 시작값 — C4-3 '같은 규칙' 시험으로 맞춘다. 배율은 만분율(10000 = 1.00) · 길이는 cm · 시간은 프레임(60 = 1초).",
+  "tick_frames": 180,
+  "hp_bp": 10000,
+  "move_ref": 7,
+  "attackers": 2,
+  "on_field": {"mine": 12, "foe": 24},
+  "room": {"w": 1320, "d": 740},
+  "intro_frames": 60,
+  "speed_ref": 80,
+  "officer": {"walk": 210, "run": 460, "posture": 60, "stagger": 50, "poise": 0, "guard_bp": 3000},
+  "troop": {"walk": 180, "run": 380, "posture": 45, "stagger": 70, "poise": 0, "guard_bp": 1000},
+  "test": {"officer": "kimshin", "troops": [["건달급", 12], ["조장급", 4]], "max_frames": 5400}
+}

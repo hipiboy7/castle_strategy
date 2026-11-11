@@ -36,9 +36,9 @@ func test_08_example_top_vs_100() -> void:
 	var t := _t()
 	var s := _a()
 	s["officers"]["chasumin"]["rank"] = "톱"            # 능력치 없는 인물 — HP 200 + 40 × 13 = 720(08 본보기)
-	var o := Combat._officer_unit(s, t, "chasumin", 0)
+	var o := Combat.officer_unit(s, t, "chasumin", 0)
 	eq(o["hp"], 720, "톱 간부 HP 720")
-	var g := Combat._group_unit(t, "건달급", 100, 1)
+	var g := Combat.group_unit(t, "건달급", 100, 1)
 	var rec := {"learned": []}
 	var sec := Combat._section(s, t, 0, [o], [g], [], [], _rng("ex"), rec)
 	eq(sec["result"], "att", "휩쓴다")
@@ -50,8 +50,8 @@ func test_08_example_top_vs_100() -> void:
 func test_sweep_cap_without_one_shot() -> void:
 	var t := _t()
 	var s := _a()
-	var o := Combat._officer_unit(s, t, "woojin", 0)       # 경호대급(3) 대 건달급 — 원콤 아님(차 3 < 5)
-	var g := Combat._group_unit(t, "건달급", 50, 1)
+	var o := Combat.officer_unit(s, t, "woojin", 0)       # 경호대급(3) 대 건달급 — 원콤 아님(차 3 < 5)
+	var g := Combat.group_unit(t, "건달급", 50, 1)
 	Combat._act(t, o, [g], 10000, false, {}, _rng("cap"), [100, 100], t["combat"]["raid"]["morale"])
 	eq(g["n"], 48, "원콤이 아니어도 쓸어 내기 상한 1 + ⌊3/2⌋ = 2명 · 남는 피해는 버림")
 	eq(g["dmg"], 0, "상한에 걸리면 남는 피해 0")
@@ -60,8 +60,8 @@ func test_sweep_cap_without_one_shot() -> void:
 func test_siege_limit_and_pin() -> void:
 	var t := _t()
 	var s := _a()
-	var o := Combat._officer_unit(s, t, "icheolmin", 1)    # 조장급
-	var g := Combat._group_unit(t, "건달급", 20, 0)
+	var o := Combat.officer_unit(s, t, "icheolmin", 1)    # 조장급
+	var g := Combat.group_unit(t, "건달급", 20, 0)
 	var siege := {}
 	Combat._act(t, g, [o], 10000, false, siege, _rng("siege"), [100, 100], t["combat"]["raid"]["morale"])
 	eq(siege["icheolmin"], 6, "한 대상에 6명까지")
@@ -71,8 +71,8 @@ func test_siege_limit_and_pin() -> void:
 func test_cards_surprise_ambush_shield() -> void:
 	var t := _t()
 	var s := _a()
-	var mk := func(): return [Combat._group_unit(t, "건달급", 30, 0)]
-	var mkd := func(): return [Combat._group_unit(t, "건달급", 30, 1)]
+	var mk := func(): return [Combat.group_unit(t, "건달급", 30, 0)]
+	var mkd := func(): return [Combat.group_unit(t, "건달급", 30, 1)]
 	var plain := Combat._section(s, t, 0, mk.call(), mkd.call(), [], [], _rng("p"), {"learned": []})
 	var A: Array = mk.call()
 	var sur := Combat._section(s, t, 0, A, mkd.call(), ["surprise"], [], _rng("p"), {"learned": []})
@@ -82,8 +82,8 @@ func test_cards_surprise_ambush_shield() -> void:
 	var A2: Array = mk.call()
 	var amb := Combat._section(s, t, 0, A2, D, [], ["ambush"], _rng("p"), {"learned": []})
 	check(amb["log"].size() >= 1, "매복 구간이 돌았다 %s" % str(plain["result"]))
-	var A3: Array = [Combat._group_unit(t, "건달급", 30, 0)]
-	var D3: Array = [Combat._group_unit(t, "건달급", 30, 1)]
+	var A3: Array = [Combat.group_unit(t, "건달급", 30, 0)]
+	var D3: Array = [Combat.group_unit(t, "건달급", 30, 1)]
 	Combat._act(t, D3[0], A3, 10000, true, {}, _rng("sh"), [100, 100], t["combat"]["raid"]["morale"])
 	eq(A3[0]["n"], 30 - 18, "방패조 — 조직원 손실 × 0.6(300 피해 → 180 → 18명)")
 
@@ -202,9 +202,9 @@ func test_tick_cap_defender_holds() -> void:
 	var cb: Dictionary = t["combat"].duplicate(true)
 	cb["raid"]["tick_cap"] = 1
 	t2["combat"] = cb
-	var A := [Combat._officer_unit(s, t2, "kimshin", 0)]
+	var A := [Combat.officer_unit(s, t2, "kimshin", 0)]
 	check(A[0]["imm"], "김신은 무적 기술(좌우로 사라지는 스텝)이 있다")
-	var D := [Combat._group_unit(t2, "경호대급", 100, 1)]
+	var D := [Combat.group_unit(t2, "경호대급", 100, 1)]
 	var sec := Combat._section(s, t2, 0, A, D, [], [], _rng("cap"), {"learned": []})
 	eq(sec["ticks"], 1, "틱 상한")
 	eq(sec["result"], "def", "상한을 넘기면 지키는 쪽이 버틴 것")

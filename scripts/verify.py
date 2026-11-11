@@ -15,6 +15,7 @@
   커버리지      함수 단위 — .tools/cov/ 사본의 A · B 파일 함수 머리마다 표시 줄을 넣고 시험을 다시 돌린다. A ≥ 90% · B ≥ 70%
   자동 진행     -- --autoplay --turns 26 --seed S (시나리오 A · 시드 1 · 2 · 3, 두 번씩) — RESULT 해시가 두 번 같고
                 tests/integration/golden_a.json 기준값과 같다 · 불변식 위반 0
+  구간 전투     -- --fight-test --seed 1 두 번(C4 FR-405) — 실시간 구간 판(fight/)을 봇으로 끝까지: FIGHT 줄이 두 번 같고 구간이 끝난다
   화면 띄우기   --quit-after 120 (창 없이 화면 장면을 120 프레임) — APP ready · SELFHASH 가 시드 1 기준값
   잘못된 인자   -- --turns 0 — ARGS 줄 · 종료 코드 2
   문서 명령     README · 테스트결과서 · 폰확인의 `python3 -B <파일>` 과 저장소 경로가 실제로 있다
@@ -48,10 +49,13 @@ COV_FILES = {
           "sim/orders.gd", "sim/kinds/move.gd", "sim/kinds/open.gd", "sim/kinds/expand.gd", "sim/kinds/recruit.gd",
           "sim/kinds/rest.gd", "sim/save.gd", "ui/map_layout.gd", "ui/view.gd", "sim/draft.gd",
           "sim/duel.gd", "sim/combat.gd", "sim/outcome.gd", "sim/kinds/raid.gd", "sim/kinds/defend.gd",
-          "ui/touch_scroll.gd"],
-    "B": ["src/storage.gd", "src/data_files.gd", "sim/turn.gd", "sim/ai.gd", "sim/game.gd"],
+          "ui/touch_scroll.gd",
+          "fight/rules_rt.gd", "fight/build.gd", "fight/world.gd", "fight/fighter.gd", "fight/fighter_body.gd",
+          "fight/moves.gd", "fight/skills.gd"],
+    "B": ["src/storage.gd", "src/data_files.gd", "sim/turn.gd", "sim/ai.gd", "sim/game.gd",
+          "fight/section.gd", "fight/bot.gd", "fight/enemy_ai.gd", "src/fight_test.gd"],
 }
-COV_DIRS = ("sim", "src", "ui", "tests", "data")
+COV_DIRS = ("sim", "src", "ui", "tests", "data", "fight")
 COV_MIN = {"A": 0.90, "B": 0.70}
 DOCS_WITH_COMMANDS = ("README.md", "docs/폰확인.md", "docs/C*_테스트결과서_*.md")
 FUNC_RE = re.compile(r"^(\s*)(?:static\s+)?func\s+(\w+)\s*\(")
@@ -260,6 +264,24 @@ def step_autoplay(g, want):
     return ok_all
 
 
+def step_fight(g):
+    """구간 전투(C4 FR-405) — 같은 시드로 두 번 돌린 FIGHT 줄이 같고(결정성) 구간이 끝난다."""
+    got = []
+
+    def chk(out):
+        m = re.search(r"^FIGHT (.*)$", out, re.M)
+        got.append(m.group(1) if m else None)
+        r = json.loads(m.group(1)) if m else {}
+        ok = r.get("over") in ("win", "lose") and r.get("outcome", {}).get("result") in ("att", "def")
+        return ok, (f"{r.get('over')} · {r.get('frames')}프레임 · 쓰러뜨림 {r.get('kills')}" if ok else "FIGHT 줄 없음 또는 구간이 안 끝남")
+    ok_all = True
+    for _ in range(2):
+        ok_all &= run("구간 전투 seed 1", [g, "--headless", "--path", ".", "--", "--fight-test", "--seed", "1"], chk, timeout=120)
+    same = len(got) == 2 and got[0] is not None and got[0] == got[1]
+    print(f"[{'ok' if same else 'FAIL'}] 구간 전투 결정성 — 두 번 {'같다' if same else '다르다'}")
+    return ok_all and same
+
+
 def step_docs():
     paths = []
     for pat in DOCS_WITH_COMMANDS:
@@ -309,6 +331,7 @@ def main():
     results.append(run("시험", [g, "--headless", "--path", ".", "-s", "res://tests/run_tests.gd"], tests_ok, timeout=180))
     results.append(step_coverage(g))
     results.append(step_autoplay(g, want))
+    results.append(step_fight(g))
     self_line = f"SELFHASH {want[1]}"
     results.append(run("화면 띄우기 (창 없이 120 프레임)", [g, "--headless", "--path", ".", "--quit-after", "120"],
                        lambda out: ("APP ready" in out and self_line in out, self_line if self_line in out else "자가 해시 줄 없음")))

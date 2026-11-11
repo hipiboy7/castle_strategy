@@ -1,0 +1,15 @@
+{
+  "_about": "3층(이 판 소유) 실시간 전투의 인물 역할 — fight/build.gd. roles: 인물 id → 동작 묶음(moveset — 조종 · 봇이 쓰는 연타 · 대시 · 반격 · 제압) · 적 AI 프로필(ai — 상대 쪽에 설 때) · 모델(model — assets/models/<이름>_a.glb). default: roles 에 없는 간부. troops: 조직원 등급 → AI 프로필 목록 · 모델 목록(사람마다 차례로 돌려 쓴다). 동작 id 는 fight/moves.gd · 프로필 id 는 fight/enemy_ai.gd 에 있어야 한다(시험 tests/unit/test_fight_roles.gd). 처음 값은 castle_M3D 2c3e69b 장 표(hoeam.gd · hotel.gd ROLES)와 적 원형(x_)에서 옮겼다. C4-0 은 시나리오 A 의 김신 일파와 엑스트라만 — C4-1 에서 A 명단 전부.",
+  "roles": {
+    "kimshin": {"moveset": {"combo": "kf_jab", "dash": "kf_dash", "counter": "kf_counter", "finisher": "kf_finisher"}, "ai": "x_brawler", "model": "kimshin_p1"},
+    "jintae": {"moveset": {"combo": "j_jab", "dash": "j_dash", "finisher": "j_finisher"}, "ai": "x_brawler", "model": "jintae"},
+    "woojin": {"moveset": {"combo": "w_jab", "dash": "w_dash", "finisher": "w_finisher"}, "ai": "x_brawler", "model": "woojin"}
+  },
+  "default": {"moveset": {"combo": "kf_jab", "dash": "kf_dash", "finisher": "kf_finisher"}, "ai": "x_brawler", "model": ""},
+  "troops": {
+    "건달급": {"ai": ["thug", "thug_pipe"], "model": ["ds_member"]},
+    "조장급": {"ai": ["thug_brute", "thug"], "model": ["ds_member"]},
+    "네임드": {"ai": ["x_brawler", "x_boxer"], "model": ["ds_member"]},
+    "경호대급": {"ai": ["x_kicker", "x_blade"], "model": ["castle_guard"]}
+  }
+}

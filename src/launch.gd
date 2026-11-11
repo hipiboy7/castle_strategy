@@ -9,6 +9,8 @@ extends RefCounted
 ##   --view NAME       화면 장면(C2 FR-217): map(기본) · card · pick · orders · report · org · log · diplo · battle(C3 — 1주 보고의 첫 전투 · 첫 일기토 장면) — --shot 과 함께 쓴다
 ##   --week N          (1 이상 · 기본 1) 맡기기로 N−1주를 둔 뒤의 화면
 ##   --zone ID         card · pick 에서 고를 구역(기본 = 내 본거지)
+##   --fight-test      전투 시험(C4 FR-405): 화면 없이 정해진 구간을 봇으로 끝까지 돌리고 FIGHT 한 줄을 찍고 끝낸다(--seed).
+##                     --shot 과 함께면 전투 화면(3D · 가로)을 띄워 봇으로 돌리다가 찍는다
 
 const INT_KEYS := {"--turns": "turns", "--seed": "seed", "--shot-frame": "shot_frame", "--week": "week"}
 const MIN_ONE := ["turns", "shot_frame", "week"]
@@ -16,7 +18,7 @@ const VIEWS := ["map", "card", "pick", "orders", "report", "org", "log", "diplo"
 
 
 static func defaults() -> Dictionary:
-	return {"autoplay": false, "turns": 26, "seed": 1, "shot": "", "shot_frame": 30, "view": "map", "week": 1, "zone": "", "errors": []}
+	return {"autoplay": false, "turns": 26, "seed": 1, "shot": "", "shot_frame": 30, "view": "map", "week": 1, "zone": "", "fight_test": false, "errors": []}
 
 
 static func parse(a: PackedStringArray) -> Dictionary:
@@ -26,6 +28,8 @@ static func parse(a: PackedStringArray) -> Dictionary:
 		var k := a[i]
 		if k == "--autoplay":
 			args["autoplay"] = true
+		elif k == "--fight-test":
+			args["fight_test"] = true
 		elif INT_KEYS.has(k):
 			if i + 1 >= a.size() or not a[i + 1].is_valid_int():
 				args["errors"].append("%s 에는 정수가 필요하다" % k)

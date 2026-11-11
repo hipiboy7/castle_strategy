@@ -91,11 +91,11 @@ static func raid(s: Dictionary, t: Dictionary, turn: int, zone: String, org: Str
 	# 들어가는 쪽 — 간부(등급 높은 순) + 조직원 commit_bp(올림)
 	var att: Array = []
 	for id in by_rank(s, t, by):
-		att.append(_officer_unit(s, t, id, 0))
+		att.append(officer_unit(s, t, id, 0))
 	for g in State.TROOP_GRADES:
 		var n := Fixed.ceil_div(int(s["orgs"][org]["troops"][g]) * int(rc["commit_bp"]), Fixed.BP)
 		if n > 0:
-			att.append(_group_unit(t, g, n, 0))
+			att.append(group_unit(t, g, n, 0))
 	# 지키는 쪽 — 그 구역의 움직일 수 있는 간부 + 조직원(본거지 100% · 다른 구역 50% · 올림)을 구간에 나눈다
 	var D := [[], [], []]
 	if owner != "":
@@ -112,21 +112,21 @@ static func raid(s: Dictionary, t: Dictionary, turn: int, zone: String, org: Str
 				defs.remove_at(0)
 		rec["def_officers"] = defs.duplicate()
 		for i in defs.size():
-			D[DEF_SLOT[i % 3]].append(_officer_unit(s, t, defs[i], 1))
+			D[DEF_SLOT[i % 3]].append(officer_unit(s, t, defs[i], 1))
 		# 원군 — 땅길로 이웃한 자기 구역의 움직일 수 있는 간부(등급 높은 순 · reinforce_max)가 본진에 더해진다
 		var near: Array = State.officers_of(s, owner).filter(func(id):
 			var z: String = s["officers"][id]["zone"]
 			return z != zone and s["zones"].has(z) and s["zones"][z]["owner"] == owner and Tables.neighbors(t, zone).has(z))
 		rec["reinforce"] = by_rank(s, t, near).slice(0, int(rc["reinforce_max"]))
 		for id in rec["reinforce"]:
-			D[2].append(_officer_unit(s, t, id, 1))
+			D[2].append(officer_unit(s, t, id, 1))
 		var share: int = int(rc["defend_bp"]["hq"] if s["orgs"][owner]["hq"] == zone else rc["defend_bp"]["other"])
 		for g in State.TROOP_GRADES:
 			var n := Fixed.ceil_div(int(s["orgs"][owner]["troops"][g]) * share, Fixed.BP)
 			var parts := _split(n, rc["sections"])
 			for i in 3:
 				if parts[i] > 0:
-					D[i].append(_group_unit(t, g, parts[i], 1))
+					D[i].append(group_unit(t, g, parts[i], 1))
 	var skip := -1
 	if cards.has("bypass"):
 		var ok: bool = int(s["orgs"][org]["intel"].get(zone, 0)) >= int(cd["bypass"]["intel"])
@@ -365,7 +365,7 @@ static func _fame(s: Dictionary, org: String, d: int) -> void:
 
 
 ## 간부 유닛 — HP = 200 + 40r (+ 맷집 × 4) · ATK = 10(r+1)(1 + 힘/100 — 없으면 0.5) · 무적 기술(immune_lower)이 있으면 구간마다 immune_ticks
-static func _officer_unit(s: Dictionary, t: Dictionary, id: String, side: int) -> Dictionary:
+static func officer_unit(s: Dictionary, t: Dictionary, id: String, side: int) -> Dictionary:
 	var un: Dictionary = t["combat"]["unit"]
 	var p: Dictionary = s["officers"][id]
 	var st: Dictionary = t["chars"].get(id, {}).get("stats", {})
@@ -384,7 +384,7 @@ static func _officer_unit(s: Dictionary, t: Dictionary, id: String, side: int) -
 
 
 ## 조직원 묶음 — 한 명 HP · ATK = 10(r+1)
-static func _group_unit(t: Dictionary, grade: String, n: int, side: int) -> Dictionary:
+static func group_unit(t: Dictionary, grade: String, n: int, side: int) -> Dictionary:
 	var un: Dictionary = t["combat"]["unit"]
 	var r: int = t["rules"].rank_index(grade)
 	return {"t": "g", "grade": grade, "r": r, "side": side, "n": n, "n0": n, "dmg": 0,
