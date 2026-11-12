@@ -58,6 +58,29 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      # castle_common 받기 — 공개 판 예외(캐슬_게임공통.md 2절 10항 · docs/기획_차이.md (다)14): 받은 사본 data/common/ 은
+      # 커밋하지 않는다. 핀(data/common_pin.json)의 판을 비공개 castle_common 에서 읽기 전용 토큰(Secrets CASTLE_COMMON_TOKEN —
+      # fine-grained · castle_common 하나 · Contents read)으로 받아 sync 한다. 토큰은 이 저장소 push · 태그 · 수동 실행에만 쓰인다
+      # (pull_request 로 돌지 않는다 — 남의 포크에는 Secrets 가 가지 않는다). 받은 내용은 로그에 찍지 않는다.
+      - name: castle_common 판 읽기
+        id: pin
+        run: echo "sha=$(python3 -c 'import json;print(json.load(open("data/common_pin.json"))["castle_common"])')" >> "$GITHUB_OUTPUT"
+
+      - name: castle_common 받기 (비공개 · 읽기 전용 토큰)
+        uses: actions/checkout@v7
+        with:
+          repository: hipiboy7/castle_common
+          ref: ${{ steps.pin.outputs.sha }}
+          token: ${{ secrets.CASTLE_COMMON_TOKEN }}
+          path: .castle_common
+          persist-credentials: false
+
+      - name: castle_common → data/common (sync)
+        run: |
+          set -e
+          python3 -B .castle_common/tools/sync.py castle_strategy --dest data/common
+          echo "CASTLE_COMMON=$GITHUB_WORKSPACE/.castle_common" >> "$GITHUB_ENV"
+
       - uses: actions/setup-java@v6
         with:
           distribution: temurin

@@ -5,8 +5,10 @@
     GODOT=/path/to/godot python3 scripts/verify.py   # CI — Godot 실행 파일을 환경 변수로
 
 단계(요구: docs/C1_요구사항정의서_시뮬코어.md FR-108):
-  공통 데이터   data/common/ 받은 파일이 도장 SOURCE.json 의 sha256(CRLF → LF)과 같다(손으로 고치지 않았다). 옆 castle_common
-                (환경 변수 CASTLE_COMMON, 없으면 ../castle_common)이 앞서 있으면 알림(--strict 는 실패). 받기 전이면 건너뛴다
+  공통 데이터   data/common/ 받은 파일이 도장 SOURCE.json 의 sha256(CRLF → LF)과 같다(손으로 고치지 않았다). 도장의 판이
+                data/common_pin.json 과 같다(공개 판 예외 — data/common/ 은 커밋하지 않고 CI 가 핀 판을 받는다 · 기획_차이 (다)14).
+                옆 castle_common(환경 변수 CASTLE_COMMON, 없으면 ../castle_common)이 앞서 있으면 알림(--strict 는 실패).
+                받은 사본이 없으면 실패(받는 명령을 알려 준다)
   자산 출처     assets/ 의 파일(.import 빼고)이 모두 assets/ASSETS.md 에 있고, 목록에만 있는 파일이 없다
   인물 그림     scripts/draw_portraits.py --check — assets/chars/svg 가 looks.json 에서 다시 그린 것과 같음 · id 가 canon 에 있음 · 명단 인물이 모두 있음(FR-212 · (라)12)
   기준 구현     tools/rng_ref.py --check — 기대값 파일이 기준 구현 그대로이고, PCG32 공개 데모 수열과 같다
@@ -38,6 +40,7 @@ sys.path.insert(0, os.path.join(ROOT, "scripts"))
 import get_godot  # noqa: E402
 
 COMMON_DIR = os.path.join(ROOT, "data", "common")
+COMMON_PIN = os.path.join(ROOT, "data", "common_pin.json")   # 받은 판(커밋한다 — data/common/ 은 .gitignore)
 COMMON_SRC = os.environ.get("CASTLE_COMMON") or os.path.join(os.path.dirname(ROOT), "castle_common")
 RECEIVES = ("data/*.json", "cases/*.json", "canon/*.json", "packs/strategy/*.json", "docs/개발규격/*.md")  # docs/castle_common_요청.md #14
 ASSETS = os.path.join(ROOT, "assets")
@@ -110,14 +113,20 @@ def _src_path(rel):
 
 
 def step_common(strict):
-    """None = 건너뜀(받기 전) · True/False = 통과/실패"""
+    """True/False = 통과/실패"""
     stamp_path = os.path.join(COMMON_DIR, "SOURCE.json")
+    with open(COMMON_PIN, encoding="utf-8") as f:
+        pin = json.load(f)["castle_common"]
     if not os.path.exists(stamp_path):
-        print("[skip] 공통 데이터 — 아직 받지 않았다(data/common/SOURCE.json 없음 · docs/castle_common_요청.md #14 등록 뒤 "
-              "castle_common 에서 python3 -B tools/sync.py castle_strategy)")
-        return None
+        print(f"[FAIL] 공통 데이터 — 받은 사본이 없다(data/common/ 은 커밋하지 않는다 · 기획_차이 (다)14). castle_common 을 "
+              f"{pin[:7]} 판으로 두고 그 폴더에서 python3 -B tools/sync.py castle_strategy")
+        return False
     with open(stamp_path, encoding="utf-8") as f:
         stamp = json.load(f)
+    if stamp["castle_common"] != pin:
+        print(f"[FAIL] 공통 데이터 — 받은 판 {stamp['castle_common'][:7]} 이 핀 data/common_pin.json {pin[:7]} 과 다르다 "
+              "(새로 받았으면 핀을 SOURCE.json 값으로 고치고 시험 · 아니면 핀 판으로 다시 받는다)")
+        return False
     want = stamp["files"]
     have = {}
     for p in glob.glob(os.path.join(COMMON_DIR, "**", "*"), recursive=True):

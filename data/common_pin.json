@@ -1,0 +1,4 @@
+{
+  "_about": "받은 castle_common 판(공개 판 예외 — data/common/ 은 커밋하지 않는다 · docs/기획_차이.md (다)14). CI(.github/workflows/android.yml)가 이 sha 로 비공개 castle_common 을 읽기 전용 토큰(Secrets CASTLE_COMMON_TOKEN)으로 받아 sync 한다. 받은 뒤 data/common/SOURCE.json 의 castle_common 값으로 고친다 — scripts/verify.py '공통 데이터' 가 둘이 같은지 본다.",
+  "castle_common": "b66e43cde38a0fd14a73ee5ad99bb173e6f9b589"
+}

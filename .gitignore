@@ -25,3 +25,8 @@ docs/*.lock
 
 # 비밀
 .env
+
+# castle_common 받은 사본 — 공개 판 예외(캐슬_게임공통.md 2절 10항 · docs/기획_차이.md (다)14). 받은 판은 data/common_pin.json(커밋)
+data/common/
+# CI 가 받는 castle_common(.github/workflows/android.yml)
+.castle_common/

@@ -120,6 +120,24 @@ func test_stun_ko_rank_roulette_immune() -> void:
 	eq(F[1]["hp"], 1000, "무적 중에는 아랫급 공격이 안 들어간다")
 
 
+## castle_common 92차 '턴제 판 해석'(rules/등급과_게이지.md 4절 ② · rules/기술.md 5절 ① ④ ⑤ — castle_srpg 와 같이 따른다)
+func test_turn_based_interpretation_92() -> void:
+	var t := _t()
+	var F := [_f("a", "내성 중위", 80), _f("b", "경호대급", 60)]
+	Duel._strike(t, F, 0, [{"card": "attack", "skill": ""}, {"card": "guard", "skill": ""}], "guard", [[], []], [])
+	eq(F[1]["hp"], 0, "② 막기는 한 방을 줄이지 않는다 — 막아도 쓰러진다")
+	F = [_with_gauge(_f("a", "외성 상위", 80, ["amur_weaving"]), 500), _f("b", "외성 상위", 50, ["roulette"])]
+	Duel._strike(t, F, 0, [{"card": "skill", "skill": "amur_weaving"}, {"card": "attack", "skill": ""}], "", [[], []], [])
+	eq([F[0]["hp"], F[1]["hp"]], [1, 0], "① 룰렛이 한 방 기술(skill_ko)을 돌려주면 친 쪽 체력 1 을 남긴다")
+	F = [_with_gauge(_f("a", "내성 중위", 80, ["offbeat"]), 1000), _f("b", "외성 하위", 50)]
+	Duel._strike(t, F, 0, [{"card": "skill", "skill": "offbeat"}, {"card": "attack", "skill": ""}], "", [[], []], [])
+	eq(F[1]["hp"], 0, "④ 한 방이 이긴다 — 다섯 등급 위의 엇박은 쓰러뜨림(비율 1)")
+	F = [_with_gauge(_f("a", "내성 중위", 80, ["offbeat2"]), 1000), _f("b", "내성 중위", 80, [], false, false, 100000)]
+	F[0]["hp"] = 100
+	Duel._strike(t, F, 0, [{"card": "skill", "skill": "offbeat2"}, {"card": "attack", "skill": ""}], "", [[], []], [])
+	eq(F[0]["hp"], 1, "⑤ 엇엇박 self_cost(최대 체력 × 0.2 = 200)로 쓴 사람은 쓰러지지 않는다 — 체력 1")
+
+
 func test_copy_after_seen_twice() -> void:
 	var t := _t()
 	var shin := _f("kimshin", "내성 중위", 80, [], false, true, 100000)

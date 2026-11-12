@@ -4,6 +4,8 @@ extends RefCounted
 ## 상태는 바꾸지 않는다 — 부상 · 카피(seen · skills)는 부르는 쪽(sim/combat.gd)이 기록을 보고 넣는다.
 ## 2층은 castle_common 값 그대로(rules_common · rules.json): 게이지 bars_for · gauge_rate · gauge.gain · 비용 skill_cost · 엇박 lethal_fraction ·
 ## 등급 차 rank_damage_k · one_shot · 막기 guard.damage_k · 쳐내기 can_parry · 룰렛 roulette_reflects · 기절 stun_sec · ko_rank · 카피 copy.seen · can_learn.
+## castle_common 92차 '턴제 판 해석'(rules/기술.md 5절 · rules/등급과_게이지.md 4절): ① 룰렛이 즉사 계열을 돌려주면 친 쪽 체력 1 · ② 막기는 한 방을
+## 줄이지 않음 · ④ 한 방이 lethal 기술보다 앞 · ⑤ 엇엇박 self_cost 는 체력 1 을 남김(③ 무리 쓸어 내기는 sim/combat.gd).
 ## 3층(data/game/combat.json duel): 체력 · 보통 맞힘 · K_TURN · 기술 피해 배율 · 쳐내기 반격 · 카드 고르는 확률 · 부상.
 ## 정수: 체력 · 게이지(점 — 한 칸 = gauge.bar_points)는 정수. 규칙 함수의 실수 결과는 Fixed.milli 로 바꿔 한 번 곱한다(설계서 3-6).
 ## 설계: docs/C3_설계서_습격과일기토.md 3절 · 요구: FR-303 · FR-304 · 시험: tests/unit/test_duel.gd
@@ -183,14 +185,19 @@ static func _strike(t: Dictionary, F: Array, att: int, cards: Array, guard: Stri
 			notes.append("%s %s — 아랫급에게 무적 %d합" % [A["id"], sk, A["immune"]])
 			return
 	var dmg := hit_damage(t, A, D)
-	if rules.one_shot(A["rank"], D["rank"]):
-		dmg = D["hp"]
+	var one: bool = rules.one_shot(A["rank"], D["rank"])
+	var kill := one   # 즉사 계열(한 방 · 즉사 비율 1 · skill_ko) — 룰렛이 돌려줄 때 친 쪽 체력 1 을 남긴다(92차 해석 ①)
+	if one:
+		dmg = D["hp"]   # ④ 한 방이 이긴다 — lethal 기술도 쓰러뜨림
 	elif sk != "":
 		if fx.has("lethal"):
 			var bars: float = float(paid) / float(rules.rule("gauge", "bar_points", 100))
-			dmg = Fixed.div_round(D["max"] * Fixed.milli(rules.lethal_fraction(fx["lethal"], D["rank"], A["rank"], bars)), 1000)
+			var frac: float = rules.lethal_fraction(fx["lethal"], D["rank"], A["rank"], bars)
+			dmg = Fixed.div_round(D["max"] * Fixed.milli(frac), 1000)
+			kill = frac >= 1.0
 		elif rules.skill_ko(sk, D["rank"]):
 			dmg = D["hp"]
+			kill = true
 		else:
 			dmg = Fixed.bp(dmg, int(d["skill_bp"]))
 	if guard == "parry":
@@ -201,7 +208,9 @@ static func _strike(t: Dictionary, F: Array, att: int, cards: Array, guard: Stri
 		notes.append("%s 쳐내기 — 반격 %d" % [D["id"], counter])
 		return
 	if guard == "guard":
-		if not (fx.has("lethal") and d["pierce"].has(fx["lethal"])):
+		if one:
+			notes.append("%s 한 방 — 막아도 쓰러진다" % A["id"])   # 92차 해석 ②
+		elif not (fx.has("lethal") and d["pierce"].has(fx["lethal"])):
 			dmg = Fixed.div_round(dmg * Fixed.milli(float(rules.rule("guard", "damage_k", 1.0))), 1000)
 			gain[1 - att].append("guard")
 		else:
@@ -213,10 +222,10 @@ static func _strike(t: Dictionary, F: Array, att: int, cards: Array, guard: Stri
 	gain[att].append("finisher" if sk != "" else "hit")
 	gain[1 - att].append("taken")
 	if sk != "" and D["skills"].has("roulette") and rules.roulette_reflects(D["rank"], A["rank"]):
-		A["hp"] = maxi(0, A["hp"] - dmg)
+		A["hp"] = maxi(mini(1, A["hp"]) if kill else 0, A["hp"] - dmg)
 		notes.append("%s 러시안 룰렛 — 같은 피해 %d 를 돌려줌" % [D["id"], dmg])
-	if sk != "" and fx.has("self_cost"):
-		A["hp"] = maxi(0, A["hp"] - Fixed.div_round(A["max"] * Fixed.milli(float(fx["self_cost"])), 1000))
+	if sk != "" and fx.has("self_cost") and A["hp"] > 0:   # ⑤ 엇엇박으로 쓴 사람은 쓰러지지 않는다 — 체력 1
+		A["hp"] = maxi(1, A["hp"] - Fixed.div_round(A["max"] * Fixed.milli(float(fx["self_cost"])), 1000))
 	if D["hp"] <= 0:
 		gain[att].append("ko")
 	elif sk != "" and rules.stun_sec(sk, A["rank"], D["rank"]) >= 1.0:
