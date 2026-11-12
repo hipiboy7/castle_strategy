@@ -4,7 +4,10 @@ extends RefCounted
 ## 한 단계에 처리기가 여럿이면 목록 차례로 부른다(C3 — 결산 = 돈 → 회복 → 승패).
 ## 처리기 꼴(LSP): <모듈>.<함수>(s, ctx) — ctx = {t, seed, turn, phase, all(명령 전부), accepted(단계별), report}.
 ## 난수는 처리기가 Pcg32.init_stream(seed, turn, phase, 대상 id)로 만든다(대상마다 갈래 — 08 13절).
-## 설계: docs/C1_설계서_상태와턴.md 3-5 · docs/C3_설계서_습격과일기토.md 2절 · 요구: FR-115 · FR-301 · 시험: tests/integration/test_turn.gd
+## C4-2(FR-416): opts = {fights, ask, auto} 를 ctx 에 싣는다. 처리기가 ctx["need"] 를 채우면 남은 단계를 돌리지 않고 {"need": …} 만 돌려준다
+## (작업 사본은 버린다 — 입력 상태 불변). 끝까지 돌면 쓴 구간 결과를 "fights" 로 함께 돌려준다. opts 가 비면 C4 전과 같다.
+## 설계: docs/C1_설계서_상태와턴.md 3-5 · docs/C3_설계서_습격과일기토.md 2절 · docs/C4_설계서_직접조작전투.md 3절 · 요구: FR-115 · FR-301 · FR-416
+## 시험: tests/integration/test_turn.gd
 
 const State = preload("res://sim/state.gd")
 const Orders = preload("res://sim/orders.gd")
@@ -22,8 +25,10 @@ const HANDLERS := {
 }
 
 
-static func run(state: Dictionary, orders: Array, t: Dictionary) -> Dictionary:
-	var r := phases(state, orders, t, PHASES)
+static func run(state: Dictionary, orders: Array, t: Dictionary, opts := {}) -> Dictionary:
+	var r := phases(state, orders, t, PHASES, opts)
+	if r.has("need"):
+		return r
 	r["report"]["invariants"] = State.check_invariants(r["state"], t)
 	r["state"]["turn"] += 1
 	return r
@@ -31,10 +36,11 @@ static func run(state: Dictionary, orders: Array, t: Dictionary) -> Dictionary:
 
 ## 단계 일부만 돌린다(입력 상태 불변 · 턴을 넘기지 않음) — 대기 명령 미리 보기(sim/draft.gd)가 ORDER_PHASES 로 부른다.
 ## 같은 ctx(seed · turn · 단계 · 대상 id 갈래 난수)라 그 단계의 결과는 run 과 같다(C2 설계서 4절)
-static func phases(state: Dictionary, orders: Array, t: Dictionary, names: Array) -> Dictionary:
+static func phases(state: Dictionary, orders: Array, t: Dictionary, names: Array, opts := {}) -> Dictionary:
 	var s := State.to_dict(state)
 	var report := {"turn": s["turn"], "applied": [], "rejected": [], "events": [], "money": {}, "invariants": [], "battles": []}
-	var ctx := {"t": t, "seed": s["seed"], "turn": s["turn"], "phase": "", "all": orders, "accepted": {}, "report": report}
+	var ctx := {"t": t, "seed": s["seed"], "turn": s["turn"], "phase": "", "all": orders, "accepted": {}, "report": report,
+		"fights": opts.get("fights", {}), "ask": String(opts.get("ask", "")), "auto": opts.get("auto", [])}
 	for phase in PHASES:
 		if not HANDLERS.has(phase) or not names.has(phase):
 			continue
@@ -42,4 +48,6 @@ static func phases(state: Dictionary, orders: Array, t: Dictionary, names: Array
 		var hs = HANDLERS[phase]
 		for h in (hs if hs is Array else [hs]):
 			h["mod"].call(h["fn"], s, ctx)
-	return {"state": s, "report": report}
+			if ctx.has("need"):
+				return {"need": ctx["need"]}
+	return {"state": s, "report": report, "fights": ctx.get("used", {})}

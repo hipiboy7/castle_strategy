@@ -4,6 +4,7 @@ extends RefCounted
 ##   raid(t, seed)  시나리오 A 처음 상태에서 습격 하나(test.raid — 구역 · 조직 · 간부 최대 4 · 카드)를 틱과 같은 준비(sim/combat.gd prepare)로 3구간 준비
 ##   run(t, seed)   raid 를 봇으로 구간마다 끝까지 — 구간 결과를 들어가는 쪽 유닛에 옮겨(sim/combat.gd apply_section) 다음 구간으로 잇는다(FR-408)
 ## 쓰는 곳: headless `-- --fight-test --seed S`(src/main.gd — FIGHT 한 줄 · verify '구간 전투') · 기록 탭 '전투 시험'(ui/app.gd) · 시험.
+##   fake(need, win, by)  그 구간의 꾸민 결과(설계서 2-3 꼴 — 이기면 지키는 쪽 전멸 · 지면 들어가는 쪽 전멸 · 체력은 그대로) — 시험 · '결과만' 화면 점검
 ## C4-2 에서 턴이 need 를 내면 이 파일은 시험용으로만 남는다.
 ## 설계: docs/C4_설계서_직접조작전투.md 2-2 · 8절 · 시험: tests/integration/test_fight_section.gd
 
@@ -81,3 +82,19 @@ static func run(t: Dictionary, seed: int) -> Dictionary:
 		i = next_section(r, i)
 	return {"seed": seed, "over": over, "won": over == "win" and i < 0, "frames": frames, "kills": kills,
 		"sections": secs, "outcome": last}
+
+
+## 꾸민 구간 결과(설계서 2-3) — win 이면 지키는 쪽 머릿수 0, 아니면 들어가는 쪽 0. 간부 체력 · 부상은 들어올 때 그대로(전멸 쪽은 쓰러짐)
+static func fake(need: Dictionary, win: bool, by := "direct") -> Dictionary:
+	var lists := [[], []]
+	for side in 2:
+		var lose: bool = (side == 1) == win
+		for u in need["A" if side == 0 else "D"]:
+			if u["t"] == "g":
+				lists[side].append({"t": "g", "grade": u["grade"], "n": 0 if lose else int(u["n"])})
+			else:
+				var down: bool = lose or u["down"]
+				lists[side].append({"t": "o", "id": u["id"], "hp": 0 if down else int(u["hp"]), "down": down,
+					"wound": int(u["wound"]) if u["down"] else (6000 if down else 0)})
+	return {"v": 1, "i": int(need["i"]), "by": by, "result": "att" if win else "def", "ticks": 3, "a": lists[0], "d": lists[1],
+		"morale": [100, 0] if win else [0, 100], "seen": {}, "frames": 540, "kills": [0, 0]}

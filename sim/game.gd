@@ -3,7 +3,9 @@ extends RefCounted
 ## 판 g = {"state": GameState, "log": [{"turn", "orders"}], "errors": [...], "reports": [{"report", "before", "after"}]} — 사전 하나(UI · main 이 들고 있는다).
 ## C2: 플레이어 주(step_player — 내 조직 = 대기 명령 · 다른 조직 = AI) · 보고 목록(전 · 뒤 상태 — 화면 보고 카드) · 저장에서 보고 다시 만들기.
 ## 매 턴 '반드시' 불변식(CLAUDE.md 3절)을 본다: 상태 불변식(sim/state.gd) + 움직일 수 없던 간부의 명령이 적용되지 않았다.
-## 설계: docs/C1_설계서_상태와턴.md 3-5 · 3-7 · docs/C2_설계서_화면과명령.md 4 · 6절 · 요구: FR-118 · FR-119 · FR-207 · FR-213
+## C4-2(FR-416): step · step_player 의 opts = {fights, ask, auto} — 묻는 조직의 미해결 실시간 구간이면 g 를 바꾸지 않고 {"need": …}.
+## 끝까지 돌면 기록 줄 {"turn", "orders", "fights": 쓴 구간 결과만}. replay 는 기록 줄의 fights 를 넣는다(묻지 않음). autoplay · AI 미리 보기는 opts 없이.
+## 설계: docs/C1_설계서_상태와턴.md 3-5 · 3-7 · docs/C2_설계서_화면과명령.md 4 · 6절 · docs/C4_설계서_직접조작전투.md 3절 · 요구: FR-118 · FR-119 · FR-207 · FR-213 · FR-416
 ## 시험: tests/integration/test_scenario_a.gd · test_save_resume.gd · test_player_turn.gd
 
 const State = preload("res://sim/state.gd")
@@ -18,16 +20,18 @@ static func new_game(t: Dictionary, scenario: String, seed: int, player: String 
 
 
 ## 한 주 — orders 가 null 이면 모든 조직을 AI 가 낸다(C1 은 플레이어 명령 화면이 없다 — C2). 보고 + 이번 턴 불변식 위반을 돌려준다
-static func step(g: Dictionary, t: Dictionary, orders = null) -> Dictionary:
+static func step(g: Dictionary, t: Dictionary, orders = null, opts := {}) -> Dictionary:
 	var before: Dictionary = g["state"]
 	var list: Array = Ai.orders_all(before, t) if orders == null else orders
-	var r: Dictionary = Turn.run(before, list, t)
+	var r: Dictionary = Turn.run(before, list, t, opts)
+	if r.has("need"):
+		return {"need": r["need"]}
 	var bad: Array = r["report"]["invariants"].duplicate()
 	for o in r["report"]["applied"]:
 		if before["officers"][o["by"]]["status"] != "active":
 			bad.append("움직일 수 없던 %s 의 명령이 적용됐다" % o["by"])
 	g["state"] = r["state"]
-	g["log"].append({"turn": before["turn"], "orders": list})
+	g["log"].append({"turn": before["turn"], "orders": list, "fights": r["fights"].duplicate(true)})
 	r["report"]["violations"] = bad
 	if not g.has("reports"):
 		g["reports"] = []
@@ -36,11 +40,11 @@ static func step(g: Dictionary, t: Dictionary, orders = null) -> Dictionary:
 
 
 ## 플레이어 한 주 — 내 조직 = 대기 명령(draft), 다른 조직 = AI(조직 id 순). 같은 꼴의 orders[] 로 step 과 같은 길(LSP)
-static func step_player(g: Dictionary, t: Dictionary, draft: Array) -> Dictionary:
+static func step_player(g: Dictionary, t: Dictionary, draft: Array, opts := {}) -> Dictionary:
 	var s: Dictionary = g["state"]
 	var list := draft.duplicate(true)
 	list.append_array(others_ai(s, t, s["player"]))
-	return step(g, t, list)
+	return step(g, t, list, opts)
 
 
 ## 내 조직을 뺀 모든 조직의 AI 명령(조직 id 순)
@@ -76,7 +80,7 @@ static func replay(t: Dictionary, scenario: String, seed: int, player: String, l
 	var g := new_game(t, scenario, seed, player)
 	if g["errors"].is_empty():
 		for entry in log:
-			step(g, t, entry["orders"])
+			step(g, t, entry["orders"], {"fights": entry.get("fights", {})})
 	return g
 
 

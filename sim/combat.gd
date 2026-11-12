@@ -5,7 +5,10 @@ extends RefCounted
 ## 결과를 상태에 넣는다: 조직원 손실 · 간부 부상(wounded · wound) · 카피(seen · skills) · 구역 주인 · 사업장 · 거점 · 물러남 · 잡힘 · 열기 · 명성.
 ## 3층 값: data/game/combat.json(raid · unit · cards). 2층: rank_damage_k · one_shot · shrugs_off · immune_lower(rules_common).
 ## heal(s, ctx) — 결산 단계: 다친 간부의 부상이 heal.per_turn 씩 낫고 0 이면 다시 움직인다.
-## 설계: docs/C3_설계서_습격과일기토.md 2 · 4절 · 요구: FR-301 · FR-302 · FR-305 · FR-306 · FR-308 · 시험: tests/unit/test_combat.gd
+## C4-2 구간 결과 계약(FR-415 · 416): ctx 의 fights(받은 구간 결과) · ask(묻는 조직) · auto(틱으로 풀 묶음 키) — 받은 결과는 outcome_error 로 검증해
+## 넣고(틀리면 틱 · 기록 rejected), 묻는 조직의 간부가 서 있는 미해결 구간이면 ctx["need"] 를 채우고 멈춘다(작업 사본은 turn 이 버린다). 없으면 C4 전과 같다.
+## 설계: docs/C3_설계서_습격과일기토.md 2 · 4절 · docs/C4_설계서_직접조작전투.md 2 · 3절 · 요구: FR-301 · FR-302 · FR-305 · FR-306 · FR-308 · FR-415 · FR-416
+## 시험: tests/unit/test_combat.gd · tests/unit/test_fight_outcome.gd
 
 const Fixed = preload("res://sim/fixed.gd")
 const State = preload("res://sim/state.gd")
@@ -72,7 +75,15 @@ static func run_phase(s: Dictionary, ctx: Dictionary) -> void:
 				report["rejected"].append({"order": o, "why": "나설 간부가 없다(앞 싸움에서 다침)"})
 			continue
 		var rng = Pcg32.new().init_stream(ctx["seed"], ctx["turn"], "clash", key)
-		var rec := raid(s, t, ctx["turn"], g["zone"], g["org"], standing, g["cards"], guard.get("%s|%s" % [g["zone"], owner], []), rng)
+		var rec := raid(s, t, ctx["turn"], g["zone"], g["org"], standing, g["cards"], guard.get("%s|%s" % [g["zone"], owner], []), rng, ctx)
+		if rec.has("need"):
+			ctx["need"] = rec["need"]
+			return
+		if not rec["used"].is_empty():
+			if not ctx.has("used"):
+				ctx["used"] = {}
+			ctx["used"][key] = rec["used"]
+		rec.erase("used")
 		report["battles"].append(rec)
 		for o in g["orders"]:
 			report["applied"].append(o)
@@ -87,7 +98,7 @@ static func prepare(s: Dictionary, t: Dictionary, zone: String, org: String, by:
 	var owner: String = s["zones"][zone]["owner"]
 	var rec := {"zone": zone, "att": org, "def": owner, "by": by.duplicate(), "cards": cards.duplicate(),
 		"def_cards": def_cards.duplicate() if owner != "" else [], "sections": [], "won": false, "notes": [],
-		"loss": {org: {}}, "down": [], "captive": [], "learned": [], "def_officers": [], "reinforce": []}
+		"loss": {org: {}}, "down": [], "captive": [], "learned": [], "def_officers": [], "reinforce": [], "rejected": [], "used": {}}
 	if owner != "":
 		rec["loss"][owner] = {}
 	# 들어가는 쪽 — 간부(등급 높은 순) + 조직원 commit_bp(올림)
@@ -177,8 +188,10 @@ static func apply_section(units: Array, rows: Array) -> void:
 				u["wound"] = clampi(int(r.get("wound", 0)), 0, State.PCT_MAX)
 
 
-## 습격 하나 — s 를 바꾸고 기록을 돌려준다(AI 가 사본으로 미리 돌려 볼 때도 쓴다)
-static func raid(s: Dictionary, t: Dictionary, turn: int, zone: String, org: String, by: Array, cards: Array, def_cards: Array, rng) -> Dictionary:
+## 습격 하나 — s 를 바꾸고 기록을 돌려준다(AI 가 사본으로 미리 돌려 볼 때도 쓴다 — opts 없이).
+## opts(C4-2 · 설계서 3절): fights{묶음 키: {"<구간>": 구간 결과}} · ask(묻는 조직) · auto([묶음 키]). 구간마다 ① 우회로면 건너뜀 ② 받은 결과가
+## 검증을 지나면 적용(기록 used) ③ 묻는 조직의 간부가 그 구간에 서 있고 · 맞은편에 누군가 있고 · 결과가 없으면 {"need": …}(s 는 앞 구간까지 바뀐 채 — 부른 쪽이 버린다) ④ 아니면 틱
+static func raid(s: Dictionary, t: Dictionary, turn: int, zone: String, org: String, by: Array, cards: Array, def_cards: Array, rng, opts := {}) -> Dictionary:
 	var prep := prepare(s, t, zone, org, by, cards, def_cards)
 	var rc: Dictionary = t["combat"]["raid"]
 	var owner: String = prep["def"]
@@ -186,12 +199,30 @@ static func raid(s: Dictionary, t: Dictionary, turn: int, zone: String, org: Str
 	var att: Array = prep["A"]
 	var D: Array = prep["D"]
 	var skip: int = prep["skip"]
+	var key := "%s|%s" % [zone, org]
+	var got = opts.get("fights", {}).get(key, {})
+	var ask: String = String(opts.get("ask", ""))
+	var side := -1
+	if ask != "" and not Array(opts.get("auto", [])).has(key):
+		side = 0 if ask == org else (1 if owner != "" and ask == owner else -1)
 	var won := true
 	for i in 3:
 		if i == skip:
 			rec["sections"].append({"i": i, "result": "skip", "ticks": 0, "log": [], "duels": [], "start": [_heads(att), _heads(D[i])]})
 			continue
-		var sec := _section(s, t, i, att, D[i], cards, def_cards, rng, rec)
+		var sec := {}
+		var res = got.get(str(i)) if got is Dictionary else null
+		if res != null:
+			var why := outcome_error(t, i, att, D[i], res)
+			if why == "":
+				sec = _apply_rt(s, t, i, att, D[i], res, rec)
+				rec["used"][str(i)] = res
+			else:
+				rec["rejected"].append({"i": i, "why": why})
+		elif side >= 0 and _officer_stands(att if side == 0 else D[i]) and _heads(D[i] if side == 0 else att) > 0:
+			return {"need": need_of(s, t, turn, prep, i, side)}
+		if sec.is_empty():
+			sec = _section(s, t, i, att, D[i], cards, def_cards, rng, rec)
 		rec["sections"].append(sec)
 		if sec["result"] != "att":
 			won = false
@@ -225,6 +256,121 @@ static func raid(s: Dictionary, t: Dictionary, turn: int, zone: String, org: Str
 		if owner != "":
 			_fame(s, owner, int(rc["fame_win_bp"]))
 	return rec
+
+
+## 서 있는 간부가 하나라도 있나
+static func _officer_stands(units: Array) -> bool:
+	for u in units:
+		if u["t"] == "o" and not u["down"]:
+			return true
+	return false
+
+
+## 구간 결과 검증(설계서 2-4) — "" 면 받는다. A · Di = 그 구간에 들어올 때의 유닛(need 의 A · D 와 같은 것). 결과가 정하지 않는 것(배우기)은 sim 이 판단한다
+static func outcome_error(t: Dictionary, i: int, A: Array, Di: Array, res) -> String:
+	if not (res is Dictionary):
+		return "구간 결과가 사전이 아니다"
+	for k in ["v", "i", "by", "result", "ticks", "a", "d", "morale", "seen"]:
+		if not res.has(k):
+			return "칸 %s 가 없다" % k
+	if typeof(res["v"]) != TYPE_INT or res["v"] != 1:
+		return "v 는 1"
+	if typeof(res["i"]) != TYPE_INT or res["i"] != i:
+		return "i 는 %d" % i
+	if not ["direct", "auto"].has(res["by"]):
+		return "by 는 direct · auto"
+	if not ["att", "def"].has(res["result"]):
+		return "result 는 att · def"
+	var rc: Dictionary = t["combat"]["raid"]
+	if not _int_in(res["ticks"], 0, int(rc["tick_cap"])):
+		return "ticks 는 0 ~ %d" % int(rc["tick_cap"])
+	var heads := [0, 0]
+	var offs := 0
+	var standing := {}
+	for side in 2:
+		var units: Array = A if side == 0 else Di
+		var rows = res["a" if side == 0 else "d"]
+		if not (rows is Array) or rows.size() != units.size():
+			return "%s 줄 수가 유닛과 다르다" % ("a" if side == 0 else "d")
+		for k in units.size():
+			var u: Dictionary = units[k]
+			var r = rows[k]
+			var at := "%s[%d]" % ["a" if side == 0 else "d", k]
+			if not (r is Dictionary) or r.get("t") != u["t"]:
+				return "%s 종류가 다르다" % at
+			if u["t"] == "g":
+				if r.get("grade") != u["grade"]:
+					return "%s 등급이 다르다" % at
+				if not _int_in(r.get("n"), 0, int(u["n"])):
+					return "%s n 은 0 ~ %d" % [at, int(u["n"])]
+				heads[side] += int(r["n"])
+				continue
+			offs += 1
+			if r.get("id") != u["id"]:
+				return "%s id 가 다르다" % at
+			if typeof(r.get("down")) != TYPE_BOOL:
+				return "%s down 은 참거짓" % at
+			if not _int_in(r.get("hp"), 0, int(u["hp"])):
+				return "%s hp 는 0 ~ %d" % [at, int(u["hp"])]
+			if not _int_in(r.get("wound"), 0, State.PCT_MAX):
+				return "%s wound 는 0 ~ %d" % [at, State.PCT_MAX]
+			if r["down"] != (r["hp"] == 0):
+				return "%s 쓰러지면 hp 0 · hp 0 이면 쓰러짐" % at
+			if u["down"] and not r["down"]:
+				return "%s 쓰러져 들어온 간부가 일어섰다" % at
+			if not r["down"]:
+				heads[side] += 1
+			if not u["down"]:
+				standing[u["id"]] = true
+	var mo: Dictionary = rc["morale"]
+	var top: int = int(mo["start"]) + int(mo["duel_win"]) * offs
+	var m = res["morale"]
+	if not (m is Array) or m.size() != 2 or not _int_in(m[0], 0, top) or not _int_in(m[1], 0, top):
+		return "morale 은 [0 ~ %d, 0 ~ %d]" % [top, top]
+	var att_won: bool = heads[1] == 0 or m[1] == 0
+	if (res["result"] == "att") != att_won:
+		return "승패가 남은 수 · 사기와 맞지 않다"
+	if res.has("frames") and not _int_in(res["frames"], 0, 100000000):
+		return "frames 는 0 이상"
+	var kl = res.get("kills", [0, 0])
+	if not (kl is Array) or kl.size() != 2 or not _int_in(kl[0], 0, 1000000) or not _int_in(kl[1], 0, 1000000):
+		return "kills 는 [정수, 정수]"
+	if not (res["seen"] is Dictionary):
+		return "seen 은 사전"
+	for id in res["seen"]:
+		if not standing.has(id) or t["chars"].get(id, {}).get("can_copy", false) != true:
+			return "seen %s — 이 구간에 선 카피 간부가 아니다" % id
+		var m2 = res["seen"][id]
+		if not (m2 is Dictionary):
+			return "seen %s 는 사전" % id
+		for sk in m2:
+			if t["rules"].skill_info(String(sk)).is_empty():
+				return "seen %s — 판에 없는 기술 %s" % [id, sk]
+			if not _int_in(m2[sk], 1, 1000000):
+				return "seen %s.%s 는 1 이상" % [id, sk]
+	return ""
+
+
+static func _int_in(v, lo: int, hi: int) -> bool:
+	return typeof(v) == TYPE_INT and v >= lo and v <= hi
+
+
+## 받은 구간 결과를 넣는다(검증을 지난 것) — 유닛 체력 · 머릿수 · 쓰러짐, 본 횟수 → 배우기(copy.seen · can_learn — 일기토와 같은 규칙). 구간 기록을 돌려준다
+static func _apply_rt(s: Dictionary, t: Dictionary, i: int, A: Array, Di: Array, res: Dictionary, rec: Dictionary) -> Dictionary:
+	var start := [_heads(A), _heads(Di)]
+	apply_section(A, res["a"])
+	apply_section(Di, res["d"])
+	var need_n: int = int(t["rules"].rule("copy", "seen", 2))
+	for id in State.sorted_keys(res["seen"]):
+		var p: Dictionary = s["officers"][id]
+		for sk in State.sorted_keys(res["seen"][id]):
+			p["seen"][sk] = int(p["seen"].get(sk, 0)) + int(res["seen"][id][sk])
+			if int(p["seen"][sk]) >= need_n and not p["skills"].has(sk) and t["rules"].can_learn(sk, p["rank"], id):
+				p["skills"].append(sk)
+				rec["learned"].append({"id": id, "skill": sk})
+	return {"i": i, "result": res["result"], "ticks": int(res["ticks"]), "log": [], "duels": [], "start": start,
+		"end": [_heads(A), _heads(Di)], "morale": Array(res["morale"]).duplicate(), "rt": res["by"],
+		"kills": Array(res.get("kills", [0, 0])).duplicate(), "frames": int(res.get("frames", 0))}
 
 
 ## 한 구간 — 구간 시작 일기토(가장 높은 등급끼리 · 남은 간부가 한쪽에만 있을 때까지) → 틱(상한 tick_cap · 넘으면 지키는 쪽이 버팀)
