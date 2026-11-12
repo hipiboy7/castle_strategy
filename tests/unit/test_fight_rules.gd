@@ -172,3 +172,20 @@ func test_room_of_zone() -> void:
 	var Room = preload("res://ui/fight3d/room3d.gd")
 	for k in t["fight"]["rooms"]:
 		check(Room.THEMES.has(t["fight"]["rooms"][k]), "방 %s 을 그릴 수 있다" % t["fight"]["rooms"][k])
+
+
+## FR-403 · FR-414 — A 명단의 싸우는 사람은 그림 A 모델이 있다(없으면 관절 인형으로 내려가지만, A 는 다 갖춘다) · 효과음 이름은 파일이 있다
+func test_a_models_and_sounds_exist() -> void:
+	var t := _t()
+	var s: Dictionary = preload("res://sim/game.gd").new_game(t, "A", 1)["state"]
+	for id in s["officers"]:
+		if t["noncombat"]["A"].has(id) or String(s["officers"][id]["org"]) == "":
+			continue
+		var lk := String(Build.role_of(t, id)["look"])
+		check(ResourceLoader.exists(str(Looks.art_of(lk).get("glb", ""))), "%s(외형 %s) 모델 파일이 있다" % [id, lk])
+	var Sound = preload("res://ui/fight3d/sound.gd")
+	for n in Sound.SFX:
+		check(ResourceLoader.exists("res://assets/sfx/%s.wav" % n), "효과음 %s" % n)
+	for mv in Moves.M.values():
+		if mv.has("hit_sfx"):
+			check(Sound.SFX.has(str(mv["hit_sfx"])), "동작의 맞는 소리 %s 가 목록에 있다" % mv["hit_sfx"])

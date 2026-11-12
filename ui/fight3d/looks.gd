@@ -252,7 +252,7 @@ const ART := {
 ## assets/roster/*) — 편집기 · 시험 · 도구에서만 있고, 폰에서는 has_art 가 거짓이라 관절 인형으로 그린다
 const ROSTER_DIR := "res://assets/roster"
 ## 3 ~ 13장 장 표에 나오는 명부 인물(그림 A · B 를 APK 에 넣는다 — 도트는 굳힌 명부 시트를 그대로 옮김, 사용자 2026-11-08 '그림 B 굳힘')
-const STAGED := ["vasily", "pyoyoung", "namilho", "bulgom", "moseunggyu", "odohwa", "masa", "shire", "ttolbae", "deumiteuri",
+const STAGED := ["chasumin", "icheolmin", "vasily", "pyoyoung", "namilho", "bulgom", "moseunggyu", "odohwa", "masa", "shire", "ttolbae", "deumiteuri",
 	"gustav", "barista", "jangho", "komodo", "keurisa", "medvedi", "ratel", "immuyeol", "choeminuk", "scaledanjang", "mark", "ryujihak",
 	"andycheong", "eunbo", "bison", "pantera", "akila", "richeon", "douchen", "hantaecheol", "yuwoosung", "lingling", "majunyeong",
 	"grolla", "eomji", "geomji", "choehyeokjin", "mahakyoung", "dohaksu", "eogwangdeuk", "sainjin", "jeongseono", "hide", "seungyeong"]

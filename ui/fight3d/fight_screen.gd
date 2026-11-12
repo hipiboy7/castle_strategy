@@ -6,7 +6,7 @@ extends Control
 ## 들어올 때 화면을 가로(screen_mode)로, 끝나면 세로로 되돌리고 finished(구간 결과, 요약)를 낸다 — 부르는 쪽(ui/app.gd)이 닫는다.
 ## 단추: 멈춤 · 속도(×1 · ×2 · ×4) · 자동(봇이 조종 ↔ 직접) · 교대(내 간부가 둘 이상). 뒤로 버튼: 멈춤 → 한 번 더 = 그만두기(봇이 빨리 감아 끝낸다).
 ## 로그 줄: FIGHT open · FIGHT over <win|lose> · FIGHT_FPS avg= min= n=(1초마다 직접 센 값 — docs/성능.md).
-## C4-1: 습격 3구간을 한 화면에서 잇는다(next — 가로 그대로 · 닫기는 close) · 간부 고르기 · 내 간부 목록 · 구간 표시 · 방 두 벌(rooms).
+## C4-1: 습격 3구간을 한 화면에서 잇는다(next — 가로 그대로 · 닫기는 close) · 간부 고르기 · 내 간부 목록 · 구간 표시 · 방 두 벌(rooms) · 효과음(sound.gd).
 ## 설계: docs/C4_설계서_직접조작전투.md 6절 · 요구: FR-403 · FR-404 · FR-405 · FR-408 · FR-409
 
 signal finished(outcome: Dictionary, summary: Dictionary)
@@ -24,17 +24,12 @@ const EventFx = preload("res://ui/fight3d/event_fx.gd")
 const Touch = preload("res://ui/fight3d/touch_ui.gd")
 const Hud = preload("res://ui/fight3d/fight_hud.gd")
 const ScreenMode = preload("res://ui/fight3d/screen_mode.gd")
+const Sound = preload("res://ui/fight3d/sound.gd")
 const SPEEDS := [1, 2, 4]
 const END_WAIT := 240             # 끝난 뒤 이 프레임이 지나면 스스로 닫는다(누르면 더 빨리)
 const CORPSE_T := 150             # 쓰러진 조직원 인형을 치우기까지(그리기 수를 줄인다)
 const COL_CTRL := Color(0.35, 0.85, 1.0, 0.9)
 const COL_MINE := Color(0.35, 0.55, 1.0, 0.45)
-
-
-## 소리 자리 — C4-0 은 소리가 없다(event_fx 가 부르는 play 만 받는다 · C4-1 에서 효과음)
-class Mute:
-	func play(_name: String, _db := 0.0, _pitch := 1.0) -> void:
-		pass
 
 
 var _t: Dictionary = {}
@@ -75,7 +70,10 @@ func start(t: Dictionary, need: Dictionary, opts := {}) -> void:
 	_touch.show_pause = true
 	_evfx = EventFx.new()
 	_evfx.hud = _hud
-	_evfx.snd = Mute.new()
+	var snd = Sound.new()                             # 효과음(FR-414 · 창 없는 점검에서는 내지 않는다)
+	add_child(snd)
+	snd.setup(DisplayServer.get_name() == "headless")
+	_evfx.snd = snd
 	_build(need, opts)
 
 
