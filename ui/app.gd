@@ -29,6 +29,8 @@ const FightScreen = preload("res://ui/fight3d/fight_screen.gd")
 const FightTest = preload("res://src/fight_test.gd")
 const Combat = preload("res://sim/combat.gd")
 const Build = preload("res://fight/build.gd")
+const Settings = preload("res://src/settings.gd")
+const MODE_NAME := {"ask": "매번 묻기", "direct": "늘 직접", "auto": "늘 자동 플레이 보기", "result": "늘 결과만"}
 
 const SAVE := "user://save_auto.json"
 const BROKEN := "user://save_auto.broken.json"
@@ -70,6 +72,12 @@ var _raid := {}                        # 전투 시험 습격(src/fight_test.gd 
 var _raid_i := -1
 var _raid_log: Array = []
 var _fight_fps := {}                   # 마지막 전투 화면 fps {"avg", "min", "n"} — 기록 탭 성능 줄
+var _settings := {}                    # src/settings.gd — fight_mode(C4-2 FR-417)
+var _fights := {}                      # 이번 주에 끝낸 구간 결과 {묶음 키: {"<구간>": 결과}} — 저장 pending_fights(FR-419)
+var _auto_keys: Array = []             # 이번 주 '결과만' · '건너뛰기' 한 묶음 키(남은 구간은 틱)
+var _need := {}                        # 지금 창 · 전투 화면이 맡은 구간(sim 이 낸 need — 설계서 2-2)
+var _fight_key := ""                   # 열린 전투 화면의 묶음 키(같은 습격의 다음 구간이면 화면을 닫지 않고 잇는다)
+var _ask: AcceptDialog                 # 전투 방식 창 [직접] [자동 플레이 보기] [결과만 보기]
 
 var _top: PanelContainer
 var _week: Label
@@ -98,6 +106,7 @@ func _ready() -> void:
 	get_tree().node_added.connect(TouchScroll.fit)      # 스크롤 목록 안 판은 끌기를 스크롤로 넘긴다(T-6)
 	_ephemeral = String(args.get("shot", "")) != ""
 	_t = DataFiles.load_tables()
+	_settings = Settings.defaults() if _ephemeral else Settings.read()["settings"]
 	_sprites = Sprites.new()
 	_build()
 	if not _t["errors"].is_empty():
@@ -137,6 +146,7 @@ func _open_game() -> void:
 			if not rb["same"]:
 				notes.append("다시 돌린 해시가 저장과 다르다(보고만 다를 수 있음)")
 			_draft = r["save"].get("pending", [])
+			_fights = r["save"].get("pending_fights", {})
 			_note = ("저장 알림: " + ", ".join(notes)) if not notes.is_empty() else "이어 하기 — %d주" % int(_g["state"]["turn"])
 			if _over():
 				_note = "앞 판이 %d주로 끝나 있다 — 아래 '새 판으로'를 누르면 1주부터" % int(_g["state"]["length"])
@@ -212,6 +222,7 @@ func _build() -> void:
 	_pages["log"].open_report.connect(_open_report)
 	_pages["log"].new_game.connect(func() -> void: _confirm_new.popup_centered())
 	_pages["log"].fight_test.connect(func() -> void: _open_raid_test(false, SELF_SEED))
+	_pages["log"].fight_mode.connect(_cycle_mode)
 	for k in SOON:
 		var p := PanelContainer.new()
 		var l := _label(SOON[k], "SmallLabel")
@@ -289,6 +300,16 @@ func _build() -> void:
 	_confirm_end.confirmed.connect(_end_week)
 	_confirm_new = _dialog("지금 판을 지우고 시나리오 A 를 1주부터 새로 시작할까요?", "새 판", "돌아가기")
 	_confirm_new.confirmed.connect(_new_game)
+	_ask = AcceptDialog.new()
+	_ask.ok_button_text = "직접"
+	_ask.add_button("자동 플레이 보기", false, "auto")
+	_ask.add_button("결과만 보기", false, "result")
+	_ask.add_cancel_button("나중에")
+	_ask.confirmed.connect(func() -> void: _go("direct"))
+	_ask.custom_action.connect(func(a: StringName) -> void:
+		_ask.hide()
+		_go(String(a)))
+	add_child(_ask)
 
 
 func _dialog(text: String, ok: String, cancel: String) -> ConfirmationDialog:
@@ -394,6 +415,7 @@ func _fill_pages(s: Dictionary, me: String, top: Dictionary) -> void:
 	for i in _draft.size():
 		rows.append({"text": View.order_text(_t, _draft[i]), "ok": marks[i]["ok"], "why": marks[i]["why"]})
 	_pages["orders"].show_orders(rows, top["actions"] + " 남음")
+	_pages["log"].mode_text = "전투 방식: %s (누르면 바뀜)" % MODE_NAME.get(_settings.get("fight_mode", "ask"), "")
 	_pages["log"].show_log(_g.get("reports", []).map(func(e): return View.report_title(e, me)), _info(s, top), _perf_text())
 
 
@@ -465,6 +487,7 @@ func _on_picked(order: Dictionary) -> void:
 	_note = r["why"]
 	_officer = ""
 	_close_sheet()
+	_week_fights_reset()
 	_save()
 
 
@@ -475,6 +498,7 @@ func _on_auto() -> void:
 	_draft = Draft.auto(_g["state"], _t)
 	_note = "맡기기 — 명령 %d개(명령 탭에서 빼거나 고칠 수 있다)" % _draft.size()
 	_officer = ""
+	_week_fights_reset()
 	_save()
 	_refresh()
 
@@ -482,6 +506,7 @@ func _on_auto() -> void:
 func _on_remove(i: int) -> void:
 	_draft = Draft.remove(_draft, i)
 	_note = ""
+	_week_fights_reset()
 	_save()
 	_refresh()
 
@@ -489,6 +514,7 @@ func _on_remove(i: int) -> void:
 func _on_clear() -> void:
 	_draft = []
 	_note = ""
+	_week_fights_reset()
 	_save()
 	_refresh()
 
@@ -510,6 +536,7 @@ func _on_end() -> void:
 func _new_game() -> void:
 	_g = Game.new_game(_t, SCENARIO, SELF_SEED)
 	_draft = []
+	_week_fights_reset()
 	_zone = ""
 	_officer = ""
 	_sheet = ""
@@ -521,13 +548,25 @@ func _new_game() -> void:
 	_refresh()
 
 
-## 주 끝내기 — 내 조직 = 대기 명령 · 다른 조직 = AI → 저장 → 보고
+## 대기 명령이 바뀌면 이번 주에 끝낸 구간 결과는 버린다(준비가 달라져 맞지 않는다)
+func _week_fights_reset() -> void:
+	_fights = {}
+	_auto_keys = []
+
+
+## 주 끝내기 — 내 조직 = 대기 명령 · 다른 조직 = AI → (내 간부가 선 실시간 구간이면 need → 전투 방식 → 전투 화면 → 결과를 넣고 다시) → 저장 → 보고.
+## 설계: docs/C4_설계서_직접조작전투.md 3절 끝 · 요구: FR-416 · FR-417 · FR-418
 func _end_week() -> void:
 	if _phase != "play":
 		return
 	var t0 := Time.get_ticks_usec()
-	var report: Dictionary = Game.step_player(_g, _t, _draft)
+	var report: Dictionary = Game.step_player(_g, _t, _draft, {"fights": _fights, "ask": String(_g["state"]["player"]), "auto": _auto_keys})
 	_turn_us = Time.get_ticks_usec() - t0
+	if report.has("need"):
+		_on_need(report["need"])
+		return
+	_close_fight()
+	_week_fights_reset()
 	_draft = []
 	_officer = ""
 	_note = "" if _save() else "저장하지 못했다"
@@ -575,6 +614,56 @@ func _close_battle() -> void:
 	_relayout()
 
 
+## 실시간으로 풀 구간 — 같은 습격의 다음 구간이면 열린 화면에서 잇고, 아니면 설정(매번 묻기면 창)대로
+func _on_need(n: Dictionary) -> void:
+	_need = n
+	if _fight != null and _fight_key == String(n["key"]):
+		_fight.next(n, _need_opts(n, false))
+		return
+	_close_fight()
+	var mode: String = _settings.get("fight_mode", "ask")
+	if mode != "ask":
+		_go(mode)
+		return
+	var me: String = _g["state"]["player"]
+	var foe: String = n["def"] if int(n["side"]) == 0 else n["att"]
+	_ask.title = "전투 — %s" % View.zone_name(_t, n["zone"])
+	_ask.dialog_text = "%s %s · %s(%d/3)\n[%s] %s 와 싸운다 — 어떻게 할까요?\n(기록 탭에서 늘 같은 방식으로 바꿀 수 있다)" % [
+		View.zone_name(_t, n["zone"]), "습격" if int(n["side"]) == 0 else "지키기", Combat.SECTIONS[int(n["i"])], int(n["i"]) + 1,
+		View.mark(_t, foe), View.org_name(_t, foe) if foe != "" else "주인 없음"]
+	_ask.popup_centered()
+	print("FIGHT ask %s#%d side=%d (%s)" % [n["key"], int(n["i"]), int(n["side"]), me])
+
+
+## 전투 방식 — direct · auto = 전투 화면 · result = 이 습격은 틱(결과만)으로 풀고 다시 돌린다
+func _go(mode: String) -> void:
+	if _need.is_empty():
+		return
+	if mode == "result":
+		if not _auto_keys.has(_need["key"]):
+			_auto_keys.append(_need["key"])
+		_need = {}
+		_end_week()
+		return
+	_fight_key = String(_need["key"])
+	_open_fight(_need, mode == "auto", _need_opts(_need, true))
+
+
+func _need_opts(n: Dictionary, first: bool) -> Dictionary:
+	var name: String = Combat.SECTIONS[int(n["i"])]
+	return {"title": "%s %s — %s" % [View.zone_name(_t, n["zone"]), "습격" if int(n["side"]) == 0 else "지키기", name],
+		"section": "%s %d/3" % [name, int(n["i"]) + 1], "theme": Build.room_of(_t, String(n["zone"])), "pick": first}
+
+
+## 설정 — 전투 방식 차례로 바꾸기(매번 묻기 → 늘 직접 → 늘 자동 보기 → 늘 결과만)
+func _cycle_mode() -> void:
+	var i: int = Settings.MODES.find(_settings.get("fight_mode", "ask"))
+	_settings["fight_mode"] = Settings.MODES[(i + 1) % Settings.MODES.size()]
+	if not _ephemeral and not Settings.write(_settings):
+		_note = "설정을 저장하지 못했다"
+	_refresh()
+
+
 ## 전투 시험(C4-1) — 시나리오 A 습격 하나(fight.json test.raid)를 3구간으로. 첫 구간 앞에서 조종할 간부를 고른다
 func _open_raid_test(auto: bool, seed: int) -> void:
 	_raid = FightTest.raid(_t, seed)
@@ -607,8 +696,22 @@ func _open_fight(need: Dictionary, auto: bool, opts: Dictionary) -> void:
 	queue_redraw()
 
 
-## 전투 화면이 끝났다 — 구간 결과 · 요약을 받고 세로 화면으로 돌아온다(C4-0 은 결과를 알림 글로만 — 판에 넣는 것은 C4-2)
+## 전투 화면이 끝났다 — 판 전투(C4-2)면 구간 결과를 이번 주 결과에 넣고 저장한 뒤 주를 다시 돌린다(다음 구간이면 화면을 잇는다).
+## 전투 시험이면 결과를 알림 글로만(판에 넣지 않는다)
 func _on_fight_done(outcome: Dictionary, summary: Dictionary) -> void:
+	_fight_fps = summary.get("fps", {})
+	if _raid.is_empty() and not _need.is_empty():
+		var k := String(_need["key"])
+		if not _fights.has(k):
+			_fights[k] = {}
+		_fights[k][str(int(outcome["i"]))] = outcome
+		if summary.get("skipped", false) and not _auto_keys.has(k):
+			_auto_keys.append(k)
+		print("FIGHT done %s#%d result=%s by=%s" % [k, int(outcome["i"]), outcome["result"], outcome["by"]])
+		_need = {}
+		_save()
+		_end_week()
+		return
 	if not _raid.is_empty():
 		FightTest.carry(_raid, outcome)
 		_raid_log.append([_raid_i, outcome["result"], int(outcome["kills"][0]), int(summary["frames"])])
@@ -618,14 +721,7 @@ func _on_fight_done(outcome: Dictionary, summary: Dictionary) -> void:
 			_raid_i = nx
 			_fight.next(FightTest.raid_need(_t, _raid, nx), _raid_opts(false))
 			return
-	_fight.close()
-	_fight.queue_free()
-	_fight = null
-	for c in _fight_hidden:
-		if is_instance_valid(c):
-			c.visible = true
-	_fight_hidden = []
-	_fight_fps = summary.get("fps", {})
+	_close_fight()
 	var kills := 0
 	var secs := 0
 	for r in _raid_log:
@@ -635,6 +731,22 @@ func _on_fight_done(outcome: Dictionary, summary: Dictionary) -> void:
 		_raid_log.size(), kills, secs, int(_fight_fps.get("avg", 0)), int(_fight_fps.get("min", 0))]
 	_raid = {}
 	print("FIGHT close result=%s ticks=%d" % [outcome["result"], int(outcome["ticks"])])
+	_relayout()
+	_refresh()
+
+
+## 전투 화면 닫기 — 세로로 돌아오고 숨긴 부품을 다시 보인다(열려 있지 않으면 아무것도 안 함)
+func _close_fight() -> void:
+	if _fight == null:
+		return
+	_fight.close()
+	_fight.queue_free()
+	_fight = null
+	_fight_key = ""
+	for c in _fight_hidden:
+		if is_instance_valid(c):
+			c.visible = true
+	_fight_hidden = []
 	queue_redraw()
 	_relayout()
 	_refresh()
@@ -665,14 +777,15 @@ func _save() -> bool:
 	var s: Dictionary = _g["state"]
 	var meta := {"game_version": version, "castle_common": DataFiles.source_sha(), "seed": s["seed"], "scenario": s["scenario"],
 		"player": s["player"], "mode": s["mode"]}
-	return Storage.write_text(SAVE, Save.to_text(Save.make(meta, s, _g["log"], _draft)))
+	return Storage.write_text(SAVE, Save.to_text(Save.make(meta, s, _g["log"], _draft, _fights)))
 
 
 ## 뒤로 — 열린 것부터 닫고(고르기 · 보고 → 카드 → 고른 간부 → 다른 탭), 다 닫혔으면 '끝낼까요?'
 func _back() -> void:
 	if _fight != null:
 		_fight.back()
-	elif _confirm.visible or _confirm_end.visible or _confirm_new.visible:
+	elif _confirm.visible or _confirm_end.visible or _confirm_new.visible or _ask.visible:
+		_ask.hide()
 		_confirm.hide()
 		_confirm_end.hide()
 		_confirm_new.hide()

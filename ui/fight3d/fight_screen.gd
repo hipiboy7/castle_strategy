@@ -4,7 +4,8 @@ extends Control
 ## 방(room3d) · 인형(그림 A GLB — 없으면 관절 인형) · 연출(event_fx · fx3d) · 카메라(camera_rig) · 위 표시(fight_hud) · 터치(touch_ui)에
 ## 넘기기만 한다(CLAUDE.md 2절 ISP). castle_M3D src/main.gd(2c3e69b)의 판 · 무대 · 인형 · 한 프레임 흐름을 본보기로 새로 썼다.
 ## 들어올 때 화면을 가로(screen_mode)로, 끝나면 세로로 되돌리고 finished(구간 결과, 요약)를 낸다 — 부르는 쪽(ui/app.gd)이 닫는다.
-## 단추: 멈춤 · 속도(×1 · ×2 · ×4) · 자동(봇이 조종 ↔ 직접) · 교대(내 간부가 둘 이상). 뒤로 버튼: 멈춤 → 한 번 더 = 그만두기(봇이 빨리 감아 끝낸다).
+## 단추: 멈춤 · 속도(×1 · ×2 · ×4) · 자동(봇이 조종 ↔ 직접) · 교대(내 간부가 둘 이상). 뒤로 버튼: 멈춤 → 한 번 더 = 건너뛰기(봇이 빨리 감아 끝낸다 ·
+## 요약 skipped — C4-2 에서 부르는 쪽이 그 습격의 남은 구간을 틱으로 푼다 · FR-418).
 ## 로그 줄: FIGHT open · FIGHT over <win|lose> · FIGHT_FPS avg= min= n=(1초마다 직접 센 값 — docs/성능.md).
 ## C4-1: 습격 3구간을 한 화면에서 잇는다(next — 가로 그대로 · 닫기는 close) · 간부 고르기 · 내 간부 목록 · 구간 표시 · 방 두 벌(rooms) · 효과음(sound.gd).
 ## 설계: docs/C4_설계서_직접조작전투.md 6절 · 요구: FR-403 · FR-404 · FR-405 · FR-408 · FR-409
@@ -53,6 +54,7 @@ var _fps: Array = []              # 1초마다 직접 센 fps
 var _title := ""
 var _pick: Control = null         # 간부 고르기 창(열린 동안 판이 멈춘다)
 var _ctrl_id := ""                # 지금 조종 간부 id(다음 구간에도 같은 간부로)
+var _skipped := false             # 이 구간을 '건너뛰기'(봇 빨리 감기)로 끝냈다 — 요약 skipped(부르는 쪽이 남은 구간을 틱으로 — FR-418)
 
 
 ## opts: auto(봇이 조종 — 자동 플레이 보기) · ctrl(조종할 간부 id) · title(시작 알림 글) · section(위 표시 — 예 '입구 1/3') ·
@@ -240,7 +242,7 @@ func set_paused(on: bool) -> void:
 	_paused = on
 	_hud.clear_messages()
 	if on:
-		_hud.message("멈춤", "아무 데나 누르면 계속 · 뒤로 한 번 더 = 그만두기", 3600.0)
+		_hud.message("멈춤", "아무 데나 누르면 계속 · 뒤로 한 번 더 = 건너뛰기(이 구간은 봇이 빨리 · 남은 구간은 결과만)", 3600.0)
 	_touch.take_edges()
 
 
@@ -257,6 +259,8 @@ func back() -> void:
 		_paused = false
 		_hud.clear_messages()
 		_auto = true
+		_skipped = true
+		_d["by"] = "auto"
 		Section.run(_d)
 		_d["world"].events.clear()
 		_over()
@@ -327,6 +331,8 @@ func _finish() -> void:
 	var out: Dictionary = Section.outcome(_d)
 	var s: Dictionary = Section.summary(_d)
 	s["fps"] = fps_stats()
+	s["skipped"] = _skipped
+	_skipped = false
 	print("FIGHT_FPS avg=%d min=%d n=%d" % [s["fps"]["avg"], s["fps"]["min"], s["fps"]["n"]])
 	_ctrl_id = _d["hero"].char_id if _d["hero"] != null else _ctrl_id
 	_d = {}

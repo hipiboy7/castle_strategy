@@ -104,8 +104,10 @@ class LogPage extends PanelContainer:
 	signal open_report(i: int)
 	signal new_game
 	signal fight_test
+	signal fight_mode                                   # 전투 방식 설정 바꾸기(C4-2 FR-417)
 	var _v: VBoxContainer
 	var _perf: Label
+	var mode_text := ""
 
 	func _ready() -> void:
 		_v = load("res://ui/tab_pages.gd")._scroll(self)
@@ -131,6 +133,13 @@ class LogPage extends PanelContainer:
 		n.custom_minimum_size = Vector2(0, 130)
 		n.pressed.connect(func() -> void: new_game.emit())
 		_v.add_child(n)
+		if mode_text != "":
+			var fm := Button.new()
+			fm.text = mode_text
+			fm.theme_type_variation = "TabButton"
+			fm.custom_minimum_size = Vector2(0, 130)
+			fm.pressed.connect(func() -> void: fight_mode.emit())
+			_v.add_child(fm)
 		var ft := Button.new()                          # C4-0 기술 검증 — 실시간 전투 화면 한 판(가로 · 3D). 판에는 영향이 없다
 		ft.text = "전투 시험(가로 화면 · 한 판)"
 		ft.theme_type_variation = "TabButton"

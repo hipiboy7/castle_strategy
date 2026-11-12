@@ -7,6 +7,7 @@ const Section = preload("res://fight/section.gd")
 const Combat = preload("res://sim/combat.gd")
 const Game = preload("res://sim/game.gd")
 const DataFiles = preload("res://src/data_files.gd")
+const FightTest = preload("res://src/fight_test.gd")
 
 var _tables := {}
 
@@ -300,3 +301,16 @@ func test_pick_ctrl_and_party() -> void:
 	check(not Section.set_ctrl(d, "jintae"), "쓰러진 간부는 못 고른다")
 	check(not Section.set_ctrl(d, "없는 사람"), "없는 사람")
 	eq(Section.party(d)[1]["down"], true, "쓰러짐 표시")
+
+
+## C4-2 FR-418 — 건너뛰기(봇 빨리 감기 — Section.run)는 봇이 처음부터 끝까지 한 것과 같은 결과(사람 입력이 없었으면)
+func test_skip_is_same_as_bot() -> void:
+	var t := _t()
+	var need := FightTest.need(t, 3)
+	var whole := Section.outcome(Section.simulate(t, need, {"by": "auto"}))
+	var d := Section.make(t, need, {"by": "auto"})
+	for k in 200:
+		Section.step(d)
+		d["world"].events.clear()
+	Section.run(d)
+	eq(JSON.stringify(Section.outcome(d), "", true), JSON.stringify(whole, "", true), "200프레임 뒤 빨리 감기 = 처음부터 봇")

@@ -14,6 +14,7 @@ const FACILITY := {"hq": "본거지", "office": "사무실", "warehouse": "창�
 const KIND := {"move": "이동", "open": "개업", "expand": "확장", "recruit": "모집", "rest": "쉼", "raid": "습격", "defend": "지키기"}
 const CARD := {"charge": "정면 돌파", "surprise": "기습", "decoy": "미끼", "bypass": "우회로", "shield": "방패조", "ambush": "매복"}
 const SECTION := ["입구", "안", "본진"]
+const RT := {"direct": "직접", "auto": "자동"}                # 실시간으로 끝낸 구간(C4-2 FR-420)
 const DUEL_CARD := {"attack": "공격", "skill": "기술", "guard": "막기", "parry": "쳐내기", "stunned": "기절"}
 const RESULT := {"win": "승리", "lose": "패배"}
 const RESULT_WHY := {"hold_all": "판의 구역을 모두 차지했다", "boss": "두목이 잡히거나 죽었다", "zones": "구역을 모두 잃었다", "time": "판 길이 안에 목표를 이루지 못했다"}
@@ -303,11 +304,20 @@ static func battle_lines(rec: Dictionary, t: Dictionary, me: String) -> Array:
 		head += " (%s)" % " · ".join(rec["cards"].map(func(c): return CARD.get(c, c)))
 	out.append(head)
 	var secs := []
+	var rts := []
 	for sec in rec["sections"]:
 		var r: String = {"att": "뚫음", "def": "막힘", "skip": "건너뜀"}.get(sec["result"], sec["result"])
+		if sec.has("rt"):
+			secs.append("%s %s(%s)" % [SECTION[int(sec["i"])], r, RT.get(sec["rt"], sec["rt"])])
+			rts.append("   %s %s — %d초 · 쓰러뜨림 우리 %d · 적 %d" % [SECTION[int(sec["i"])], RT.get(sec["rt"], sec["rt"]), int(sec.get("frames", 0)) / 60,
+				int(sec["kills"][0 if rec["att"] == me else 1]), int(sec["kills"][1 if rec["att"] == me else 0])])
+			continue
 		secs.append("%s %s%s" % [SECTION[int(sec["i"])], r, (" %d틱" % int(sec["ticks"])) if int(sec["ticks"]) > 0 else ""])
 	if not secs.is_empty():
 		out.append("   " + " · ".join(secs))
+	out.append_array(rts)
+	for rj in rec.get("rejected", []):
+		out.append("   %s 실시간 결과를 버림 — %s(결과만으로 풂)" % [SECTION[int(rj["i"])], rj["why"]])
 	for sec in rec["sections"]:
 		for d in sec["duels"]:
 			out.append("   일기토 %s — %s 이김(%d합%s)" % [_pair(t, d), person(t, d["winner"]), d["rounds"].size(), " · 한 방" if d["ko"] else ""])
@@ -344,7 +354,7 @@ static func battle_frames(rec: Dictionary, t: Dictionary, max_ticks: int = 12) -
 		var i := int(sec["i"])
 		var st: Array = sec["start"]
 		out.append({"sec": i, "tick": 0, "att": int(st[0]), "def": int(st[1]), "am": 100, "dm": 100, "duel": {},
-			"text": "%s — %s" % [SECTION[i], "건너뜀(우회로)" if sec["result"] == "skip" else "들어감"]})
+			"text": "%s — %s" % [SECTION[i], "건너뜀(우회로)" if sec["result"] == "skip" else ("들어감 — %s" % RT[sec["rt"]] if RT.has(sec.get("rt", "")) else "들어감")]})
 		for d in sec["duels"]:
 			var w: int = int(d["w"])
 			var ids := [d["winner"] if w == 0 else d["loser"], d["loser"] if w == 0 else d["winner"]]

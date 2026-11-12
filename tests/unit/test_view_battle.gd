@@ -78,3 +78,24 @@ func test_report_order_battle_first() -> void:
 		"before": g["state"], "after": g["state"]}
 	eq(View.report_cards(quiet, t, "bujinpa").map(func(c): return c["kind"]), ["goal", "money", "orders", "intel", "battle"], "조용한 주는 전투가 끝")
 	eq(View.goal_card({"scenario": "Z", "zones": {}, "flags": {}}, t, "bujinpa"), {}, "목표 없는 시나리오는 카드 없음")
+
+
+## C4-2 FR-420 — 실시간으로 끝낸 구간: 구간 줄에 '직접' · '자동' · 요약 줄(걸린 시간 · 쓰러뜨림 — 내 쪽 먼저) · 버린 결과 줄 · 재생 첫 장면 표시
+func test_realtime_marks() -> void:
+	var t := _t()
+	var rec := {"zone": "bukgu", "att": "bujinpa", "def": "dssecurity", "won": true, "cards": [], "notes": [], "loss": {}, "down": [],
+		"captive": [], "learned": [], "rejected": [{"i": 2, "why": "i 는 2"}], "sections": [
+		{"i": 0, "result": "att", "ticks": 4, "start": [10, 8], "end": [9, 0], "morale": [100, 0], "duels": [], "log": [],
+			"rt": "direct", "frames": 1260, "kills": [8, 1]},
+		{"i": 1, "result": "att", "ticks": 2, "start": [9, 5], "end": [9, 0], "morale": [100, 0], "duels": [], "log": [],
+			"rt": "auto", "frames": 600, "kills": [5, 0]},
+		{"i": 2, "result": "att", "ticks": 3, "start": [9, 4], "end": [8, 0], "morale": [100, 0], "duels": [], "log": [[8, 0, 100, 0]]}]}
+	var lines := View.battle_lines(rec, t, "bujinpa")
+	eq(lines[1], "   입구 뚫음(직접) · 안 뚫음(자동) · 본진 뚫음 3틱", "구간 줄 표시")
+	eq(lines[2], "   입구 직접 — 21초 · 쓰러뜨림 우리 8 · 적 1", "직접 요약")
+	eq(lines[3], "   안 자동 — 10초 · 쓰러뜨림 우리 5 · 적 0", "자동 요약")
+	check(lines.has("   본진 실시간 결과를 버림 — i 는 2(결과만으로 풂)"), "버린 결과 줄")
+	var def_view := View.battle_lines(rec, t, "dssecurity")
+	eq(def_view[2], "   입구 직접 — 21초 · 쓰러뜨림 우리 1 · 적 8", "지키는 쪽에서 보면 내 쪽 먼저")
+	var frames := View.battle_frames(rec, t)
+	eq(frames[0]["text"], "입구 — 들어감 — 직접", "재생 첫 장면에 직접 표시")
