@@ -42,6 +42,7 @@ func test_rules_rt_same_values_as_table() -> void:
 			eq(rt.rank_damage_k(a, b), r.rank_damage_k(a, b), "rank_damage_k %s %s" % [a, b])
 			eq(rt.shrugs_off(a, b), r.shrugs_off(a, b), "shrugs_off %s %s" % [a, b])
 			eq(rt.one_shot(a, b), r.one_shot(a, b), "one_shot %s %s" % [a, b])
+			eq(rt.roulette_reflects(a, b), r.roulette_reflects(a, b), "roulette_reflects %s %s" % [a, b])
 			eq(rt.immune_lower(a, b), r.immune_lower(a, b), "immune_lower %s %s" % [a, b])
 
 
@@ -147,6 +148,9 @@ func test_fight_roles_ids_exist() -> void:
 		check(row["moveset"].has("combo"), "연타 동작이 있다")
 		check(EnemyAI.PROFILES.has(row["ai"]), "AI 프로필 %s" % row["ai"])
 		check(Looks.known(row["look"]), "외형 %s 이 외형 표에 있다" % row["look"])
+	for row in t["scenarios"]["A"]["roster"]:
+		var id: String = row["id"]
+		check(fr["roles"].has(id) or t["noncombat"]["A"].has(id), "A 명단 %s 는 역할이 있다(싸우지 않는 사람 빼고 — C4-1 FR-411)" % id)
 	for g in fr["troops"]:
 		check(t["rules"].rank_index(g) >= 0, "조직원 등급 %s 는 사다리에 있다" % g)
 		for p in fr["troops"][g]["ai"]:

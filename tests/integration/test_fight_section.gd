@@ -161,3 +161,125 @@ func test_fight_test_fixture() -> void:
 	var a: Dictionary = FightTest.run(t, 1)
 	eq(JSON.stringify(a), JSON.stringify(FightTest.run(t, 1)), "같은 시드면 같은 값")
 	check(a["over"] != "" and a["outcome"]["result"] != "", "구간이 끝난다(%s)" % a["over"])
+
+
+## FR-408 · FR-409 — 습격 하나를 3구간으로: 틱과 같은 준비(prepare) · 간부 최대 4 · 들어가는 쪽 체력 · 머릿수가 구간을 넘어 이어진다
+func test_raid_three_sections_carry() -> void:
+	var FightTest = preload("res://src/fight_test.gd")
+	var t := _t()
+	var r: Dictionary = FightTest.raid(t, 1)
+	var offs: Array = r["prep"]["A"].filter(func(u): return u["t"] == "o")
+	check(offs.size() >= 2 and offs.size() <= int(t["combat"]["raid"]["max_officers"]), "참전 간부 %d 명(최대 4)" % offs.size())
+	var n0: Dictionary = FightTest.raid_need(t, r, 0)
+	var n1: Dictionary = FightTest.raid_need(t, r, 1)
+	check(n0["seed"] != n1["seed"], "구간마다 다른 시드")
+	eq(n0["cards"], t["fight"]["test"]["raid"]["cards"], "카드가 need 로")
+	var d := Section.simulate(t, n0, {"by": "auto"}, int(t["fight"]["test"]["max_frames"]))
+	var o := Section.outcome(d)
+	FightTest.carry(r, o)
+	var n1b: Dictionary = FightTest.raid_need(t, r, 1)
+	for k in o["a"].size():
+		var row: Dictionary = o["a"][k]
+		var u: Dictionary = n1b["A"][k]
+		if row["t"] == "o":
+			eq([u["hp"], u["down"]], [row["hp"], row["down"]], "다음 구간 간부 %s 체력 · 쓰러짐이 이어진다" % row["id"])
+		else:
+			eq(u["n"], row["n"], "다음 구간 %s 머릿수가 이어진다" % row["grade"])
+	eq(FightTest.next_section(r, 0), 1, "다음 구간")
+	r["prep"]["skip"] = 1
+	eq(FightTest.next_section(r, 0), 2, "우회로로 건너뛴 구간은 넘는다")
+	eq(FightTest.next_section(r, 2), -1, "마지막 뒤는 없다")
+	var run: Dictionary = FightTest.run(t, 1)
+	check(run["sections"].size() >= 1 and run["sections"].size() <= 3, "구간 %d 개" % run["sections"].size())
+	eq(run["won"], run["over"] == "win" and run["sections"].size() == 3, "셋 다 이기면 습격을 이긴다")
+
+
+## FR-413 — 작전 카드(틱과 같은 combat.json 값): 정면 돌파 · 기습 · 매복은 첫 구간만 · 방패조는 모든 구간
+func test_cards_scale_like_ticks() -> void:
+	var t := _t()
+	var cd: Dictionary = t["combat"]["cards"]
+	var tf := int(t["fight"]["tick_frames"])
+	var need := _need(["kimshin"], [["건달급", 6]])
+	need["cards"] = ["charge", "shield"]
+	need["def_cards"] = ["ambush", "shield"]
+	var d := Section.make(t, need)
+	var w = d["world"]
+	eq(w.team_dmg_k, [float(cd["charge"]["dmg_bp"]) / 10000.0, float(cd["ambush"]["dmg_bp"]) / 10000.0], "정면 돌파 × 1.2 · 매복 × 1.5(첫 구간)")
+	eq(w.mob_taken_k, [0.6, 0.6], "방패조 — 그 쪽 조직원이 받는 피해 × 0.6")
+	while int(d["fight_t"]) <= tf:
+		Section.step(d)
+		w.events.clear()
+	eq(w.team_dmg_k[1], 1.0, "매복은 첫 틱 길이만")
+	var n2 := need.duplicate(true)
+	n2["i"] = 1
+	var d2 := Section.make(t, n2)
+	eq(d2["world"].team_dmg_k, [1.0, 1.0], "둘째 구간 — 정면 돌파 · 매복 없음")
+	eq(d2["world"].mob_taken_k, [0.6, 0.6], "방패조는 그대로")
+	var n3 := _need(["kimshin"], [["건달급", 6]])
+	n3["cards"] = ["surprise"]
+	var d3 := Section.make(t, n3)
+	var hold := int(cd["surprise"]["skip_ticks"]) * tf
+	eq(d3["surprise"], hold, "기습 — 틱 둘 × 틱 길이")
+	var struck := false
+	while int(d3["fight_t"]) < hold:
+		Section.step(d3)
+		for f in d3["ais"]:
+			struck = struck or not f.intent.is_empty()
+		d3["world"].events.clear()
+	check(not struck, "기습 동안 지키는 쪽은 치지 못한다")
+	var later := false
+	for k in 120:
+		Section.step(d3)
+		for f in d3["ais"]:
+			later = later or not f.intent.is_empty()
+		d3["world"].events.clear()
+	check(later, "기습이 끝나면 친다")
+	eq(Section._no_strike({"attack": true, "skill": true, "use": "x", "dash": true, "move": Vector2(1, 0), "parry": true}),
+		{"move": Vector2(1, 0), "parry": true}, "기습 중 지키는 쪽 사람 입력 — 치기 · 기술 · 대시를 뺀다")
+
+
+## FR-411 · 92차 해석 ⑥ — 간부가 기술을 내면 서 있는 can_copy 간부(같은 편 · 기절 중도)가 본 횟수 +1 · 한 신호는 한 번만 센다
+func test_copy_counts_seen() -> void:
+	var t := _t()
+	var need := _need(["kimshin", "jintae"], [["건달급", 2]])
+	var d := Section.make(t, need)
+	var k = d["mine"][0] if d["mine"][0].char_id == "kimshin" else d["mine"][1]
+	var j = d["mine"][1] if k == d["mine"][0] else d["mine"][0]
+	check(k.can_copy, "김신은 카피(1층 can_copy)")
+	k.state = "stun"
+	var w = d["world"]
+	d["ev0"] = w.events.size()
+	w.events.append(["skill", j, {"id": "jintae_vital"}])
+	w.events.append(["skill", j, {"id": "없는 기술"}])
+	Section._after(d)
+	Section._after(d)
+	eq(d["seen"].get("kimshin", {}), {"jintae_vital": 1}, "같은 편 기술 · 기절 중에도 본다 · 없는 기술은 안 센다 · 같은 신호는 한 번")
+	check(not d["seen"].has("jintae") or j.can_copy, "can_copy 가 아니면 세지 않는다")
+	d["over"] = "win"
+	d["result"] = "att"
+	eq(Section.outcome(d)["seen"], {"kimshin": {"jintae_vital": 1}}, "구간 결과의 seen")
+
+
+## FR-410 — 동시에 치는 수는 대상마다(attackers): 내 간부 둘이면 한꺼번에 둘보다 많이 칠 수 있지만, 한 사람에게는 attackers 까지
+func test_attackers_cap_per_target() -> void:
+	var t := _t()
+	var cap := int(t["fight"]["attackers"])
+	var d := Section.make(t, _need(["kimshin", "jintae"], [["건달급", 20]], 3))
+	var most := 0
+	var total := 0
+	for k in 900:
+		Section.step(d)
+		d["world"].events.clear()
+		var by := {}
+		var n := 0
+		for f in d["ais"]:
+			if d["ais"][f].busy() and f.target() != null:
+				by[f.target()] = int(by.get(f.target(), 0)) + 1
+				n += 1
+		for v in by.values():
+			most = maxi(most, v)
+		total = maxi(total, n)
+		if d["over"] != "":
+			break
+	check(most <= cap, "한 사람에게 동시에 %d 명까지(본 최대 %d)" % [cap, most])
+	check(total > cap, "대상이 둘이면 모두 합쳐 %d 명보다 많이 친다(본 최대 %d)" % [cap, total])

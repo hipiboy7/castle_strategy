@@ -1,6 +1,7 @@
 extends RefCounted
 ## 명령 처리기 raid(충돌 단계 · 습격) — 검사만 한다(상태를 바꾸지 않음). 전투는 sim/combat.gd run_phase 가 (구역 → 조직) 순으로 묶어 돌린다.
 ## 처리기 꼴(LSP): apply(s, o, ctx) -> 까닭("" = 받을 수 있음). to = 들어갈 구역(우리 구역이 아님 · 간부가 서 있는 구역의 땅길 이웃이거나 그 구역).
+## 싸우지 않는 사람(명단 noncombat — castle_common 92차 · C4 FR-409)은 나서지 못한다.
 ## args.cards = 작전 카드(data/game/combat.json attack_cards · 최대 max_cards · 겹치지 않음). 우회로는 그 구역 정보 2 이상(08 4-1).
 ## 등록: sim/orders.gd KINDS · 설계: docs/C3_설계서_습격과일기토.md 2절 · 요구: FR-301 · FR-302 · 시험: tests/unit/test_combat.gd
 
@@ -13,6 +14,8 @@ static func apply(s: Dictionary, o: Dictionary, ctx: Dictionary) -> String:
 	var to: String = o["to"]
 	if not s["zones"].has(to):
 		return "판에 없는 구역 %s" % to
+	if Tables.noncombat(t, String(s.get("scenario", "")), o["by"]):
+		return "싸우지 않는 사람이다(명단 noncombat)"
 	if s["zones"][to]["owner"] == o["org"]:
 		return "이미 우리 구역이다"
 	if p["zone"] != to and not Tables.neighbors(t, p["zone"]).has(to):

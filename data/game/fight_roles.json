@@ -1,9 +1,18 @@
 {
-  "_about": "3층(이 판 소유) 실시간 전투의 인물 역할 — fight/build.gd. roles: 인물 id → 동작 묶음(moveset — 조종 · 봇이 쓰는 연타 · 대시 · 반격 · 제압) · 적 AI 프로필(ai — 상대 쪽에 설 때) · 외형(look — ui/fight3d/looks.gd 의 외형 이름. 그림 A 모델 assets/models/*_a.glb 가 있으면 그것, 없으면 관절 인형). default: roles 에 없는 간부. troops: 조직원 등급 → AI 프로필 목록 · 외형 목록(사람마다 차례로 돌려 쓴다). 동작 id 는 fight/moves.gd · 프로필 id 는 fight/enemy_ai.gd 에 있어야 한다(시험 tests/unit/test_fight_roles.gd). 처음 값은 castle_M3D 2c3e69b 장 표(hoeam.gd · hotel.gd ROLES)와 적 원형(x_)에서 옮겼다. C4-0 은 시나리오 A 의 김신 일파와 엑스트라만 — C4-1 에서 A 명단 전부.",
+  "_about": "3층(이 판 소유) 실시간 전투의 인물 역할 — fight/build.gd. roles: 인물 id → 동작 묶음(moveset — 조종 · 봇이 쓰는 연타 · 대시 · 반격 · 제압) · 적 AI 프로필(ai — 상대 쪽에 설 때) · 외형(look — ui/fight3d/looks.gd 의 외형 이름. 그림 A 모델 assets/models/*_a.glb 가 있으면 그것, 없으면 관절 인형). default: roles 에 없는 간부. troops: 조직원 등급 → AI 프로필 목록 · 외형 목록(사람마다 차례로 돌려 쓴다). 동작 id 는 fight/moves.gd · 프로필 id 는 fight/enemy_ai.gd 에 있어야 한다(시험 tests/unit/test_fight_roles.gd). 처음 값은 castle_M3D 2c3e69b 장 표(hoeam.gd · hotel.gd ROLES)와 적 원형(x_)에서 옮겼다. C4-1 — 시나리오 A 명단의 싸우는 사람 전부(noncombat 김성유 · 리사 빼고). posture · stagger · poise 는 castle_M3D 장 표(hoeam · prologue · haseong · ch4_russia)의 값(맞추기는 C4-3). 차수민 · 이철민은 castle_M3D 장 표에 없어 동작 묶음 · AI 는 원형 — 외형만 명부(looks_common ROSTER).",
   "roles": {
     "kimshin": {"moveset": {"combo": "kf_jab", "dash": "kf_dash", "counter": "kf_counter", "finisher": "kf_finisher"}, "ai": "x_brawler", "look": "kim_bare"},
     "jintae": {"moveset": {"combo": "j_jab", "dash": "j_dash", "finisher": "j_finisher"}, "ai": "x_brawler", "look": "jintae"},
-    "woojin": {"moveset": {"combo": "w_jab", "dash": "w_dash", "finisher": "w_finisher"}, "ai": "x_brawler", "look": "woojin"}
+    "woojin": {"moveset": {"combo": "w_jab", "dash": "w_dash", "finisher": "w_finisher"}, "ai": "x_brawler", "look": "woojin"},
+    "chasumin": {"moveset": {"combo": "kf_jab", "dash": "kf_dash", "finisher": "kf_finisher"}, "ai": "x_kicker", "look": "chasumin"},
+    "icheolmin": {"moveset": {"combo": "kf_jab", "dash": "kf_dash", "finisher": "kf_finisher"}, "ai": "x_brawler", "look": "icheolmin"},
+    "kimdaegeon": {"moveset": {"combo": "dk_jab", "dash": "dk_dash", "finisher": "dk_finisher"}, "ai": "daegeon", "look": "kimdaegeon", "posture": 90, "stagger": 50},
+    "kimseongjun": {"moveset": {"combo": "sj_flurry", "dash": "sj_kick", "finisher": "sj_upslash"}, "ai": "seongjun", "look": "kimseongjun", "posture": 220, "stagger": 70, "poise": 28},
+    "yundeoksu": {"moveset": {"combo": "yd_jab", "dash": "yd_hook", "finisher": "yd_stomp"}, "ai": "deoksu", "look": "yundeoksu", "posture": 600, "stagger": 80, "poise": 34},
+    "kimjaehoon": {"moveset": {"combo": "jh_swing", "dash": "jh_shove", "finisher": "jh_swing"}, "ai": "jaehoon", "look": "kimjaehoon", "posture": 60, "stagger": 70},
+    "gangmanjae": {"moveset": {"combo": "mj_hook", "dash": "mj_rush", "finisher": "mj_straight"}, "ai": "manjae", "look": "gangmanjae", "posture": 260, "stagger": 75, "poise": 30},
+    "gunter": {"moveset": {"combo": "gt_swing", "dash": "gt_point", "finisher": "gt_glass"}, "ai": "gunter", "look": "gunter", "posture": 400, "stagger": 70, "poise": 30},
+    "kimhyeokju": {"moveset": {"combo": "hj_jab", "dash": "hj_rush", "finisher": "hj_thrust"}, "ai": "hyeokju", "look": "kimhyeokju", "posture": 200, "stagger": 70, "poise": 28}
   },
   "default": {"moveset": {"combo": "kf_jab", "dash": "kf_dash", "finisher": "kf_finisher"}, "ai": "x_brawler", "look": "guard"},
   "troops": {

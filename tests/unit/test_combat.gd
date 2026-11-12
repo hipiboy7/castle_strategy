@@ -210,3 +210,50 @@ func test_tick_cap_defender_holds() -> void:
 	eq(sec["result"], "def", "상한을 넘기면 지키는 쪽이 버틴 것")
 	eq(D[0]["n"], 95, "원콤 쓸어 내기 1 + ⌊8/2⌋ = 5명")
 	eq(A[0]["hp"], A[0]["max"], "무적 3틱 — 아랫급 피해 없음")
+
+
+## C4 FR-409 — 싸우지 않는 사람(명단 noncombat · castle_common 92차)은 나서지도 지키지도 않는다
+func test_noncombat_never_fights() -> void:
+	var t := _t()
+	var s := _a()
+	check(t["noncombat"]["A"].has("kimseongyu"), "A 명단의 김성유는 noncombat(받은 사본)")
+	var p: Dictionary = s["officers"]["kimseongyu"]
+	p["org"] = "bujinpa"
+	p["zone"] = "bujindong"
+	p["status"] = "active"
+	var ctx := _ctx(s)
+	eq(Orders.apply_one(s, Orders.make("bujinpa", "kimseongyu", "raid", "namgu", {"cards": []}), ctx), "싸우지 않는 사람이다(명단 noncombat)", "습격 명령을 받지 않는다")
+	var prep := Combat.prepare(s, t, "namgu", "bujinpa", ["kimshin", "kimseongyu"], [], [])
+	eq(prep["A"].filter(func(u): return u["t"] == "o").map(func(u): return u["id"]), ["kimshin"], "준비에도 서지 않는다")
+	p["org"] = "dssecurity"
+	p["zone"] = "bukgu"
+	var prep2 := Combat.prepare(s, t, "bukgu", "bujinpa", ["kimshin"], [], [])
+	check(not prep2["rec"]["def_officers"].has("kimseongyu"), "지키는 쪽 간부에도 없다")
+	eq(Combat.fighters_only(s, t, ["kimseongyu", "kimshin"]), ["kimshin"], "fighters_only")
+
+
+## C4 FR-408 — 준비는 상태를 바꾸지 않고, 구간 결과 줄을 유닛에 옮기면 들어가는 쪽이 다음 구간으로 이어진다
+func test_prepare_and_apply_section() -> void:
+	var t := _t()
+	var s := _a()
+	s["orgs"]["bujinpa"]["intel"]["bukgu"] = 2
+	var before := State.hash_of(s)
+	var prep := Combat.prepare(s, t, "bukgu", "bujinpa", ["kimshin", "jintae"], ["charge"], [])
+	eq(State.hash_of(s), before, "준비는 상태를 바꾸지 않는다")
+	eq(prep["def"], "dssecurity", "지키는 조직")
+	eq(prep["D"].size(), 3, "구간 셋")
+	eq(prep["skip"], -1, "우회로 없음")
+	var A: Array = prep["A"]
+	var rows := []
+	for u in A:
+		rows.append({"t": "g", "grade": u["grade"], "n": u["n"] - 1} if u["t"] == "g" else {"t": "o", "id": u["id"], "hp": 5, "down": u["id"] == "jintae", "wound": 6000})
+	Combat.apply_section(A, rows)
+	var k: Dictionary = A.filter(func(u): return u["t"] == "o" and u["id"] == "kimshin")[0]
+	var j: Dictionary = A.filter(func(u): return u["t"] == "o" and u["id"] == "jintae")[0]
+	eq([k["hp"], k["down"]], [5, false], "체력이 이어진다")
+	eq([j["hp"], j["down"], j["wound"]], [0, true, 6000], "쓰러짐 · 부상이 이어진다")
+	for u in A:
+		if u["t"] == "g":
+			eq(u["n"], u["n0"] - 1, "머릿수가 이어진다(%s)" % u["grade"])
+	Combat.apply_section(A, [{"t": "o", "hp": 99999, "down": false}])
+	eq(A[0]["hp"], 5, "범위 밖 값은 자른다(체력이 늘지 않는다)")

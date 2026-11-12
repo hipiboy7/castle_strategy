@@ -63,6 +63,8 @@ static func officer(t: Dictionary, rules, u: Dictionary, team: int, known: Dicti
 	f.poise = float(role.get("poise", base["poise"]))
 	f.moveset = role["moveset"]
 	f.can_parry = c.get("can_parry", false) == true
+	f.can_copy = c.get("can_copy", false) == true
+	f.roulette = Array(known.get("skills", [])).has("roulette")
 	f.skills = Skills.entries(rules, known.get("skills", []), f.rank)
 	f.gauge_max = rules.bars_for(f.rank) * rules.bar_points()
 	f.gauge_rate = rules.gauge_rate(f.rank, st.get("기술"))

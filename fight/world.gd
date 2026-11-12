@@ -1,5 +1,6 @@
 extends RefCounted
-## [옮김] castle_M3D `src/combat/world.gd`(2c3e69b) — 바꾼 것: 규칙 인스턴스 · 한 대 피해 _dmg(틱 기준) · 막기 배율 = 2층 0.7 · 카드 배율(team_dmg_k · mob_taken_k) · 쓰러뜨린 쪽 기록. 설계: docs/C4_설계서_직접조작전투.md 4-1 · 요구: FR-401
+## [옮김] castle_M3D `src/combat/world.gd`(2c3e69b) — 바꾼 것: 규칙 인스턴스 · 한 대 피해 _dmg(틱 기준) · 막기 배율 = 2층 0.7 · 카드 배율(team_dmg_k · mob_taken_k) · 쓰러뜨린 쪽 기록 ·
+##   castle_common 92차 턴제 판 해석 ①(룰렛 — 즉사 계열이면 체력 1) ②(막아도 한 방) ④(한 방이 lethal 보다 앞) — C4-1 · 일기토(sim/duel.gd)와 같은 규칙. 설계: docs/C4_설계서_직접조작전투.md 4-1 · 요구: FR-401
 ## 결투 판정 — 공격 판정 · 구르기 무적 · 칼날 쳐내기(늦은 쳐내기) · 막기 · 체간 · 빈틈 · 제압 · 역경직 · 페이즈 ·
 ## 기술(엇박 관통 · 엇박 피해 · 기절 · 삼연타) · 기술 게이지 · 등급 차 강함.
 ## 2층 규칙(엇박 피해 lethal_fraction · 기절 stun_sec · 등급 차 rank_damage_k · shrugs_off · 게이지 얻는 양)은 공통 데이터
@@ -234,6 +235,10 @@ func _resolve(a, d) -> void:
 	if parryable and d.parry_open() and _faces(d, a):
 		_parry(a, d, at, mv)
 		return
+	if parryable and d.state == "parry" and _faces(d, a) and not d.oneshot_immune and Skills.one_shot(rules, a.rank, d.rank, false):
+		events.append(["block", d, at])                # 92차 해석 ② — 막기는 한 방을 줄이지 않는다(막아도 쓰러진다)
+		_take_hit(a, d, mv, at)
+		return
 	if parryable and d.state == "parry" and _faces(d, a):
 		stats["blocks"] += 1
 		d.hp -= _dmg(a, d, mv) * block_dmg_k
@@ -283,10 +288,20 @@ func _take_hit(a, d, mv: Dictionary, at: Vector3) -> void:
 		stats["boss_offbeats" if a.is_boss else "offbeats"] += 1
 	# 한 방: 기술의 ko_rank(그 등급 이하) · 등급 차 one_shot_gap 이상 — 조작 인물 · 방의 보스는 빼고(보스전은 보통 피해로 —
 	# 위빙 · 오리지널이 보스를 두 번에 눕혀 2장 신태진전이 17초에 끝났다, 봇 판 2026-11-08)
-	if lethal == "" and not d.oneshot_immune and (Skills.kills(rules, mv, d.rank) or Skills.one_shot(rules, a.rank, d.rank, false)):
+	# 92차 해석 ④ — 한 방(등급 차)은 lethal 기술에도 이긴다(쓰러뜨림 · 비율 1)
+	var kill := lethal != "" and float(rules.lethal_fraction(lethal, d.rank, a.rank, a.skill_paid)) >= 1.0
+	if not d.oneshot_immune and ((lethal == "" and Skills.kills(rules, mv, d.rank)) or Skills.one_shot(rules, a.rank, d.rank, false)):
 		dmg = maxf(dmg, d.hp)
+		kill = true
 		events.append(["oneshot", d, at])
+	var hp0: float = d.hp
 	d.hp -= dmg
+	# 러시안 룰렛(92차 해석 ①) — 기술로 친 사람에게 같은 피해. 즉사 계열(한 방 · 비율 1 · ko_rank)이면 친 쪽 체력 1 을 남긴다
+	if d.roulette and mv["skill"] and rules.roulette_reflects(d.rank, a.rank):
+		var back: float = minf(dmg, hp0)
+		a.hp = maxf(minf(1.0, a.hp) if kill else 0.0, a.hp - back)
+		events.append(["roulette", d, at, a])
+		_check_hp(a, d)
 	d.take_posture(float(mv["posture"]))
 	d.get_hit(mv, push, a.rank)
 	if float(mv["self_cost"]) > 0.0:

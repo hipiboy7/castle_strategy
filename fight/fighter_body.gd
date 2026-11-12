@@ -108,6 +108,8 @@ var off_k := 1.0                 # 맞는 간부의 환산(습격 체력 ÷ 일�
 var unit_i := -1                 # 이 사람이 온 유닛 자리(구간 결과를 낼 때)
 var downed_by_mob := false       # 조직원에게 쓰러졌다(부상 값이 다르다)
 var oneshot_immune := false      # 한 방(등급 차 common.one_shot · 기술 ko_rank)을 안 받는다 — 조작 인물 · 방의 보스(판이 정한다)
+var roulette := false            # 러시안 룰렛(아는 기술) — 같은 등급 이상이 기술로 치면 같은 피해를 돌려준다(2층 roulette_reflects · 92차 해석 ①)
+var can_copy := false            # 카피(1층 can_copy) — 구간 판이 본 횟수를 센다(fight/section.gd · 92차 해석 ⑥)
 
 
 func set_target(f) -> void:

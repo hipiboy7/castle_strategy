@@ -5,7 +5,9 @@ extends RefCounted
 ## castle_M3D `src/combat/stage.gd`(2c3e69b — 장 진행 · 방 · 교대)를 본보기로 새로 썼다: 겨누기 · 차례(동시에 치는 수) · 봇은 같은 생각.
 ## 쪽: 유닛의 side(0 들어가는 쪽 · 1 지키는 쪽) ↔ 편(team): 묻는 조직이 선 쪽 = 0(내 쪽 — 조종 · 봇 간부 + AI 조직원), 상대 = 1(전부 AI).
 ## 사기 · 시간 상한 · 부상 값은 틱 습격과 같은 data/game/combat.json, 실시간 환산은 data/game/fight.json(틱 길이 · 세우는 수 · 차례).
-## C4-0 범위: 간부 · 조직원 세우기 · 채우기 · 봇 자동 플레이 · 교대 · 사기 · 시간 · 구간 결과. 작전 카드 · 카피는 C4-1(지금은 받기만 하고 쓰지 않는다).
+## C4-0: 간부 · 조직원 세우기 · 채우기 · 봇 자동 플레이 · 교대 · 사기 · 시간 · 구간 결과. C4-1: 작전 카드(정면 돌파 · 기습 · 매복 · 방패조 — 틱과 같은
+## combat.json 값 · 틱 수는 틱 길이로 환산) · 카피(같은 방의 간부가 기술을 낼 때마다 서 있는 can_copy 간부가 본 횟수 +1 — 같은 편 · 기절 중도 센다 ·
+## 92차 해석 ⑥) · 한 대상에 동시에 패턴을 내는 수(attackers — 포위 한도).
 ## 신호: world.events(그림 · 소리가 읽는다) · 설계: docs/C4_설계서_직접조작전투.md 4-4 · 4-5 · 요구: FR-402 · 시험: tests/integration/test_fight_section.gd
 
 const World = preload("res://fight/world.gd")
@@ -30,7 +32,9 @@ static func make(t: Dictionary, need: Dictionary, opts := {}) -> Dictionary:
 	var d := {"kind": "section", "t": t, "need": need, "rules": rules, "world": w, "side": int(need["side"]),
 		"units": [need["A"], need["D"]], "who": {}, "mine": [], "ctrl": -1, "bots": {}, "ais": {}, "wait": [[], []],
 		"morale": [start, start], "heads0": [0, 0], "frames": 0, "fight_t": 0, "stage": "intro", "over": "", "result": "",
-		"kills": [0, 0], "counted": {}, "by": String(opts.get("by", "direct")), "n": 0, "hero": null, "boss": null}
+		"kills": [0, 0], "counted": {}, "by": String(opts.get("by", "direct")), "n": 0, "hero": null, "boss": null,
+		"seen": {}, "ev0": 0, "surprise": 0, "ambush": 0}
+	_cards(d)
 	for side in 2:
 		var units: Array = d["units"][side]
 		for ui in units.size():
@@ -49,6 +53,30 @@ static func make(t: Dictionary, need: Dictionary, opts := {}) -> Dictionary:
 			d["ctrl"] = k
 	_focus(d)
 	return d
+
+
+## 작전 카드(08 4-1 · 틱 sim/combat.gd _section 과 같은 값) — 정면 돌파 · 기습 · 매복은 첫 구간만, 방패조는 모든 구간.
+## 들어가는 쪽 카드 = need.cards · 지키는 쪽 카드 = need.def_cards. 미끼 · 우회로는 준비(sim/combat.gd prepare)에서 이미 반영돼 온다.
+static func _cards(d: Dictionary) -> void:
+	var t: Dictionary = d["t"]
+	var cd: Dictionary = t["combat"]["cards"]
+	var w = d["world"]
+	var need: Dictionary = d["need"]
+	var first: bool = int(need["i"]) == 0
+	var tf := int(t["fight"]["tick_frames"])
+	var att := team_of(d, 0)
+	var dfn := team_of(d, 1)
+	if first and need["cards"].has("charge"):
+		w.team_dmg_k[att] = float(cd["charge"]["dmg_bp"]) / BP
+	if need["cards"].has("shield"):
+		w.mob_taken_k[att] = float(cd["shield"]["loss_bp"]) / BP
+	if need["def_cards"].has("shield"):
+		w.mob_taken_k[dfn] = float(cd["shield"]["loss_bp"]) / BP
+	if first and need["cards"].has("surprise"):
+		d["surprise"] = int(cd["surprise"]["skip_ticks"]) * tf      # 싸움 시간 이 프레임까지 지키는 쪽이 치지 못한다
+	if first and need["def_cards"].has("ambush"):
+		d["ambush"] = tf                                            # 첫 틱 길이 동안 지키는 쪽 피해 ×
+		w.team_dmg_k[dfn] = float(cd["ambush"]["dmg_bp"]) / BP
 
 
 static func team_of(d: Dictionary, side: int) -> int:
@@ -143,10 +171,14 @@ static func step(d: Dictionary, human = null) -> void:
 			d["stage"] = "fight"
 	elif d["stage"] == "fight" and d["over"] == "":
 		d["fight_t"] += 1
+	if int(d["ambush"]) > 0 and int(d["fight_t"]) > int(d["ambush"]):
+		w.team_dmg_k[team_of(d, 1)] = 1.0
+		d["ambush"] = 0
 	if human != null and human.get("swap", false):
 		swap(d)
 	_targets(d)
 	_intents(d, human)
+	d["ev0"] = w.events.size()                       # 이번 프레임에 새로 난 신호만 센다(그림이 비우기 전에 여러 번 부를 때 — 배속)
 	w.tick()
 	_after(d)
 
@@ -177,6 +209,8 @@ static func _targets(d: Dictionary) -> void:
 	for f in d["world"].fighters:
 		if not f.alive():
 			continue
+		if d["ais"].has(f) and d["ais"][f].busy() and f.target() != null and f.target().alive():
+			continue                                  # 패턴을 내는 중이면 대상을 바꾸지 않는다(포위 한도를 대상마다 센다)
 		var best = null
 		var bd := INF
 		for o in _foes_of(d, f):
@@ -192,23 +226,27 @@ static func _intents(d: Dictionary, human) -> void:
 	var frozen: bool = w.hitstop > 0 or d["over"] != ""
 	var fighting: bool = d["stage"] == "fight"
 	var cap := int(d["t"]["fight"]["attackers"])
-	var busy := [0, 0]                                # 편마다 지금 패턴을 내는 AI 수(예고를 읽을 틈 — castle_M3D MAX_ATTACKERS)
+	var held: bool = int(d["surprise"]) > 0 and int(d["fight_t"]) <= int(d["surprise"])   # 기습 — 지키는 쪽이 아직 치지 못한다
+	var busy := {}                                    # 대상마다 지금 패턴을 내는 AI 수(포위 한도 · 예고를 읽을 틈 — castle_M3D MAX_ATTACKERS)
 	for f in d["ais"]:
-		if d["ais"][f].busy():
-			busy[f.team] += 1
+		if d["ais"][f].busy() and f.target() != null:
+			busy[f.target()] = int(busy.get(f.target(), 0)) + 1
 	for f in d["ais"]:
-		if frozen or not fighting:
+		if frozen or not fighting or (held and int(d["who"][f][0]) == 1):
 			f.intent = {}
 			continue
 		var ai = d["ais"][f]
 		var was: bool = ai.busy()
-		f.intent = ai.decide(f.target(), was or busy[f.team] < cap)
-		if not was and ai.busy():
-			busy[f.team] += 1
+		var tg = f.target()
+		f.intent = ai.decide(tg, was or int(busy.get(tg, 0)) < cap)
+		if not was and ai.busy() and tg != null:
+			busy[tg] = int(busy.get(tg, 0)) + 1
 	for k in d["mine"].size():
 		var h = d["mine"][k]
 		if k == int(d["ctrl"]) and human != null:
 			h.intent = human
+			if held and int(d["who"][h][0]) == 1:
+				h.intent = _no_strike(human)
 		elif frozen or not fighting or not h.alive() or h.target() == null:
 			h.intent = {}
 		else:
@@ -222,7 +260,11 @@ static func _after(d: Dictionary) -> void:
 	var w = d["world"]
 	var rc: Dictionary = d["t"]["combat"]["raid"]
 	var mo: Dictionary = rc["morale"]
-	for e in w.events:
+	for ei in range(int(d["ev0"]), w.events.size()):
+		var e: Array = w.events[ei]
+		if e[0] == "skill":
+			_saw(d, e)
+			continue
 		if e[0] != "ko" or d["counted"].has(e[1]) or not d["who"].has(e[1]):
 			continue
 		var f = e[1]
@@ -235,6 +277,7 @@ static func _after(d: Dictionary) -> void:
 			d["morale"][side] -= int(mo["officer_down"])
 			if not f.downed_by_mob:
 				d["morale"][1 - side] += int(mo["duel_win"])
+	d["ev0"] = w.events.size()                        # 센 신호는 다시 세지 않는다
 	for side in 2:
 		_fill(d, side)
 	if int(d["ctrl"]) >= 0 and not d["mine"][d["ctrl"]].alive():
@@ -256,6 +299,34 @@ static func _after(d: Dictionary) -> void:
 			w.over = d["over"]
 			w.events.append(["over", d["over"], res])
 	_focus(d)
+
+
+## 기습 중인 지키는 쪽 사람 입력 — 움직이기 · 막기 · 구르기만(치기 · 기술 · 대시는 뺀다)
+static func _no_strike(human: Dictionary) -> Dictionary:
+	var out := human.duplicate()
+	for k in ["attack", "skill", "use", "dash"]:
+		out.erase(k)
+	return out
+
+
+## 카피(설계서 4-5 · 92차 해석 ⑥) — 간부가 기술을 내면, 서 있는 다른 can_copy 간부(같은 편 · 기절 중도)의 본 횟수 +1.
+## 기술 id 는 이 판 규칙에 있는 것만(게이지 기술 = 신호의 id · 보스 패턴 기술 = 그 동작의 skill_id). 배우기는 sim 이 판단한다.
+static func _saw(d: Dictionary, e: Array) -> void:
+	var x = e[1]
+	if x.is_mob or not d["who"].has(x):
+		return
+	var rules = d["rules"]
+	var sid := String(e[2].get("id", "")) if e.size() > 2 and e[2] is Dictionary else ""
+	if not rules.has_skill(sid):
+		sid = String(x.move.get("skill_id", ""))
+	if sid == "" or not rules.has_skill(sid):
+		return
+	for f in d["who"]:
+		if f == x or f.is_mob or not f.can_copy or not f.alive():
+			continue
+		var m: Dictionary = d["seen"].get(f.char_id, {})
+		m[sid] = int(m.get(sid, 0)) + 1
+		d["seen"][f.char_id] = m
 
 
 ## 화면에 보일 두 사람: hero = 조종 간부(없으면 null), boss = 그에게 가장 가까운 상대 간부(없으면 가장 가까운 상대)
@@ -310,7 +381,22 @@ static func outcome(d: Dictionary) -> Dictionary:
 	return {"v": 1, "i": int(d["need"]["i"]), "by": d["by"], "result": d["result"],
 		"ticks": clampi(ceili(float(d["fight_t"]) / float(t["fight"]["tick_frames"])), 0, int(rc["tick_cap"])),
 		"a": lists[0], "d": lists[1], "morale": [maxi(0, int(d["morale"][0])), maxi(0, int(d["morale"][1]))],
-		"seen": {}, "frames": int(d["frames"]), "kills": [int(d["kills"][0]), int(d["kills"][1])]}
+		"seen": _seen_sorted(d["seen"]), "frames": int(d["frames"]), "kills": [int(d["kills"][0]), int(d["kills"][1])]}
+
+
+## 본 횟수(인물 id → 기술 id → 수)를 키 차례로 — 결과를 글로 바꿔도 늘 같은 차례(결정성)
+static func _seen_sorted(seen: Dictionary) -> Dictionary:
+	var out := {}
+	var ids: Array = seen.keys()
+	ids.sort()
+	for id in ids:
+		var sk: Array = seen[id].keys()
+		sk.sort()
+		var m := {}
+		for k in sk:
+			m[k] = int(seen[id][k])
+		out[id] = m
+	return out
 
 
 ## 그림 없이 끝까지(또는 max_frames 까지) — 시험 · 자동 점검 · 빨리 감기. 판(d)을 돌려준다(끝났는지는 d["over"])

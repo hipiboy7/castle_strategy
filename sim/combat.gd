@@ -78,8 +78,10 @@ static func run_phase(s: Dictionary, ctx: Dictionary) -> void:
 			report["applied"].append(o)
 
 
-## 습격 하나 — s 를 바꾸고 기록을 돌려준다(AI 가 사본으로 미리 돌려 볼 때도 쓴다)
-static func raid(s: Dictionary, t: Dictionary, turn: int, zone: String, org: String, by: Array, cards: Array, def_cards: Array, rng) -> Dictionary:
+## 습격 준비(상태를 바꾸지 않는다 — 유닛은 값 사본) — {"A": 들어가는 쪽 유닛, "D": [구간 0 · 1 · 2 의 지키는 쪽 유닛], "skip": 건너뛸 구간(-1 없음),
+## "def": 지키는 조직, "rec": 습격 기록 머리}. 틱 습격(raid)과 실시간 구간(C4 — fight/section.gd 의 need)이 같은 준비를 쓴다(설계서 2절).
+## 싸우지 않는 사람(명단 noncombat)은 들어가는 쪽 · 지키는 쪽 · 원군 어디에도 서지 않는다(FR-409).
+static func prepare(s: Dictionary, t: Dictionary, zone: String, org: String, by: Array, cards: Array, def_cards: Array) -> Dictionary:
 	var rc: Dictionary = t["combat"]["raid"]
 	var cd: Dictionary = t["combat"]["cards"]
 	var owner: String = s["zones"][zone]["owner"]
@@ -90,7 +92,7 @@ static func raid(s: Dictionary, t: Dictionary, turn: int, zone: String, org: Str
 		rec["loss"][owner] = {}
 	# 들어가는 쪽 — 간부(등급 높은 순) + 조직원 commit_bp(올림)
 	var att: Array = []
-	for id in by_rank(s, t, by):
+	for id in by_rank(s, t, fighters_only(s, t, by)):
 		att.append(officer_unit(s, t, id, 0))
 	for g in State.TROOP_GRADES:
 		var n := Fixed.ceil_div(int(s["orgs"][org]["troops"][g]) * int(rc["commit_bp"]), Fixed.BP)
@@ -99,7 +101,7 @@ static func raid(s: Dictionary, t: Dictionary, turn: int, zone: String, org: Str
 	# 지키는 쪽 — 그 구역의 움직일 수 있는 간부 + 조직원(본거지 100% · 다른 구역 50% · 올림)을 구간에 나눈다
 	var D := [[], [], []]
 	if owner != "":
-		var defs: Array = by_rank(s, t, State.officers_of(s, owner).filter(func(id): return s["officers"][id]["zone"] == zone))
+		var defs: Array = by_rank(s, t, fighters_only(s, t, State.officers_of(s, owner).filter(func(id): return s["officers"][id]["zone"] == zone)))
 		if cards.has("decoy") and not defs.is_empty():
 			var mine := 0
 			for id in by:
@@ -114,9 +116,9 @@ static func raid(s: Dictionary, t: Dictionary, turn: int, zone: String, org: Str
 		for i in defs.size():
 			D[DEF_SLOT[i % 3]].append(officer_unit(s, t, defs[i], 1))
 		# 원군 — 땅길로 이웃한 자기 구역의 움직일 수 있는 간부(등급 높은 순 · reinforce_max)가 본진에 더해진다
-		var near: Array = State.officers_of(s, owner).filter(func(id):
+		var near: Array = fighters_only(s, t, State.officers_of(s, owner).filter(func(id):
 			var z: String = s["officers"][id]["zone"]
-			return z != zone and s["zones"].has(z) and s["zones"][z]["owner"] == owner and Tables.neighbors(t, zone).has(z))
+			return z != zone and s["zones"].has(z) and s["zones"][z]["owner"] == owner and Tables.neighbors(t, zone).has(z)))
 		rec["reinforce"] = by_rank(s, t, near).slice(0, int(rc["reinforce_max"]))
 		for id in rec["reinforce"]:
 			D[2].append(officer_unit(s, t, id, 1))
@@ -133,6 +135,57 @@ static func raid(s: Dictionary, t: Dictionary, turn: int, zone: String, org: Str
 		rec["notes"].append({"card": "bypass", "ok": ok, "who": ""})
 		if ok:
 			skip = 1
+	return {"A": att, "D": D, "skip": skip, "def": owner, "rec": rec}
+
+
+## 실시간으로 풀 구간 하나의 준비 need(설계서 2-2 — 값 사본 · 정수 · 글). prep = prepare() 결과(들어가는 쪽 유닛은 앞 구간 결과가 옮겨진 채),
+## side = 묻는 조직이 선 쪽(0 들어가는 쪽 · 1 지키는 쪽). 시드 = Pcg32(seed, turn, "fight", 묶음 키 | 구간)의 첫 값. 상태는 읽기만 한다.
+static func need_of(s: Dictionary, t: Dictionary, turn: int, prep: Dictionary, i: int, side: int) -> Dictionary:
+	var rec: Dictionary = prep["rec"]
+	var key := "%s|%s" % [rec["zone"], rec["att"]]
+	var A: Array = prep["A"].duplicate(true)
+	var D: Array = prep["D"][i].duplicate(true)
+	var known := {}
+	for u in A + D:
+		if u["t"] == "o":
+			var p: Dictionary = s["officers"][u["id"]]
+			known[u["id"]] = {"skills": Array(p["skills"]).duplicate(), "seen": Dictionary(p.get("seen", {})).duplicate()}
+	return {"key": key, "turn": turn, "zone": rec["zone"], "att": rec["att"], "def": rec["def"], "i": i, "side": side,
+		"A": A, "D": D, "cards": rec["cards"].duplicate(), "def_cards": rec["def_cards"].duplicate(), "known": known,
+		"seed": Pcg32.new().init_stream(int(s["seed"]), turn, "fight", "%s|%d" % [key, i]).next_u32()}
+
+
+## 싸울 수 있는 사람만(명단 noncombat 이 아닌 사람 · 차례는 그대로)
+static func fighters_only(s: Dictionary, t: Dictionary, ids: Array) -> Array:
+	return ids.filter(func(id): return not Tables.noncombat(t, String(s.get("scenario", "")), id))
+
+
+## 구간 결과의 한쪽 줄(설계서 2-3 의 "a" 또는 "d" — 유닛과 같은 차례 · 같은 종류)을 유닛에 옮긴다: 간부 체력 · 쓰러짐 · 부상, 묶음 머릿수.
+## 들어가는 쪽 유닛은 이렇게 다음 구간으로 이어진다(FR-408). 꼴 검사는 부르는 쪽 몫(C4-2 outcome_error) — 여기서는 범위만 자른다.
+static func apply_section(units: Array, rows: Array) -> void:
+	for k in mini(units.size(), rows.size()):
+		var u: Dictionary = units[k]
+		var r: Dictionary = rows[k]
+		if u["t"] == "g":
+			u["n"] = clampi(int(r.get("n", u["n"])), 0, int(u["n"]))
+			u["dmg"] = 0
+		elif not u["down"]:
+			u["hp"] = clampi(int(r.get("hp", u["hp"])), 0, int(u["hp"]))
+			if r.get("down", false) == true or u["hp"] == 0:
+				u["down"] = true
+				u["hp"] = 0
+				u["wound"] = clampi(int(r.get("wound", 0)), 0, State.PCT_MAX)
+
+
+## 습격 하나 — s 를 바꾸고 기록을 돌려준다(AI 가 사본으로 미리 돌려 볼 때도 쓴다)
+static func raid(s: Dictionary, t: Dictionary, turn: int, zone: String, org: String, by: Array, cards: Array, def_cards: Array, rng) -> Dictionary:
+	var prep := prepare(s, t, zone, org, by, cards, def_cards)
+	var rc: Dictionary = t["combat"]["raid"]
+	var owner: String = prep["def"]
+	var rec: Dictionary = prep["rec"]
+	var att: Array = prep["A"]
+	var D: Array = prep["D"]
+	var skip: int = prep["skip"]
 	var won := true
 	for i in 3:
 		if i == skip:

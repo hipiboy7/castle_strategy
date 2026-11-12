@@ -80,7 +80,7 @@ static func raid_plan(s: Dictionary, t: Dictionary, org: String) -> Dictionary:
 	order.sort_custom(func(x, y): return weight[x] > weight[y] if weight[x] != weight[y] else x < y)
 	for zid in order:
 		var near: Array = mine.filter(func(id): return s["officers"][id]["zone"] == zid or Tables.neighbors(t, s["officers"][id]["zone"]).has(zid))
-		var by: Array = Combat.by_rank(s, t, near).slice(0, int(t["combat"]["raid"]["max_officers"]))
+		var by: Array = Combat.by_rank(s, t, Combat.fighters_only(s, t, near)).slice(0, int(t["combat"]["raid"]["max_officers"]))
 		var tries: Array = RAID_TRIES if s["zones"][zid]["owner"] != "" else [[]]
 		for cards in tries:
 			var sc := State.to_dict(s)

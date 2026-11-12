@@ -362,3 +362,45 @@ func test_determinism() -> void:
 			_tick(d, {"attack": i % 9 == 0, "parry": i % 17 == 0, "move": Vector2(0.2, 0.1)}, {"use": "b_slash1" if i % 31 == 0 else ""})
 		outs.append([d["hero"].hp, d["boss"].hp, d["hero"].pos, d["boss"].pos, d["hero"].state, d["boss"].posture, d["world"].frame])
 	eq(str(outs[0]), str(outs[1]), "같은 입력이면 같은 결과")
+
+
+## castle_common 92차 '턴제 판 해석' — 실시간 구간도 틱 · 일기토와 같은 규칙(FR-411 · 같은 규칙 (나)43): ② 막아도 한 방 · ④ 한 방이 lethal 보다 앞 · ① 룰렛
+func test_turn_based_interpretation_92() -> void:
+	var d := _close(0.9)
+	var h = d["hero"]
+	var b = d["boss"]
+	h.rank = "톱"
+	b.rank = "건달급"
+	b.is_boss = false
+	b.can_parry = false
+	for i in 20:
+		_tick(d, {}, {"parry": i == 0, "parry_held": true})
+	_tick(d, {"attack": true}, {"parry_held": true})
+	for i in 14:
+		_tick(d, {}, {"parry_held": true})
+	check(not b.alive(), "② 막기는 한 방을 줄이지 않는다(boss hp %s · 막기 %d)" % [b.hp, d["world"].stats["blocks"]])
+	var d2 := _close()
+	var mv: Dictionary = Moves.get_move("s_offbeat", d2["rules"]).duplicate()
+	mv["lethal"] = "jesus"
+	d2["hero"].rank = "톱"
+	d2["boss"].rank = "외성 하위"
+	check(d2["rules"].lethal_fraction("jesus", "외성 하위", "톱", null) < 1.0, "예수존 → 외성 하위는 비율 1 밑")
+	d2["world"]._take_hit(d2["hero"], d2["boss"], mv, Vector3.ZERO)
+	check(not d2["boss"].alive(), "④ 한 방이 이긴다 — 다섯 등급 위의 lethal 기술은 쓰러뜨림(boss hp %s)" % d2["boss"].hp)
+	var d3 := _close()
+	var weave: Dictionary = Moves.get_move("s_weave", d3["rules"])
+	d3["hero"].rank = "외성 상위"
+	d3["boss"].rank = "외성 상위"
+	d3["boss"].roulette = true
+	d3["world"]._take_hit(d3["hero"], d3["boss"], weave, Vector3.ZERO)
+	check(not d3["boss"].alive(), "위빙 ko_rank 외성 상위 — 한 방")
+	eq(d3["hero"].hp, 1.0, "① 룰렛이 한 방 기술을 돌려주면 친 쪽 체력 1")
+	var d4 := _close()
+	var kick: Dictionary = Moves.get_move("s_kick", d4["rules"])
+	d4["hero"].rank = "외성 하위"
+	d4["boss"].rank = "외성 하위"
+	d4["boss"].roulette = true
+	var hp0: float = d4["hero"].hp
+	var bhp0: float = d4["boss"].hp
+	d4["world"]._take_hit(d4["hero"], d4["boss"], kick, Vector3.ZERO)
+	check(is_equal_approx(hp0 - d4["hero"].hp, bhp0 - d4["boss"].hp), "룰렛 — 같은 등급 기술은 같은 피해를 돌려준다(%s · %s)" % [hp0 - d4["hero"].hp, bhp0 - d4["boss"].hp])

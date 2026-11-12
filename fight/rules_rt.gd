@@ -97,3 +97,7 @@ func stun_sec(id: String, att_rank: String, def_rank: String) -> float:
 
 func lethal_fraction(kind: String, target_rank: String, user_rank = null, paid_bars = null) -> float:
 	return r.lethal_fraction(kind, target_rank, user_rank, paid_bars)
+
+
+func roulette_reflects(owner_rank: String, attacker_rank: String) -> bool:
+	return r.roulette_reflects(owner_rank, attacker_rank)

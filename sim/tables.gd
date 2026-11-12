@@ -73,6 +73,14 @@ static func build(files: Dictionary) -> Dictionary:
 	t["units"] = _by_id(_ints(_list(files, errors, fpath, "units")))
 	t["districts"] = _by_id(_ints(_list(files, errors, PACK + "districts.json", "districts")))
 	t["scenarios"] = _by_id(_ints(_list(files, errors, PACK + "scenarios.json", "scenarios")))
+	# 싸우지 않는 사람(명단 noncombat — castle_common 92차 · C4 FR-409): 시나리오 id → {인물 id: true}
+	var nc := {}
+	for sid in sorted_keys(t["scenarios"]):
+		nc[sid] = {}
+		for row in t["scenarios"][sid].get("roster", []):
+			if row is Dictionary and row.get("noncombat", false) == true:
+				nc[sid][String(row.get("id", ""))] = true
+	t["noncombat"] = nc
 	var strat := {}
 	var tags := {}
 	var spath := PACK + "characters.json"
@@ -202,6 +210,11 @@ static func _check_game(t: Dictionary, errors: Array) -> void:
 ## 땅길 이웃(id 순 — data/game/map.json links)
 static func neighbors(t: Dictionary, zone: String) -> Array:
 	return t["neighbors"].get(zone, [])
+
+
+## 그 시나리오에서 싸우지 않는 사람인가(습격 · 지키기 · 원군 · 실시간 구간에 서지 않는다 — 명단 noncombat)
+static func noncombat(t: Dictionary, scenario: String, id: String) -> bool:
+	return t.get("noncombat", {}).get(scenario, {}).has(id)
 
 
 ## replaced_by 를 끝까지 따라간 id(고리면 MAX_HOPS 에서 멈춘다)
