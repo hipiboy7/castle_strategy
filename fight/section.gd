@@ -196,6 +196,28 @@ static func swap(d: Dictionary) -> bool:
 	return false
 
 
+## 조종 간부를 고른다(전투 화면의 '간부 고르기' — FR-409). 살아 있는 내 간부만 · 못 고르면 false
+static func set_ctrl(d: Dictionary, id: String) -> bool:
+	for k in d["mine"].size():
+		if d["mine"][k].char_id == id and d["mine"][k].alive():
+			if k != int(d["ctrl"]):
+				d["ctrl"] = k
+				d["world"].events.append(["swap", d["mine"][k]])
+			_focus(d)
+			return true
+	return false
+
+
+## 내 간부 목록(위 표시 · 고르기 창) — [{"id", "name", "rank", "hp", "max", "down", "ctrl"}] 정수 · 글
+static func party(d: Dictionary) -> Array:
+	var out := []
+	for k in d["mine"].size():
+		var f = d["mine"][k]
+		out.append({"id": f.char_id, "name": f.name, "rank": f.rank, "hp": maxi(0, ceili(f.hp)), "max": int(round(f.hp_max)),
+			"down": not f.alive(), "ctrl": k == int(d["ctrl"])})
+	return out
+
+
 static func _foes_of(d: Dictionary, f) -> Array:
 	var out: Array = []
 	for o in d["world"].fighters:

@@ -6,7 +6,8 @@ extends Control
 ## 들어올 때 화면을 가로(screen_mode)로, 끝나면 세로로 되돌리고 finished(구간 결과, 요약)를 낸다 — 부르는 쪽(ui/app.gd)이 닫는다.
 ## 단추: 멈춤 · 속도(×1 · ×2 · ×4) · 자동(봇이 조종 ↔ 직접) · 교대(내 간부가 둘 이상). 뒤로 버튼: 멈춤 → 한 번 더 = 그만두기(봇이 빨리 감아 끝낸다).
 ## 로그 줄: FIGHT open · FIGHT over <win|lose> · FIGHT_FPS avg= min= n=(1초마다 직접 센 값 — docs/성능.md).
-## C4-0 범위: 방 하나 · 소리 없음(C4-1) · 원작 초상 패 없음(C4-1). 설계: docs/C4_설계서_직접조작전투.md 6절 · 요구: FR-403 · FR-404 · FR-405
+## C4-1: 습격 3구간을 한 화면에서 잇는다(next — 가로 그대로 · 닫기는 close) · 간부 고르기 · 내 간부 목록 · 구간 표시 · 방 두 벌(rooms).
+## 설계: docs/C4_설계서_직접조작전투.md 6절 · 요구: FR-403 · FR-404 · FR-405 · FR-408 · FR-409
 
 signal finished(outcome: Dictionary, summary: Dictionary)
 
@@ -55,40 +56,72 @@ var _fr_n := 0
 var _fr_t0 := 0
 var _fps: Array = []              # 1초마다 직접 센 fps
 var _title := ""
+var _pick: Control = null         # 간부 고르기 창(열린 동안 판이 멈춘다)
+var _ctrl_id := ""                # 지금 조종 간부 id(다음 구간에도 같은 간부로)
 
 
-## opts: auto(봇이 조종 — 자동 플레이 보기) · ctrl(조종할 간부 id) · title(시작 알림 글)
+## opts: auto(봇이 조종 — 자동 플레이 보기) · ctrl(조종할 간부 id) · title(시작 알림 글) · section(위 표시 — 예 '입구 1/3') ·
+##       theme(방 — data/game/fight.json rooms) · pick(내 간부가 둘 이상이면 시작 전에 조종할 간부를 고른다 — FR-409)
 func start(t: Dictionary, need: Dictionary, opts := {}) -> void:
 	_t = t
 	_auto = bool(opts.get("auto", false))
-	_title = String(opts.get("title", ""))
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	ScreenMode.apply(get_window(), true)
-	_d = Section.make(t, need, {"ctrl": String(opts.get("ctrl", "")), "by": "auto" if _auto else "direct"})
+	_hud = Hud.new()
+	add_child(_hud)
+	_touch = Touch.new()
+	add_child(_touch)
+	_touch.show_pause = true
+	_evfx = EventFx.new()
+	_evfx.hud = _hud
+	_evfx.snd = Mute.new()
+	_build(need, opts)
+
+
+## 다음 구간(FR-408) — 가로 화면 · 위 표시 · 터치는 그대로 두고 방과 사람만 새로 세운다(자동 · 조종 간부는 이어진다)
+func next(need: Dictionary, opts := {}) -> void:
+	var o := opts.duplicate()
+	o["auto"] = _auto
+	if not o.has("ctrl"):
+		o["ctrl"] = _ctrl_id
+	_build(need, o)
+
+
+## 닫기 — 세로로 되돌린다(부르는 쪽이 finished 를 받은 뒤 부르고 이 장면을 지운다)
+func close() -> void:
+	_d = {}
+	ScreenMode.apply(get_window(), false)
+
+
+func _build(need: Dictionary, opts: Dictionary) -> void:
+	_title = String(opts.get("title", ""))
+	_d = Section.make(_t, need, {"ctrl": String(opts.get("ctrl", "")), "by": "auto" if _auto else "direct"})
+	if _world != null:
+		_world.queue_free()
+	_pup = {}
+	_dead_t = {}
+	_n_pup = 0
+	_end_t = -1
+	_paused = false
 	_world = Node3D.new()
 	add_child(_world)
+	move_child(_world, 0)
 	var room = Room.new()
 	_world.add_child(room)
-	room.build("office", _d["world"].bounds, DisplayServer.get_name() != "headless")
+	room.build(String(opts.get("theme", "office")), _d["world"].bounds, DisplayServer.get_name() != "headless")
 	_fx = Fx.new()
 	_world.add_child(_fx)
 	_cam = Cam.new()
 	_world.add_child(_cam)
 	_cam.current = true
-	_hud = Hud.new()
-	add_child(_hud)
 	_hud.bar_points = _d["rules"].bar_points()
-	_touch = Touch.new()
-	add_child(_touch)
-	_touch.show_pause = true
+	_hud.section_text = String(opts.get("section", ""))
+	_hud.clear_messages()
 	_touch.show_swap = _d["mine"].size() > 1
 	_touch.set_label("menu", "직접" if _auto else "자동")
-	_evfx = EventFx.new()
 	_evfx.fx = _fx
 	_evfx.cam = _cam
-	_evfx.hud = _hud
-	_evfx.snd = Mute.new()
 	_evfx.pup = _pup
 	_sync_puppets()
 	_markers()
@@ -96,7 +129,45 @@ func start(t: Dictionary, need: Dictionary, opts := {}) -> void:
 	_cam.snap(at, at + Vector3(2.0, 0, 0))
 	if _title != "":
 		_hud.message(_title, "자동 플레이" if _auto else "", 1.6)
-	print("FIGHT open")
+	if bool(opts.get("pick", false)) and not _auto and _d["mine"].size() > 1:
+		_open_pick()
+	print("FIGHT open %d" % int(need.get("i", 0)))
+
+
+## 간부 고르기 — 이 구간에 선 내 간부(체력 · 등급)를 단추로 보이고, 누른 간부를 조종한다. 고를 동안 판은 멈춘다
+func _open_pick() -> void:
+	_pick = PanelContainer.new()
+	add_child(_pick)
+	_pick.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	var box := VBoxContainer.new()
+	_pick.add_child(box)
+	var head := Label.new()
+	head.text = "조종할 간부"
+	head.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(head)
+	var row := HBoxContainer.new()
+	box.add_child(row)
+	for p in Section.party(_d):
+		if p["down"]:
+			continue
+		var b := Button.new()
+		b.text = "%s\n%s · 체력 %d" % [p["name"], p["rank"], int(p["hp"])]
+		b.custom_minimum_size = Vector2(200, 96)
+		b.pressed.connect(func() -> void: _picked(String(p["id"])))
+		row.add_child(b)
+	_pick.reset_size()
+	_pick.position = (get_viewport_rect().size - _pick.size) * 0.5
+
+
+func _picked(id: String) -> void:
+	Section.set_ctrl(_d, id)
+	_d["world"].events.clear()
+	_ctrl_id = id
+	if _pick != null:
+		_pick.queue_free()
+		_pick = null
+	_markers()
+	_touch.take_edges()
 
 
 ## 지금 판(시험 · 스크린샷이 읽는다)
@@ -177,6 +248,9 @@ func set_paused(on: bool) -> void:
 
 ## 뒤로 버튼 — 멈춤 → 한 번 더 누르면 그만두기(봇이 이 구간을 빨리 감아 끝낸다 · 전투를 무르지 않는다)
 func back() -> void:
+	if _pick != null:
+		_picked(_d["hero"].char_id if _d["hero"] != null else "")
+		return
 	if _end_t >= 0:
 		_finish()
 	elif not _paused:
@@ -191,7 +265,7 @@ func back() -> void:
 
 
 func _physics_process(_dt: float) -> void:
-	if _d.is_empty():
+	if _d.is_empty() or _pick != null:
 		return
 	if _end_t >= 0:
 		_end_t += 1
@@ -256,8 +330,8 @@ func _finish() -> void:
 	var s: Dictionary = Section.summary(_d)
 	s["fps"] = fps_stats()
 	print("FIGHT_FPS avg=%d min=%d n=%d" % [s["fps"]["avg"], s["fps"]["min"], s["fps"]["n"]])
+	_ctrl_id = _d["hero"].char_id if _d["hero"] != null else _ctrl_id
 	_d = {}
-	ScreenMode.apply(get_window(), false)
 	finished.emit(out, s)
 
 
@@ -297,6 +371,7 @@ func _process(dt: float) -> void:
 	_cam.follow_group(lead, pts, dt, w.shake)
 	var h = _d["hero"]
 	_hud.hero = h
+	_hud.party = Section.party(_d)
 	_hud.hero_name = h.name if h != null else ""
 	_hud.auto = _auto
 	var mine := int(_d["side"])

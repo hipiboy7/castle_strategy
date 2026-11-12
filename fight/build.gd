@@ -97,3 +97,12 @@ static func guard_rate(t: Dictionary, id: String) -> float:
 	if st.has("기술"):
 		return clampf(0.55 * float(st["기술"]) / float(t["fight"]["speed_ref"]), 0.05, 0.8)
 	return float(t["fight"]["officer"]["guard_bp"]) / BP
+
+
+## 구간 방(전투 화면 배경 — FR-408): 그 구역 업종 가운데 data/game/fight.json rooms 에 있는 첫 업종의 방, 없으면 default
+static func room_of(t: Dictionary, zone: String) -> String:
+	var rooms: Dictionary = t["fight"]["rooms"]
+	for tr in t["districts"].get(zone, {}).get("trades", []):
+		if rooms.has(tr):
+			return String(rooms[tr])
+	return String(rooms["default"])

@@ -27,6 +27,8 @@ const Pages = preload("res://ui/tab_pages.gd")
 const TouchScroll = preload("res://ui/touch_scroll.gd")
 const FightScreen = preload("res://ui/fight3d/fight_screen.gd")
 const FightTest = preload("res://src/fight_test.gd")
+const Combat = preload("res://sim/combat.gd")
+const Build = preload("res://fight/build.gd")
 
 const SAVE := "user://save_auto.json"
 const BROKEN := "user://save_auto.broken.json"
@@ -64,6 +66,9 @@ var _map_fps: Array = []               # 지도가 보이는 동안 1초마다 �
 var _wide := false
 var _fight = null                      # 전투 화면(ui/fight3d/fight_screen.gd) — 열린 동안 다른 부품은 숨기고 배치 · 바탕 그리기를 멈춘다(C4)
 var _fight_hidden: Array = []
+var _raid := {}                        # 전투 시험 습격(src/fight_test.gd raid) — 구간 결과를 옮기며 3구간을 잇는다(C4-1 FR-408)
+var _raid_i := -1
+var _raid_log: Array = []
 var _fight_fps := {}                   # 마지막 전투 화면 fps {"avg", "min", "n"} — 기록 탭 성능 줄
 
 var _top: PanelContainer
@@ -172,7 +177,7 @@ func _setup_shot() -> void:
 		_open_battle(0)
 		_battle.hold_at_first_duel()
 	if args.get("fight_test", false):
-		_open_fight(FightTest.need(_t, int(args.get("seed", SELF_SEED))), true, "전투 시험")       # --fight-test --shot: 봇이 돌리는 전투 화면을 찍는다
+		_open_raid_test(true, int(args.get("seed", SELF_SEED)))       # --fight-test --shot: 봇이 돌리는 전투 화면(습격 첫 구간)을 찍는다
 
 
 func _build() -> void:
@@ -206,7 +211,7 @@ func _build() -> void:
 	_pages["log"] = Pages.LogPage.new()
 	_pages["log"].open_report.connect(_open_report)
 	_pages["log"].new_game.connect(func() -> void: _confirm_new.popup_centered())
-	_pages["log"].fight_test.connect(func() -> void: _open_fight(FightTest.need(_t, SELF_SEED), false, "전투 시험"))
+	_pages["log"].fight_test.connect(func() -> void: _open_raid_test(false, SELF_SEED))
 	for k in SOON:
 		var p := PanelContainer.new()
 		var l := _label(SOON[k], "SmallLabel")
@@ -570,8 +575,22 @@ func _close_battle() -> void:
 	_relayout()
 
 
+## 전투 시험(C4-1) — 시나리오 A 습격 하나(fight.json test.raid)를 3구간으로. 첫 구간 앞에서 조종할 간부를 고른다
+func _open_raid_test(auto: bool, seed: int) -> void:
+	_raid = FightTest.raid(_t, seed)
+	_raid_log = []
+	_raid_i = FightTest.next_section(_raid, -1)
+	_open_fight(FightTest.raid_need(_t, _raid, _raid_i), auto, _raid_opts(true))
+
+
+func _raid_opts(first: bool) -> Dictionary:
+	var name: String = Combat.SECTIONS[_raid_i]
+	return {"title": "전투 시험 — %s" % name, "section": "%s %d/3" % [name, _raid_i + 1],
+		"theme": Build.room_of(_t, String(_raid["prep"]["rec"]["zone"])), "pick": first}
+
+
 ## 전투 화면 열기(C4) — 다른 부품을 숨기고 가로 3D 전투 화면을 띄운다. need = 구간 준비(설계서 2-2) · auto = 봇이 조종(자동 플레이 보기)
-func _open_fight(need: Dictionary, auto: bool, title: String) -> void:
+func _open_fight(need: Dictionary, auto: bool, opts: Dictionary) -> void:
 	if _fight != null or _phase == "error":
 		return
 	_fight_hidden = []
@@ -582,12 +601,24 @@ func _open_fight(need: Dictionary, auto: bool, title: String) -> void:
 	_fight = FightScreen.new()
 	add_child(_fight)
 	_fight.finished.connect(_on_fight_done)
-	_fight.start(_t, need, {"auto": auto, "title": title})
+	var o := opts.duplicate()
+	o["auto"] = auto
+	_fight.start(_t, need, o)
 	queue_redraw()
 
 
 ## 전투 화면이 끝났다 — 구간 결과 · 요약을 받고 세로 화면으로 돌아온다(C4-0 은 결과를 알림 글로만 — 판에 넣는 것은 C4-2)
 func _on_fight_done(outcome: Dictionary, summary: Dictionary) -> void:
+	if not _raid.is_empty():
+		FightTest.carry(_raid, outcome)
+		_raid_log.append([_raid_i, outcome["result"], int(outcome["kills"][0]), int(summary["frames"])])
+		var nx := FightTest.next_section(_raid, _raid_i) if outcome["result"] == "att" else -1
+		print("FIGHT section i=%d result=%s" % [_raid_i, outcome["result"]])
+		if nx >= 0:
+			_raid_i = nx
+			_fight.next(FightTest.raid_need(_t, _raid, nx), _raid_opts(false))
+			return
+	_fight.close()
 	_fight.queue_free()
 	_fight = null
 	for c in _fight_hidden:
@@ -595,8 +626,14 @@ func _on_fight_done(outcome: Dictionary, summary: Dictionary) -> void:
 			c.visible = true
 	_fight_hidden = []
 	_fight_fps = summary.get("fps", {})
-	_note = "전투 시험 — %s · 쓰러뜨림 %d · %d초 · 전투 fps 평균 %d · 최저 %d" % ["이김" if summary["over"] == "win" else "짐",
-		int(outcome["kills"][0]), int(summary["frames"]) / 60, int(_fight_fps.get("avg", 0)), int(_fight_fps.get("min", 0))]
+	var kills := 0
+	var secs := 0
+	for r in _raid_log:
+		kills += int(r[2])
+		secs += int(r[3]) / 60
+	_note = "전투 시험 — %s(%d구간) · 쓰러뜨림 %d · %d초 · 전투 fps 평균 %d · 최저 %d" % ["습격 성공" if summary["over"] == "win" and outcome["result"] == "att" else "물러남",
+		_raid_log.size(), kills, secs, int(_fight_fps.get("avg", 0)), int(_fight_fps.get("min", 0))]
+	_raid = {}
 	print("FIGHT close result=%s ticks=%d" % [outcome["result"], int(outcome["ticks"])])
 	queue_redraw()
 	_relayout()

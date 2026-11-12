@@ -161,3 +161,14 @@ func test_fight_roles_ids_exist() -> void:
 		for pat in EnemyAI.PROFILES[name]["patterns"].values():
 			for step in pat:
 				check(Moves.M.has(step[0]), "프로필 %s 의 동작 %s" % [name, step[0]])
+
+
+## FR-408 — 구간 방: 구역 업종 → 방(3층 rooms) · 방 이름은 room3d THEMES 에 있다
+func test_room_of_zone() -> void:
+	var t := _t()
+	eq(Build.room_of(t, "bukgu"), "club", "북구(유흥) → 클럽")
+	eq(Build.room_of(t, "hoeamsijang"), "office", "회암 시장(상권 · 대부) → 사무실")
+	eq(Build.room_of(t, "없는 구역"), t["fight"]["rooms"]["default"], "없는 구역 → default")
+	var Room = preload("res://ui/fight3d/room3d.gd")
+	for k in t["fight"]["rooms"]:
+		check(Room.THEMES.has(t["fight"]["rooms"][k]), "방 %s 을 그릴 수 있다" % t["fight"]["rooms"][k])

@@ -283,3 +283,20 @@ func test_attackers_cap_per_target() -> void:
 			break
 	check(most <= cap, "한 사람에게 동시에 %d 명까지(본 최대 %d)" % [cap, most])
 	check(total > cap, "대상이 둘이면 모두 합쳐 %d 명보다 많이 친다(본 최대 %d)" % [cap, total])
+
+
+## FR-409 — 시작할 때 조종할 간부를 고른다 · 쓰러진 간부는 못 고른다 · 내 간부 목록(위 표시)
+func test_pick_ctrl_and_party() -> void:
+	var t := _t()
+	var d := Section.make(t, _need(["kimshin", "jintae", "woojin"], [["건달급", 4]]))
+	eq(d["mine"][d["ctrl"]].char_id, "kimshin", "처음은 첫 간부(등급 높은 순)")
+	check(Section.set_ctrl(d, "woojin"), "피우진을 고른다")
+	eq(d["hero"].char_id, "woojin", "조종 간부가 바뀐다")
+	var p := Section.party(d)
+	eq(p.map(func(x): return x["id"]), ["kimshin", "jintae", "woojin"], "목록 차례")
+	eq(p.map(func(x): return x["ctrl"]), [false, false, true], "조종 표시")
+	d["mine"][1].hp = 0.0
+	d["mine"][1].state = "dead"
+	check(not Section.set_ctrl(d, "jintae"), "쓰러진 간부는 못 고른다")
+	check(not Section.set_ctrl(d, "없는 사람"), "없는 사람")
+	eq(Section.party(d)[1]["down"], true, "쓰러짐 표시")

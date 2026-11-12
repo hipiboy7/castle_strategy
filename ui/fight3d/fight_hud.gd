@@ -1,6 +1,6 @@
 extends Control
 ## 전투 화면 위 표시 — 왼쪽 위: 조종 간부 이름 · 체력 · 체간 · 게이지(칸) · 고른 기술, 가운데 위: 양쪽 남은 머릿수 · 사기 · 남은 시간,
-## 오른쪽 위: fps(1초마다 · 평균 · 최저), 가운데: 알림(시작 · 한 방 · 승패). 그리기만 한다 — 값은 fight_screen.gd 가 매 프레임 넣는다.
+## 오른쪽 위: fps(1초마다 · 평균 · 최저), 가운데: 알림(시작 · 한 방 · 승패). C4-1: 구간 표시 · 내 간부 목록(> = 조종 · 글자로도 구분). 그리기만 한다 — 값은 fight_screen.gd 가 매 프레임 넣는다.
 ## 자리는 안전 영역(safe_area.gd) 기준 · 매 프레임 다시 읽는다(접는 폰). 색 · 글꼴은 테마(ui/theme.tres)에서 읽고, 없는 색 칸만 여기 상수.
 ## castle_M3D src/ui/hud.gd 와 같은 구실(message 는 event_fx.gd 가 부르는 이름 그대로). 설계: docs/C4_설계서_직접조작전투.md 6절 · 요구: FR-403
 
@@ -22,6 +22,8 @@ var secs_left := 0
 var fps_text := ""
 var auto := false
 var bar_points := 100.0
+var section_text := ""              # 구간(예 '입구 1/3') — 가운데 위 줄 위
+var party: Array = []               # 내 간부 [{"name", "hp", "max", "down", "ctrl"}](fight/section.gd party) — 왼쪽 위 아래로(교대할 사람을 본다)
 var _msgs: Array = []               # [제목, 작은 글, 남은 초, 늦춤 초]
 
 
@@ -74,7 +76,16 @@ func _draw() -> void:
 		if not hero.skills.is_empty():
 			var sk: Dictionary = hero.current_skill()
 			_text(Vector2(x, y + 122), "기술  %s" % str(sk["name"]), 20, COL_TEXT if hero.can_pay(sk) else COL_DIM)
+	var py := y + 140.0
+	if party.size() > 1:
+		for p in party:
+			var col: Color = COL_DIM if p["down"] else COL_TEXT
+			_text(Vector2(x, py + 16), ("> " if p["ctrl"] else "   ") + str(p["name"]) + (" · 쓰러짐" if p["down"] else ""), 18, col)
+			_bar(Vector2(x + 170, py + 4), 110, 12, float(p["hp"]) / maxf(1.0, float(p["max"])), COL_HP if not p["down"] else COL_BACK)
+			py += 22.0
 	var cx := sa.position.x + sa.size.x * 0.5
+	if section_text != "":
+		_text(Vector2(cx - 150, y + 2), section_text, 18, COL_DIM, HORIZONTAL_ALIGNMENT_CENTER, 300)
 	_text(Vector2(cx - 230, y + 30), "우리 %d" % int(heads[0]), 30, COL_HP, HORIZONTAL_ALIGNMENT_RIGHT, 180)
 	_text(Vector2(cx - 40, y + 30), "%d초" % maxi(0, secs_left), 24, COL_DIM, HORIZONTAL_ALIGNMENT_CENTER, 80)
 	_text(Vector2(cx + 50, y + 30), "상대 %d" % int(heads[1]), 30, COL_FOE, HORIZONTAL_ALIGNMENT_LEFT, 180)
