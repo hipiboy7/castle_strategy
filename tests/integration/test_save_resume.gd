@@ -69,3 +69,36 @@ func test_v0_file_opens_new_game_with_same_seed() -> void:
 
 func test_read_missing_is_empty() -> void:
 	eq(Storage.read_text("user://없는_파일_c1.json"), "", "없는 파일은 빈 문자열")
+
+
+## C4-2 FR-419 — 실시간 구간 결과가 든 판: 부진파를 AI 명령으로 12주(묻는 조직 = 부진파 · need 마다 꾸민 결과) → 저장 v2 → 읽기 →
+## 기록 줄 fights 그대로 · 명령 기록 + fights 를 다시 돌린 해시 = 저장 상태 해시(rebuild_reports same) · 이번 주 pending_fights 도 그대로
+func test_fights_save_and_rebuild() -> void:
+	const FightTest = preload("res://src/fight_test.gd")
+	var t := _t()
+	var g: Dictionary = Game.new_game(t, "A", 1, "bujinpa")
+	var asked := 0
+	for w in 12:
+		var orders: Array = Game.Ai.orders_all(g["state"], t)
+		var fights := {}
+		for k in 20:
+			var r := Game.step(g, t, orders, {"fights": fights, "ask": "bujinpa"})
+			if not r.has("need"):
+				break
+			var n: Dictionary = r["need"]
+			asked += 1
+			if not fights.has(n["key"]):
+				fights[n["key"]] = {}
+			fights[n["key"]][str(n["i"])] = FightTest.fake(n, n["side"] == 0, "auto" if asked % 2 == 0 else "direct")
+	check(asked > 0, "12주 안에 부진파 간부가 선 구간이 있다(%d번 물음)" % asked)
+	var used: int = g["log"].filter(func(e): return not e["fights"].is_empty()).size()
+	check(used > 0, "기록 줄에 쓴 구간 결과(%d주)" % used)
+	var pf := {"x|y": {"0": {"v": 1, "i": 0}}}
+	check(Storage.write_text(PATH, Save.to_text(Save.make(_meta(g), g["state"], g["log"], [], pf))), "쓰기")
+	var r: Dictionary = Save.from_text(Storage.read_text(PATH), t)
+	eq(r["errors"], [], "읽기 오류 없음")
+	eq(JSON.stringify(r["save"]["orders"].map(func(e): return e["fights"]), "", true), JSON.stringify(g["log"].map(func(e): return e["fights"]), "", true), "기록 줄 fights 그대로")
+	eq(r["save"]["pending_fights"], pf, "이번 주 끝낸 구간 그대로")
+	var rb := Game.rebuild_reports(t, r["save"])
+	check(rb["same"], "명령 기록 + fights 를 다시 돌린 해시 = 저장 상태")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(PATH))
