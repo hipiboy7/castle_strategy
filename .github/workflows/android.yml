@@ -66,6 +66,22 @@ jobs:
         id: pin
         run: echo "sha=$(python3 -c 'import json;print(json.load(open("data/common_pin.json"))["castle_common"])')" >> "$GITHUB_OUTPUT"
 
+      # 토큰 점검 — 응답 코드만 찍는다(토큰 · 내용은 찍지 않는다). 401 = 토큰이 틀렸거나 만료 · 404 = 토큰이 castle_common 을 못 본다
+      - name: castle_common 토큰 점검
+        env:
+          TOK: ${{ secrets.CASTLE_COMMON_TOKEN }}
+        run: |
+          if [ -z "$TOK" ]; then echo "::error::Secrets CASTLE_COMMON_TOKEN 이 비었다"; exit 1; fi
+          c=$(curl -s -o /dev/null -w '%{http_code}' -H "Authorization: Bearer $TOK" \
+              "https://api.github.com/repos/hipiboy7/castle_common/commits/${{ steps.pin.outputs.sha }}")
+          echo "castle_common API 응답 $c"
+          case "$c" in
+            200) ;;
+            401) echo "::error::토큰이 틀렸거나 만료됐다(401) — 새로 만들어 Secrets CASTLE_COMMON_TOKEN 에 다시 넣는다"; exit 1 ;;
+            403|404) echo "::error::토큰이 castle_common 을 못 본다($c) — 토큰 Repository access 에 castle_common · Permissions Contents Read-only"; exit 1 ;;
+            *) echo "::error::castle_common API 응답 $c"; exit 1 ;;
+          esac
+
       - name: castle_common 받기 (비공개 · 읽기 전용 토큰)
         uses: actions/checkout@v7
         with:
